@@ -30,6 +30,10 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
   const isCustomerSection = location.pathname.startsWith("/customers");
   const isSettingSection = location.pathname.startsWith("/settings");
 
+  // =========================================
+  // OPEN CURRENT SECTION AUTOMATICALLY
+  // =========================================
+
   useEffect(() => {
     if (isProjectSection && sideBarOpen) {
       setProjectOpen(true);
@@ -73,11 +77,13 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
 
   const mainNavClass = ({ isActive }) =>
     `group relative flex items-center rounded-xl transition-all duration-200 ${
-      sideBarOpen ? "gap-3 px-3 py-2.5" : "justify-center px-2 py-3"
+      sideBarOpen
+        ? "gap-3 px-3 py-2.5"
+        : "justify-center px-2 py-3"
     } ${
       isActive
         ? "bg-orange-500 text-white shadow-sm"
-        : "text-slate-600 hover:bg-slate-200 hover:text-slate-900"
+        : "text-slate-600 hover:bg-slate-200 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
     }`;
 
   // =========================================
@@ -87,26 +93,27 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
   const subNavClass = ({ isActive }) =>
     `flex items-center rounded-lg px-3 py-2 text-sm transition-all duration-200 ${
       isActive
-        ? "bg-orange-50 font-semibold text-orange-600"
-        : "text-slate-500 hover:bg-slate-100 hover:text-slate-800"
+        ? "bg-orange-50 font-semibold text-orange-600 dark:bg-orange-500/10 dark:text-orange-400"
+        : "text-slate-500 hover:bg-slate-100 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
     }`;
 
   return (
     <aside
-      className={`fixed left-0 top-0 z-40 flex h-screen flex-col overflow-visible border-r border-slate-200 bg-white shadow-sm transition-all duration-300 ${
-        sideBarOpen ? "w-64" : "w-[76px]"
-      }`}
+      className={`fixed left-0 top-0 z-40 flex h-screen flex-col overflow-visible border-r shadow-sm transition-all duration-300
+        bg-white border-slate-200
+        dark:bg-slate-900 dark:border-slate-800
+        ${sideBarOpen ? "w-64" : "w-[76px]"}
+      `}
     >
       {/* =====================================================
           HEADER / LOGO
       ====================================================== */}
 
       <div
-        className={`relative flex h-20 shrink-0 items-center border-b border-slate-100 ${
-          sideBarOpen
-            ? "justify-between px-5"
-            : "justify-center px-2"
-        }`}
+        className={`relative flex h-20 shrink-0 items-center border-b
+          border-slate-100 dark:border-slate-800
+          ${sideBarOpen ? "justify-between px-5" : "justify-center px-2"}
+        `}
       >
         {/* Logo */}
 
@@ -115,7 +122,14 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
             sideBarOpen ? "gap-3" : "justify-center"
           }`}
         >
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
+          <div
+            className="
+              flex h-10 w-10 shrink-0 items-center justify-center
+              overflow-hidden rounded-xl border
+              border-slate-200 bg-slate-50
+              dark:border-slate-700 dark:bg-slate-800
+            "
+          >
             <img
               src={Logo}
               alt="PrintTech"
@@ -125,7 +139,7 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
 
           {sideBarOpen && (
             <div className="min-w-0">
-              <h1 className="truncate text-sm font-bold text-slate-900">
+              <h1 className="truncate text-sm font-bold text-slate-900 dark:text-white">
                 PrintTech
               </h1>
 
@@ -136,30 +150,38 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
           )}
         </div>
 
-        {/* =========================================
-            COLLAPSE BUTTON
-        ========================================== */}
+        {/* Collapse Button */}
 
         {sideBarOpen && (
           <button
             type="button"
             onClick={() => setSideBarOpen(false)}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+            className="
+              flex h-8 w-8 items-center justify-center rounded-lg
+              text-slate-400 transition
+              hover:bg-slate-100 hover:text-slate-700
+              dark:hover:bg-slate-800 dark:hover:text-slate-200
+            "
             aria-label="Collapse sidebar"
           >
             <IoIosArrowBack className="text-lg" />
           </button>
         )}
 
-        {/* =========================================
-            EXPAND BUTTON
-        ========================================== */}
+        {/* Expand Button */}
 
         {!sideBarOpen && (
           <button
             type="button"
             onClick={() => setSideBarOpen(true)}
-            className="absolute -right-3 top-6 z-50 flex h-7 w-7 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:border-orange-300 hover:text-orange-600"
+            className="
+              absolute -right-3 top-6 z-50 flex h-7 w-7
+              items-center justify-center rounded-full border
+              border-slate-200 bg-white text-slate-500 shadow-sm
+              transition hover:border-orange-300 hover:text-orange-600
+              dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400
+              dark:hover:border-orange-500 dark:hover:text-orange-400
+            "
             aria-label="Expand sidebar"
           >
             <IoIosArrowForward className="text-sm" />
@@ -173,12 +195,12 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
 
       <nav className="flex-1 overflow-visible px-3 py-5">
 
-        {/* =========================================
+        {/* =====================================================
             DASHBOARD
-        ========================================== */}
+        ====================================================== */}
 
         <NavLink
-          to="/"
+          to="/dashboard"
           end
           className={mainNavClass}
           title={!sideBarOpen ? "Dashboard" : ""}
@@ -186,15 +208,17 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
           <FaThLarge className="shrink-0 text-sm" />
 
           {sideBarOpen && (
-            <span className="font-medium">Dashboard</span>
+            <span className="font-medium">
+              Dashboard
+            </span>
           )}
         </NavLink>
 
-        {/* ===================================================
+        {/* =====================================================
             PROJECTS
-        ==================================================== */}
+        ====================================================== */}
 
-        <div className="relative group mt-1">
+        <div className="group relative mt-1">
 
           <button
             type="button"
@@ -214,7 +238,7 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
             } ${
               isProjectSection
                 ? "bg-orange-500 text-white shadow-sm"
-                : "text-slate-600 hover:bg-slate-200 hover:text-slate-900"
+                : "text-slate-600 hover:bg-slate-200 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
             }`}
             title={!sideBarOpen ? "Projects" : ""}
           >
@@ -226,7 +250,9 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
               <FaFolder className="shrink-0 text-sm" />
 
               {sideBarOpen && (
-                <span className="font-medium">Projects</span>
+                <span className="font-medium">
+                  Projects
+                </span>
               )}
             </div>
 
@@ -238,17 +264,17 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
               ))}
           </button>
 
-          {/* COLLAPSED PROJECT HOVER MENU */}
+          {/* Collapsed Project Menu */}
 
           {!sideBarOpen && (
             <div className="pointer-events-none absolute left-[68px] top-0 z-[999] hidden w-48 group-hover:pointer-events-auto group-hover:block">
 
               <div className="absolute -left-3 top-0 h-full w-3" />
 
-              <div className="rounded-xl border border-slate-200 bg-white p-2 shadow-xl">
+              <div className="rounded-xl border border-slate-200 bg-white p-2 shadow-xl dark:border-slate-700 dark:bg-slate-900">
 
-                <div className="border-b border-slate-100 px-3 py-2">
-                  <p className="text-sm font-semibold text-slate-800">
+                <div className="border-b border-slate-100 px-3 py-2 dark:border-slate-800">
+                  <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
                     Projects
                   </p>
                 </div>
@@ -261,8 +287,8 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                     className={({ isActive }) =>
                       `flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm transition ${
                         isActive
-                          ? "bg-orange-50 font-semibold text-orange-600"
-                          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                          ? "bg-orange-50 font-semibold text-orange-600 dark:bg-orange-500/10 dark:text-orange-400"
+                          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
                       }`
                     }
                   >
@@ -274,8 +300,8 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                     className={({ isActive }) =>
                       `flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm transition ${
                         isActive
-                          ? "bg-orange-50 font-semibold text-orange-600"
-                          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                          ? "bg-orange-50 font-semibold text-orange-600 dark:bg-orange-500/10 dark:text-orange-400"
+                          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
                       }`
                     }
                   >
@@ -288,10 +314,10 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
             </div>
           )}
 
-          {/* EXPANDED PROJECT SUBMENU */}
+          {/* Expanded Project Menu */}
 
           {sideBarOpen && projectOpen && (
-            <div className="ml-9 mt-1 space-y-1 border-l border-slate-200 pl-2">
+            <div className="ml-9 mt-1 space-y-1 border-l border-slate-200 pl-2 dark:border-slate-700">
 
               <NavLink
                 to="/projects"
@@ -313,11 +339,11 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
           )}
         </div>
 
-        {/* ===================================================
+        {/* =====================================================
             CUSTOMERS
-        ==================================================== */}
+        ====================================================== */}
 
-        <div className="relative group mt-1">
+        <div className="group relative mt-1">
 
           <button
             type="button"
@@ -337,7 +363,7 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
             } ${
               isCustomerSection
                 ? "bg-orange-500 text-white shadow-sm"
-                : "text-slate-600 hover:bg-slate-200 hover:text-slate-900"
+                : "text-slate-600 hover:bg-slate-200 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
             }`}
             title={!sideBarOpen ? "Customers" : ""}
           >
@@ -349,7 +375,9 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
               <FaUsers className="shrink-0 text-sm" />
 
               {sideBarOpen && (
-                <span className="font-medium">Customers</span>
+                <span className="font-medium">
+                  Customers
+                </span>
               )}
             </div>
 
@@ -361,17 +389,17 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
               ))}
           </button>
 
-          {/* COLLAPSED CUSTOMER HOVER MENU */}
+          {/* Collapsed Customer Menu */}
 
           {!sideBarOpen && (
             <div className="pointer-events-none absolute left-[68px] top-0 z-[999] hidden w-48 group-hover:pointer-events-auto group-hover:block">
 
               <div className="absolute -left-3 top-0 h-full w-3" />
 
-              <div className="rounded-xl border border-slate-200 bg-white p-2 shadow-xl">
+              <div className="rounded-xl border border-slate-200 bg-white p-2 shadow-xl dark:border-slate-700 dark:bg-slate-900">
 
-                <div className="border-b border-slate-100 px-3 py-2">
-                  <p className="text-sm font-semibold text-slate-800">
+                <div className="border-b border-slate-100 px-3 py-2 dark:border-slate-800">
+                  <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
                     Customers
                   </p>
                 </div>
@@ -384,8 +412,8 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                     className={({ isActive }) =>
                       `block rounded-lg px-3 py-2.5 text-sm transition ${
                         isActive
-                          ? "bg-orange-50 font-semibold text-orange-600"
-                          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                          ? "bg-orange-50 font-semibold text-orange-600 dark:bg-orange-500/10 dark:text-orange-400"
+                          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
                       }`
                     }
                   >
@@ -397,8 +425,8 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                     className={({ isActive }) =>
                       `flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm transition ${
                         isActive
-                          ? "bg-orange-50 font-semibold text-orange-600"
-                          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                          ? "bg-orange-50 font-semibold text-orange-600 dark:bg-orange-500/10 dark:text-orange-400"
+                          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
                       }`
                     }
                   >
@@ -411,10 +439,10 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
             </div>
           )}
 
-          {/* EXPANDED CUSTOMER SUBMENU */}
+          {/* Expanded Customer Menu */}
 
           {sideBarOpen && customerOpen && (
-            <div className="ml-9 mt-1 space-y-1 border-l border-slate-200 pl-2">
+            <div className="ml-9 mt-1 space-y-1 border-l border-slate-200 pl-2 dark:border-slate-700">
 
               <NavLink
                 to="/customers"
@@ -436,11 +464,11 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
           )}
         </div>
 
-        {/* ===================================================
+        {/* =====================================================
             REPORTS
-        ==================================================== */}
+        ====================================================== */}
 
-        <div className="relative group mt-1">
+        <div className="group relative mt-1">
 
           <button
             type="button"
@@ -460,7 +488,7 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
             } ${
               isReportSection
                 ? "bg-orange-500 text-white shadow-sm"
-                : "text-slate-600 hover:bg-slate-200 hover:text-slate-900"
+                : "text-slate-600 hover:bg-slate-200 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
             }`}
             title={!sideBarOpen ? "Reports" : ""}
           >
@@ -472,7 +500,9 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
               <FaChartBar className="shrink-0 text-sm" />
 
               {sideBarOpen && (
-                <span className="font-medium">Reports</span>
+                <span className="font-medium">
+                  Reports
+                </span>
               )}
             </div>
 
@@ -484,17 +514,17 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
               ))}
           </button>
 
-          {/* COLLAPSED REPORT HOVER MENU */}
+          {/* Collapsed Reports Menu */}
 
           {!sideBarOpen && (
             <div className="pointer-events-none absolute left-[68px] top-0 z-[999] hidden w-48 group-hover:pointer-events-auto group-hover:block">
 
               <div className="absolute -left-3 top-0 h-full w-3" />
 
-              <div className="rounded-xl border border-slate-200 bg-white p-2 shadow-xl">
+              <div className="rounded-xl border border-slate-200 bg-white p-2 shadow-xl dark:border-slate-700 dark:bg-slate-900">
 
-                <div className="border-b border-slate-100 px-3 py-2">
-                  <p className="text-sm font-semibold text-slate-800">
+                <div className="border-b border-slate-100 px-3 py-2 dark:border-slate-800">
+                  <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
                     Reports
                   </p>
                 </div>
@@ -506,8 +536,8 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                     className={({ isActive }) =>
                       `block rounded-lg px-3 py-2.5 text-sm transition ${
                         isActive
-                          ? "bg-orange-50 font-semibold text-orange-600"
-                          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                          ? "bg-orange-50 font-semibold text-orange-600 dark:bg-orange-500/10 dark:text-orange-400"
+                          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
                       }`
                     }
                   >
@@ -519,8 +549,8 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                     className={({ isActive }) =>
                       `block rounded-lg px-3 py-2.5 text-sm transition ${
                         isActive
-                          ? "bg-orange-50 font-semibold text-orange-600"
-                          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                          ? "bg-orange-50 font-semibold text-orange-600 dark:bg-orange-500/10 dark:text-orange-400"
+                          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
                       }`
                     }
                   >
@@ -532,8 +562,8 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                     className={({ isActive }) =>
                       `block rounded-lg px-3 py-2.5 text-sm transition ${
                         isActive
-                          ? "bg-orange-50 font-semibold text-orange-600"
-                          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                          ? "bg-orange-50 font-semibold text-orange-600 dark:bg-orange-500/10 dark:text-orange-400"
+                          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
                       }`
                     }
                   >
@@ -545,10 +575,10 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
             </div>
           )}
 
-          {/* EXPANDED REPORT SUBMENU */}
+          {/* Expanded Reports Menu */}
 
           {sideBarOpen && reportOpen && (
-            <div className="ml-9 mt-1 space-y-1 border-l border-slate-200 pl-2">
+            <div className="ml-9 mt-1 space-y-1 border-l border-slate-200 pl-2 dark:border-slate-700">
 
               <NavLink
                 to="/reports/sales"
@@ -575,9 +605,9 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
           )}
         </div>
 
-        {/* ===================================================
+        {/* =====================================================
             NOTIFICATIONS
-        ==================================================== */}
+        ====================================================== */}
 
         <NavLink
           to="/notifications"
@@ -588,7 +618,7 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
 
             <FaBell className="shrink-0 text-sm" />
 
-            <span className="absolute -right-1.5 -top-1.5 h-2 w-2 rounded-full border-2 border-white bg-orange-500" />
+            <span className="absolute -right-1.5 -top-1.5 h-2 w-2 rounded-full border-2 border-white bg-orange-500 dark:border-slate-900" />
 
           </div>
 
@@ -601,11 +631,11 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
           )}
         </NavLink>
 
-        {/* ===================================================
+        {/* =====================================================
             SETTINGS
-        ==================================================== */}
+        ====================================================== */}
 
-        <div className="relative group mt-1">
+        <div className="group relative mt-1">
 
           {/* SETTINGS BUTTON */}
 
@@ -629,7 +659,7 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
             } ${
               isSettingSection
                 ? "bg-orange-500 text-white shadow-sm"
-                : "text-slate-600 hover:bg-slate-200 hover:text-slate-900"
+                : "text-slate-600 hover:bg-slate-200 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
             }`}
             title={!sideBarOpen ? "Settings" : ""}
           >
@@ -639,6 +669,7 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                 sideBarOpen ? "gap-3" : "justify-center"
               }`}
             >
+
               <FaCog className="shrink-0 text-sm" />
 
               {sideBarOpen && (
@@ -646,6 +677,7 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                   Settings
                 </span>
               )}
+
             </div>
 
             {sideBarOpen &&
@@ -659,29 +691,23 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
 
 
           {/* =================================================
-              COLLAPSED SETTINGS HOVER MENU
+              COLLAPSED SETTINGS MENU
           ================================================= */}
 
           {!sideBarOpen && (
-
             <div className="pointer-events-none absolute left-[68px] top-0 z-[999] hidden w-52 group-hover:pointer-events-auto group-hover:block">
-
-              {/* Invisible bridge */}
 
               <div className="absolute -left-3 top-0 h-full w-3" />
 
-              <div className="rounded-xl border border-slate-200 bg-white p-2 shadow-xl">
+              <div className="rounded-xl border border-slate-200 bg-white p-2 shadow-xl dark:border-slate-700 dark:bg-slate-900">
 
-                {/* MENU TITLE */}
+                <div className="border-b border-slate-100 px-3 py-2 dark:border-slate-800">
 
-                <div className="border-b border-slate-100 px-3 py-2">
-
-                  <p className="text-sm font-semibold text-slate-800">
+                  <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
                     Settings
                   </p>
 
                 </div>
-
 
                 <div className="mt-1">
 
@@ -692,15 +718,14 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                     className={({ isActive }) =>
                       `flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm transition ${
                         isActive
-                          ? "bg-orange-50 font-semibold text-orange-600"
-                          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                          ? "bg-orange-50 font-semibold text-orange-600 dark:bg-orange-500/10 dark:text-orange-400"
+                          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
                       }`
                     }
                   >
                     <FaSlidersH className="text-xs" />
                     Studio Settings
                   </NavLink>
-
 
                   {/* RESET & CLEANUP */}
 
@@ -709,8 +734,8 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                     className={({ isActive }) =>
                       `flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm transition ${
                         isActive
-                          ? "bg-orange-50 font-semibold text-orange-600"
-                          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                          ? "bg-orange-50 font-semibold text-orange-600 dark:bg-orange-500/10 dark:text-orange-400"
+                          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
                       }`
                     }
                   >
@@ -727,12 +752,12 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
 
 
           {/* =================================================
-              EXPANDED SETTINGS SUBMENU
+              EXPANDED SETTINGS MENU
           ================================================= */}
 
           {sideBarOpen && settingOpen && (
 
-            <div className="ml-9 mt-1 space-y-1 border-l border-slate-200 pl-2">
+            <div className="ml-9 mt-1 space-y-1 border-l border-slate-200 pl-2 dark:border-slate-700">
 
               {/* STUDIO SETTINGS */}
 
@@ -756,6 +781,7 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
               </NavLink>
 
             </div>
+
           )}
 
         </div>
@@ -766,7 +792,4 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
 };
 
 export default Sidebar;
-
-
-
 

@@ -5,11 +5,7 @@ import {
   FiPrinter,
   FiDollarSign,
   FiPlus,
-  FiSearch,
-  FiBell,
-  FiChevronDown,
   FiClock,
-  FiMenu,
 } from "react-icons/fi";
 
 const HomePage = () => {
@@ -94,45 +90,6 @@ const HomePage = () => {
   return (
     <div className="min-h-screen bg-[#f7f8fa] text-slate-800">
       <main>
-        <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-slate-200 bg-white/95 px-5 backdrop-blur md:px-8">
-          <div className="flex items-center gap-4">
-            <button className="lg:hidden">
-              <FiMenu size={23} />
-            </button>
-
-            <div>
-              <h2 className="text-xl font-bold text-slate-600">Dashboard</h2>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            {/* Search */}
-            <button className="hidden rounded-xl border border-slate-200 p-2.5 text-slate-500 hover:bg-slate-50 sm:block">
-              <FiSearch size={19} />
-            </button>
-
-            {/* Notification */}
-            <button className="relative rounded-xl border border-slate-200 p-2.5 text-slate-500 hover:bg-slate-50">
-              <FiBell size={19} />
-              <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-orange-500"></span>
-            </button>
-
-            {/* Profile */}
-            <div className="hidden items-center gap-2 border-l border-slate-200 pl-4 md:flex">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-orange-100 text-sm font-bold text-orange-600">
-                A
-              </div>
-
-              <div>
-                <p className="text-sm font-semibold">Admin</p>
-                <p className="text-[11px] text-slate-400">Admin</p>
-              </div>
-
-              <FiChevronDown size={15} className="text-slate-400" />
-            </div>
-          </div>
-        </header>
-
         {/* Content */}
         <div className="p-5 md:p-8">
           {/* Welcome */}

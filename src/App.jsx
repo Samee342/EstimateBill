@@ -1,6 +1,8 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
-import { lazy } from "react";
+
+import { lazy, useEffect } from "react";
+import { useSelector } from "react-redux";
 
 // ========================================
 // PUBLIC PAGES
@@ -18,7 +20,6 @@ const SetupPage = lazy(
   () => import("./pages/auth/SetupPage")
 );
 
-
 // ========================================
 // ADMIN LAYOUT
 // ========================================
@@ -27,7 +28,6 @@ const AdminLayout = lazy(
   () => import("./layout/AdminLayout")
 );
 
-
 // ========================================
 // DASHBOARD
 // ========================================
@@ -35,7 +35,6 @@ const AdminLayout = lazy(
 const Home = lazy(
   () => import("./pages/HomePage")
 );
-
 
 // ========================================
 // PROJECT PAGES
@@ -49,7 +48,6 @@ const CreateProject = lazy(
   () => import("./pages/project/CreateProject")
 );
 
-
 // ========================================
 // CUSTOMER PAGES
 // ========================================
@@ -61,7 +59,6 @@ const AllCustomers = lazy(
 const AddCustomer = lazy(
   () => import("./pages/customers/AddCustomer")
 );
-
 
 // ========================================
 // REPORT PAGES
@@ -79,15 +76,26 @@ const PaymentReport = lazy(
   () => import("./pages/Reports/PaymentReport")
 );
 
-// Notification
+// ========================================
+// NOTIFICATION
+// ========================================
+
 const Notification = lazy(
   () => import("./pages/Notification/Notification")
-)
+);
 
 function App() {
+  const theme = useSelector((state) => state.theme.theme);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle(
+      "dark",
+      theme === "dark"
+    );
+  }, [theme]);
+
   return (
     <BrowserRouter>
-
       <Routes>
 
         {/* ========================================
@@ -114,7 +122,6 @@ function App() {
           element={<SetupPage />}
         />
 
-
         {/* ========================================
             ADMIN DASHBOARD
         ======================================== */}
@@ -122,12 +129,16 @@ function App() {
         <Route element={<AdminLayout />}>
 
           {/* Dashboard */}
-
           <Route
             index
             element={<Home />}
           />
 
+          {/* Optional /dashboard URL */}
+          <Route
+            path="/dashboard"
+            element={<Home />}
+          />
 
           {/* ======================================
               PROJECTS
@@ -143,7 +154,6 @@ function App() {
             element={<CreateProject />}
           />
 
-
           {/* ======================================
               CUSTOMERS
           ====================================== */}
@@ -158,43 +168,37 @@ function App() {
             element={<AddCustomer />}
           />
 
-
           {/* ======================================
               REPORTS
           ====================================== */}
-
-          {/* Sales Report */}
 
           <Route
             path="/reports/sales"
             element={<SalesReport />}
           />
 
-
-          {/* Customer Report */}
-
           <Route
             path="/reports/customers"
             element={<CustomerReport />}
           />
-
-
-          {/* Payment Report */}
 
           <Route
             path="/reports/payments"
             element={<PaymentReport />}
           />
 
-            {/* Notification */}
-          <Route path="/notifications" 
-          element={<Notification />} />
+          {/* ======================================
+              NOTIFICATIONS
+          ====================================== */}
 
+          <Route
+            path="/notifications"
+            element={<Notification />}
+          />
 
         </Route>
 
       </Routes>
-
     </BrowserRouter>
   );
 }
