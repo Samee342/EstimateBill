@@ -84,6 +84,18 @@ const Notification = lazy(
   () => import("./pages/Notification/Notification")
 );
 
+// ========================================
+// SETTINGS PAGES
+// ========================================
+
+const ResetCleanup = lazy(
+  () => import("./pages/settings/ResetCleanup")
+);
+
+const StudioSettings = lazy(
+  () => import("./pages/settings/StudioSettings")
+);
+
 function App() {
   const theme = useSelector((state) => state.theme.theme);
 
@@ -134,7 +146,6 @@ function App() {
             element={<Home />}
           />
 
-          {/* Optional /dashboard URL */}
           <Route
             path="/dashboard"
             element={<Home />}
@@ -194,6 +205,20 @@ function App() {
           <Route
             path="/notifications"
             element={<Notification />}
+          />
+
+          {/* ======================================
+              SETTINGS
+          ====================================== */}
+
+          <Route
+            path="/settings/studio"
+            element={<StudioSettings />}
+          />
+
+          <Route
+            path="/settings/reset-cleanup"
+            element={<ResetCleanup />}
           />
 
         </Route>
