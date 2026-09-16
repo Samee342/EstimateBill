@@ -79,10 +79,30 @@ const PaymentReport = lazy(
   () => import("./pages/Reports/PaymentReport")
 );
 
-// Notification
+
+// ========================================
+// NOTIFICATION
+// ========================================
+
 const Notification = lazy(
   () => import("./pages/Notification/Notification")
-)
+);
+
+
+// ========================================
+// SETTINGS PAGES
+// ========================================
+
+// Studio Settings
+const StudioSettings = lazy(
+  () => import("./pages/settings/StudioSettings")
+);
+
+// Reset & CleanUp
+const ResetCleanup = lazy(
+  () => import("./pages/settings/ResetCleanup")
+);
+
 
 function App() {
   return (
@@ -121,7 +141,9 @@ function App() {
 
         <Route element={<AdminLayout />}>
 
-          {/* Dashboard */}
+          {/* ======================================
+              DASHBOARD
+          ====================================== */}
 
           <Route
             index
@@ -163,33 +185,50 @@ function App() {
               REPORTS
           ====================================== */}
 
-          {/* Sales Report */}
-
           <Route
             path="/reports/sales"
             element={<SalesReport />}
           />
-
-
-          {/* Customer Report */}
 
           <Route
             path="/reports/customers"
             element={<CustomerReport />}
           />
 
-
-          {/* Payment Report */}
-
           <Route
             path="/reports/payments"
             element={<PaymentReport />}
           />
 
-            {/* Notification */}
-          <Route path="/notifications" 
-          element={<Notification />} />
 
+          {/* ======================================
+              NOTIFICATION
+          ====================================== */}
+
+          <Route
+            path="/notifications"
+            element={<Notification />}
+          />
+
+
+          {/* ======================================
+              SETTINGS
+          ====================================== */}
+
+          {/* Studio Settings */}
+
+          <Route
+            path="/settings/studio"
+            element={<StudioSettings />}
+          />
+
+
+          {/* Reset & CleanUp */}
+
+          <Route
+            path="/settings/reset-cleanup"
+            element={<ResetCleanup />}
+          />
 
         </Route>
 

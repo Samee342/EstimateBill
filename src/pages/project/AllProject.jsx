@@ -1,10 +1,10 @@
+
 import React, { useState } from "react";
 import {
   FiPlus,
   FiSearch,
   FiMoreVertical,
   FiCalendar,
-  FiUser,
   FiFileText,
   FiClock,
   FiCheckCircle,
@@ -15,12 +15,15 @@ const AllProject = () => {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
 
-  const projects = [
+  // Projects
+  // Date format: YYYY-MM-DD
+  const [projects, setProjects] = useState([
     {
       id: "PRJ-1001",
       name: "Business Card Printing",
       customer: "Ram Sharma",
-      date: "07 Sep 2026",
+      date: "2026-09-07",
+      dueDate: "2026-09-10",
       amount: "Rs. 12,500",
       status: "Completed",
     },
@@ -28,7 +31,8 @@ const AllProject = () => {
       id: "PRJ-1002",
       name: "Wedding Invitation Cards",
       customer: "Sita Karki",
-      date: "07 Sep 2026",
+      date: "2026-09-07",
+      dueDate: "2026-09-15",
       amount: "Rs. 18,750",
       status: "Pending",
     },
@@ -36,7 +40,8 @@ const AllProject = () => {
       id: "PRJ-1003",
       name: "Restaurant Menu Printing",
       customer: "Hari Thapa",
-      date: "06 Sep 2026",
+      date: "2026-09-06",
+      dueDate: "2026-09-12",
       amount: "Rs. 24,300",
       status: "Printed",
     },
@@ -44,7 +49,8 @@ const AllProject = () => {
       id: "PRJ-1004",
       name: "Flex Banner Design",
       customer: "Aashish Gurung",
-      date: "06 Sep 2026",
+      date: "2026-09-06",
+      dueDate: "2026-09-11",
       amount: "Rs. 5,600",
       status: "Pending",
     },
@@ -52,7 +58,8 @@ const AllProject = () => {
       id: "PRJ-1005",
       name: "Company Brochure",
       customer: "Mina Rai",
-      date: "05 Sep 2026",
+      date: "2026-09-05",
+      dueDate: "2026-09-14",
       amount: "Rs. 18,900",
       status: "Completed",
     },
@@ -60,7 +67,8 @@ const AllProject = () => {
       id: "PRJ-1006",
       name: "Product Label Printing",
       customer: "Everest Traders",
-      date: "04 Sep 2026",
+      date: "2026-09-04",
+      dueDate: "2026-09-13",
       amount: "Rs. 32,500",
       status: "Printed",
     },
@@ -68,7 +76,8 @@ const AllProject = () => {
       id: "PRJ-1007",
       name: "Office Letterhead",
       customer: "ABC Enterprises",
-      date: "03 Sep 2026",
+      date: "2026-09-03",
+      dueDate: "2026-09-09",
       amount: "Rs. 7,800",
       status: "Pending",
     },
@@ -76,12 +85,59 @@ const AllProject = () => {
       id: "PRJ-1008",
       name: "Promotional Posters",
       customer: "New Star Hotel",
-      date: "02 Sep 2026",
+      date: "2026-09-02",
+      dueDate: "2026-09-08",
       amount: "Rs. 15,400",
       status: "Completed",
     },
-  ];
+  ]);
 
+  // -----------------------------
+  // Date ko readable format mein convert karega
+  // 2026-09-07 -> 07 Sep 2026
+  // -----------------------------
+  const formatDate = (date) => {
+    if (!date) return "";
+
+    const [year, month, day] = date.split("-");
+
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+
+    return `${day} ${months[Number(month) - 1]} ${year}`;
+  };
+
+  // -----------------------------
+  // Date update function
+  // -----------------------------
+  const updateProjectDate = (projectId, field, newDate) => {
+    setProjects((previousProjects) =>
+      previousProjects.map((project) =>
+        project.id === projectId
+          ? {
+              ...project,
+              [field]: newDate,
+            }
+          : project
+      )
+    );
+  };
+
+  // -----------------------------
+  // Status Style
+  // -----------------------------
   const getStatusStyle = (status) => {
     switch (status) {
       case "Completed":
@@ -98,6 +154,9 @@ const AllProject = () => {
     }
   };
 
+  // -----------------------------
+  // Search + Status Filter
+  // -----------------------------
   const filteredProjects = projects.filter((project) => {
     const matchesSearch =
       project.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -112,42 +171,45 @@ const AllProject = () => {
 
   return (
     <div className="min-h-screen bg-[#f7f8fa] text-slate-800">
-      {/* Header */}
+      {/* ================= HEADER ================= */}
+
       <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-slate-200 bg-white/95 px-5 backdrop-blur md:px-8">
         <div>
-          <h2 className="text-xl font-bold text-slate-900">All Projects</h2>
+          <h2 className="text-xl font-bold text-slate-900">
+            All Projects
+          </h2>
 
           <p className="mt-1 text-xs text-slate-400">
             Manage all your printing projects
           </p>
         </div>
 
-        <button className="flex items-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-orange-600">
+        <a
+          href="/projects/create-project"
+          className="flex items-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-orange-600"
+        >
           <FiPlus size={18} />
-          <a href="/projects/create-project">New Project</a>
-        </button>
+          New Project
+        </a>
       </header>
 
-      {/* Main Content */}
+      {/* ================= MAIN CONTENT ================= */}
+
       <div className="p-5 md:p-8">
-        {/* Page Title */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-slate-900">Projects</h1>
+        {/* ================= SUMMARY CARDS ================= */}
 
-          <p className="mt-1 text-sm text-slate-500">
-            View and manage all printing projects from one place.
-          </p>
-        </div>
-
-        {/* Summary Cards */}
         <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {/* Total */}
           <div className="rounded-2xl border border-slate-200 bg-white p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-slate-500">Total Projects</p>
+                <p className="text-sm text-slate-500">
+                  Total Projects
+                </p>
 
-                <h3 className="mt-2 text-2xl font-bold text-slate-900">248</h3>
+                <h3 className="mt-2 text-2xl font-bold text-slate-900">
+                  248
+                </h3>
               </div>
 
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-orange-50 text-orange-500">
@@ -160,9 +222,13 @@ const AllProject = () => {
           <div className="rounded-2xl border border-slate-200 bg-white p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-slate-500">Pending</p>
+                <p className="text-sm text-slate-500">
+                  Pending
+                </p>
 
-                <h3 className="mt-2 text-2xl font-bold text-slate-900">32</h3>
+                <h3 className="mt-2 text-2xl font-bold text-slate-900">
+                  32
+                </h3>
               </div>
 
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-orange-50 text-orange-500">
@@ -175,9 +241,13 @@ const AllProject = () => {
           <div className="rounded-2xl border border-slate-200 bg-white p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-slate-500">Printed</p>
+                <p className="text-sm text-slate-500">
+                  Printed
+                </p>
 
-                <h3 className="mt-2 text-2xl font-bold text-slate-900">64</h3>
+                <h3 className="mt-2 text-2xl font-bold text-slate-900">
+                  64
+                </h3>
               </div>
 
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-blue-500">
@@ -190,9 +260,13 @@ const AllProject = () => {
           <div className="rounded-2xl border border-slate-200 bg-white p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-slate-500">Completed</p>
+                <p className="text-sm text-slate-500">
+                  Completed
+                </p>
 
-                <h3 className="mt-2 text-2xl font-bold text-slate-900">152</h3>
+                <h3 className="mt-2 text-2xl font-bold text-slate-900">
+                  152
+                </h3>
               </div>
 
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-green-50 text-green-500">
@@ -202,7 +276,8 @@ const AllProject = () => {
           </div>
         </div>
 
-        {/* Search + Filter */}
+        {/* ================= SEARCH + FILTER ================= */}
+
         <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-4">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             {/* Search */}
@@ -223,7 +298,9 @@ const AllProject = () => {
 
             {/* Status */}
             <div className="flex items-center gap-2">
-              <span className="text-sm text-slate-500">Status:</span>
+              <span className="text-sm text-slate-500">
+                Status:
+              </span>
 
               <select
                 value={statusFilter}
@@ -239,12 +316,15 @@ const AllProject = () => {
           </div>
         </div>
 
-        {/* Projects Table */}
+        {/* ================= PROJECT TABLE ================= */}
+
         <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
           {/* Table Header */}
           <div className="flex flex-col justify-between gap-2 border-b border-slate-200 p-6 sm:flex-row sm:items-center">
             <div>
-              <h3 className="font-bold text-slate-900">All Projects</h3>
+              <h3 className="font-bold text-slate-900">
+                All Projects
+              </h3>
 
               <p className="mt-1 text-xs text-slate-400">
                 {filteredProjects.length} projects found
@@ -252,7 +332,8 @@ const AllProject = () => {
             </div>
           </div>
 
-          {/* Desktop Table */}
+          {/* ================= DESKTOP TABLE ================= */}
+
           <div className="hidden overflow-x-auto md:block">
             <table className="w-full">
               <thead>
@@ -267,6 +348,10 @@ const AllProject = () => {
 
                   <th className="px-6 py-4 text-xs font-semibold uppercase text-slate-400">
                     Date
+                  </th>
+
+                  <th className="px-6 py-4 text-xs font-semibold uppercase text-slate-400">
+                    Due Date
                   </th>
 
                   <th className="px-6 py-4 text-xs font-semibold uppercase text-slate-400">
@@ -321,11 +406,63 @@ const AllProject = () => {
                       </div>
                     </td>
 
-                    {/* Date */}
+                    {/* ================= DATE ================= */}
+
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-2 text-sm text-slate-500">
-                        <FiCalendar size={15} />
-                        {project.date}
+                      <div className="flex items-center gap-3">
+                        {/* Date Text */}
+                        <span className="text-sm text-slate-500">
+                          {formatDate(project.date)}
+                        </span>
+
+                        {/* Calendar Icon */}
+                        <label className="relative flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-orange-500">
+                          <FiCalendar size={17} />
+
+                          {/* Invisible input sitting ON TOP of icon */}
+                          <input
+                            type="date"
+                            value={project.date}
+                            onChange={(e) =>
+                              updateProjectDate(
+                                project.id,
+                                "date",
+                                e.target.value
+                              )
+                            }
+                            className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                          />
+                        </label>
+                      </div>
+                    </td>
+
+                    {/* ================= DUE DATE ================= */}
+
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        {/* Due Date Text */}
+                        <span className="text-sm font-medium text-orange-600">
+                          {formatDate(project.dueDate)}
+                        </span>
+
+                        {/* Calendar Icon */}
+                        <label className="relative flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-orange-400 transition hover:bg-orange-50 hover:text-orange-600">
+                          <FiCalendar size={17} />
+
+                          {/* Invisible input sitting ON TOP of icon */}
+                          <input
+                            type="date"
+                            value={project.dueDate}
+                            onChange={(e) =>
+                              updateProjectDate(
+                                project.id,
+                                "dueDate",
+                                e.target.value
+                              )
+                            }
+                            className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                          />
+                        </label>
                       </div>
                     </td>
 
@@ -340,7 +477,7 @@ const AllProject = () => {
                     <td className="px-6 py-4">
                       <span
                         className={`rounded-full px-3 py-1.5 text-xs font-semibold ${getStatusStyle(
-                          project.status,
+                          project.status
                         )}`}
                       >
                         {project.status}
@@ -359,13 +496,15 @@ const AllProject = () => {
             </table>
           </div>
 
-          {/* Mobile Cards */}
+          {/* ================= MOBILE CARDS ================= */}
+
           <div className="space-y-3 p-4 md:hidden">
             {filteredProjects.map((project) => (
               <div
                 key={project.id}
                 className="rounded-xl border border-slate-200 p-4"
               >
+                {/* Project Header */}
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
                     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-orange-500">
@@ -373,7 +512,9 @@ const AllProject = () => {
                     </div>
 
                     <div>
-                      <p className="text-sm font-semibold">{project.name}</p>
+                      <p className="text-sm font-semibold">
+                        {project.name}
+                      </p>
 
                       <p className="mt-1 text-xs text-orange-500">
                         {project.id}
@@ -386,33 +527,100 @@ const AllProject = () => {
                   </button>
                 </div>
 
-                <div className="mt-4 grid grid-cols-2 gap-3">
+                <div className="mt-4 grid grid-cols-2 gap-4">
+                  {/* Customer */}
                   <div>
-                    <p className="text-[11px] text-slate-400">Customer</p>
+                    <p className="text-[11px] text-slate-400">
+                      Customer
+                    </p>
 
                     <p className="mt-1 text-sm font-medium">
                       {project.customer}
                     </p>
                   </div>
 
-                  <div>
-                    <p className="text-[11px] text-slate-400">Date</p>
+                  {/* ================= MOBILE DATE ================= */}
 
-                    <p className="mt-1 text-sm font-medium">{project.date}</p>
+                  <div>
+                    <p className="text-[11px] text-slate-400">
+                      Date
+                    </p>
+
+                    <div className="mt-1 flex items-center gap-2">
+                      <span className="text-sm font-medium">
+                        {formatDate(project.date)}
+                      </span>
+
+                      <label className="relative flex h-7 w-7 cursor-pointer items-center justify-center rounded-md text-slate-400 hover:bg-slate-100 hover:text-orange-500">
+                        <FiCalendar size={16} />
+
+                        <input
+                          type="date"
+                          value={project.date}
+                          onChange={(e) =>
+                            updateProjectDate(
+                              project.id,
+                              "date",
+                              e.target.value
+                            )
+                          }
+                          className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                        />
+                      </label>
+                    </div>
                   </div>
 
-                  <div>
-                    <p className="text-[11px] text-slate-400">Amount</p>
+                  {/* ================= MOBILE DUE DATE ================= */}
 
-                    <p className="mt-1 text-sm font-bold">{project.amount}</p>
+                  <div>
+                    <p className="text-[11px] text-slate-400">
+                      Due Date
+                    </p>
+
+                    <div className="mt-1 flex items-center gap-2">
+                      <span className="text-sm font-medium text-orange-600">
+                        {formatDate(project.dueDate)}
+                      </span>
+
+                      <label className="relative flex h-7 w-7 cursor-pointer items-center justify-center rounded-md text-orange-400 hover:bg-orange-50 hover:text-orange-600">
+                        <FiCalendar size={16} />
+
+                        <input
+                          type="date"
+                          value={project.dueDate}
+                          onChange={(e) =>
+                            updateProjectDate(
+                              project.id,
+                              "dueDate",
+                              e.target.value
+                            )
+                          }
+                          className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                        />
+                      </label>
+                    </div>
                   </div>
 
+                  {/* Amount */}
                   <div>
-                    <p className="text-[11px] text-slate-400">Status</p>
+                    <p className="text-[11px] text-slate-400">
+                      Amount
+                    </p>
+
+                    <p className="mt-1 text-sm font-bold">
+                      {project.amount}
+                    </p>
+                  </div>
+
+                  {/* Status */}
+                  <div>
+                    <p className="text-[11px] text-slate-400">
+                      Status
+                    </p>
 
                     <span
                       className={`mt-1 inline-block rounded-full px-2.5 py-1 text-[11px] font-semibold ${getStatusStyle(
-                        project.status,
+                        project.status
                       )}`}
                     >
                       {project.status}
@@ -423,10 +631,14 @@ const AllProject = () => {
             ))}
           </div>
 
-          {/* Empty State */}
+          {/* ================= EMPTY STATE ================= */}
+
           {filteredProjects.length === 0 && (
             <div className="p-12 text-center">
-              <FiFileText size={35} className="mx-auto text-slate-300" />
+              <FiFileText
+                size={35}
+                className="mx-auto text-slate-300"
+              />
 
               <h3 className="mt-3 font-semibold text-slate-700">
                 No projects found
@@ -444,3 +656,4 @@ const AllProject = () => {
 };
 
 export default AllProject;
+

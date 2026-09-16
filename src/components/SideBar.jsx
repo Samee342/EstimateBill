@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import {
   FaThLarge,
@@ -9,6 +10,8 @@ import {
   FaChevronRight,
   FaBell,
   FaPlus,
+  FaSlidersH,
+  FaBroom,
 } from "react-icons/fa";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 import { NavLink, useLocation } from "react-router-dom";
@@ -20,10 +23,12 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
   const [reportOpen, setReportOpen] = useState(false);
   const [projectOpen, setProjectOpen] = useState(false);
   const [customerOpen, setCustomerOpen] = useState(false);
+  const [settingOpen, setSettingOpen] = useState(false);
 
   const isReportSection = location.pathname.startsWith("/reports");
   const isProjectSection = location.pathname.startsWith("/projects");
   const isCustomerSection = location.pathname.startsWith("/customers");
+  const isSettingSection = location.pathname.startsWith("/settings");
 
   useEffect(() => {
     if (isProjectSection && sideBarOpen) {
@@ -33,21 +38,39 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
     if (isCustomerSection && sideBarOpen) {
       setCustomerOpen(true);
     }
-  }, [isProjectSection, isCustomerSection, sideBarOpen]);
+
+    if (isReportSection && sideBarOpen) {
+      setReportOpen(true);
+    }
+
+    if (isSettingSection && sideBarOpen) {
+      setSettingOpen(true);
+    }
+  }, [
+    isProjectSection,
+    isCustomerSection,
+    isReportSection,
+    isSettingSection,
+    sideBarOpen,
+  ]);
 
   // =========================================
   // CLOSE DROPDOWNS WHEN SIDEBAR COLLAPSES
   // =========================================
+
   useEffect(() => {
     if (!sideBarOpen) {
       setProjectOpen(false);
       setCustomerOpen(false);
+      setReportOpen(false);
+      setSettingOpen(false);
     }
   }, [sideBarOpen]);
 
   // =========================================
   // MAIN NAVIGATION STYLE
   // =========================================
+
   const mainNavClass = ({ isActive }) =>
     `group relative flex items-center rounded-xl transition-all duration-200 ${
       sideBarOpen ? "gap-3 px-3 py-2.5" : "justify-center px-2 py-3"
@@ -60,6 +83,7 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
   // =========================================
   // SUB NAVIGATION STYLE
   // =========================================
+
   const subNavClass = ({ isActive }) =>
     `flex items-center rounded-lg px-3 py-2 text-sm transition-all duration-200 ${
       isActive
@@ -76,12 +100,16 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
       {/* =====================================================
           HEADER / LOGO
       ====================================================== */}
+
       <div
         className={`relative flex h-20 shrink-0 items-center border-b border-slate-100 ${
-          sideBarOpen ? "justify-between px-5" : "justify-center px-2"
+          sideBarOpen
+            ? "justify-between px-5"
+            : "justify-center px-2"
         }`}
       >
         {/* Logo */}
+
         <div
           className={`flex items-center ${
             sideBarOpen ? "gap-3" : "justify-center"
@@ -111,6 +139,7 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
         {/* =========================================
             COLLAPSE BUTTON
         ========================================== */}
+
         {sideBarOpen && (
           <button
             type="button"
@@ -125,6 +154,7 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
         {/* =========================================
             EXPAND BUTTON
         ========================================== */}
+
         {!sideBarOpen && (
           <button
             type="button"
@@ -140,10 +170,13 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
       {/* =====================================================
           NAVIGATION
       ====================================================== */}
+
       <nav className="flex-1 overflow-visible px-3 py-5">
+
         {/* =========================================
             DASHBOARD
         ========================================== */}
+
         <NavLink
           to="/"
           end
@@ -152,14 +185,17 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
         >
           <FaThLarge className="shrink-0 text-sm" />
 
-          {sideBarOpen && <span className="font-medium">Dashboard</span>}
+          {sideBarOpen && (
+            <span className="font-medium">Dashboard</span>
+          )}
         </NavLink>
 
         {/* ===================================================
             PROJECTS
         ==================================================== */}
+
         <div className="relative group mt-1">
-          {/* Project Button */}
+
           <button
             type="button"
             onClick={() => {
@@ -189,7 +225,9 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
             >
               <FaFolder className="shrink-0 text-sm" />
 
-              {sideBarOpen && <span className="font-medium">Projects</span>}
+              {sideBarOpen && (
+                <span className="font-medium">Projects</span>
+              )}
             </div>
 
             {sideBarOpen &&
@@ -200,15 +238,15 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
               ))}
           </button>
 
-          {/* =========================================
-              COLLAPSED PROJECT HOVER MENU
-          ========================================== */}
+          {/* COLLAPSED PROJECT HOVER MENU */}
+
           {!sideBarOpen && (
             <div className="pointer-events-none absolute left-[68px] top-0 z-[999] hidden w-48 group-hover:pointer-events-auto group-hover:block">
-              {/* Invisible bridge */}
+
               <div className="absolute -left-3 top-0 h-full w-3" />
 
               <div className="rounded-xl border border-slate-200 bg-white p-2 shadow-xl">
+
                 <div className="border-b border-slate-100 px-3 py-2">
                   <p className="text-sm font-semibold text-slate-800">
                     Projects
@@ -216,6 +254,7 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                 </div>
 
                 <div className="mt-1">
+
                   <NavLink
                     to="/projects"
                     end
@@ -243,24 +282,33 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                     <FaPlus className="text-[9px]" />
                     Create Project
                   </NavLink>
+
                 </div>
               </div>
             </div>
           )}
 
-          {/* =========================================
-              EXPANDED PROJECT SUBMENU
-          ========================================== */}
+          {/* EXPANDED PROJECT SUBMENU */}
+
           {sideBarOpen && projectOpen && (
             <div className="ml-9 mt-1 space-y-1 border-l border-slate-200 pl-2">
-              <NavLink to="/projects" end className={subNavClass}>
+
+              <NavLink
+                to="/projects"
+                end
+                className={subNavClass}
+              >
                 All Projects
               </NavLink>
 
-              <NavLink to="/projects/create-project" className={subNavClass}>
+              <NavLink
+                to="/projects/create-project"
+                className={subNavClass}
+              >
                 <FaPlus className="mr-2 text-[9px]" />
                 Create Project
               </NavLink>
+
             </div>
           )}
         </div>
@@ -268,8 +316,9 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
         {/* ===================================================
             CUSTOMERS
         ==================================================== */}
+
         <div className="relative group mt-1">
-          {/* Customer Button */}
+
           <button
             type="button"
             onClick={() => {
@@ -299,7 +348,9 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
             >
               <FaUsers className="shrink-0 text-sm" />
 
-              {sideBarOpen && <span className="font-medium">Customers</span>}
+              {sideBarOpen && (
+                <span className="font-medium">Customers</span>
+              )}
             </div>
 
             {sideBarOpen &&
@@ -310,15 +361,15 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
               ))}
           </button>
 
-          {/* =========================================
-              COLLAPSED CUSTOMER HOVER MENU
-          ========================================== */}
+          {/* COLLAPSED CUSTOMER HOVER MENU */}
+
           {!sideBarOpen && (
             <div className="pointer-events-none absolute left-[68px] top-0 z-[999] hidden w-48 group-hover:pointer-events-auto group-hover:block">
-              {/* Invisible bridge */}
+
               <div className="absolute -left-3 top-0 h-full w-3" />
 
               <div className="rounded-xl border border-slate-200 bg-white p-2 shadow-xl">
+
                 <div className="border-b border-slate-100 px-3 py-2">
                   <p className="text-sm font-semibold text-slate-800">
                     Customers
@@ -326,6 +377,7 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                 </div>
 
                 <div className="mt-1">
+
                   <NavLink
                     to="/customers"
                     end
@@ -353,33 +405,43 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                     <FaPlus className="text-[9px]" />
                     Add Customer
                   </NavLink>
+
                 </div>
               </div>
             </div>
           )}
 
-          {/* =========================================
-              EXPANDED CUSTOMER SUBMENU
-          ========================================== */}
+          {/* EXPANDED CUSTOMER SUBMENU */}
+
           {sideBarOpen && customerOpen && (
             <div className="ml-9 mt-1 space-y-1 border-l border-slate-200 pl-2">
-              <NavLink to="/customers" end className={subNavClass}>
+
+              <NavLink
+                to="/customers"
+                end
+                className={subNavClass}
+              >
                 All Customers
               </NavLink>
 
-              <NavLink to="/customers/add" className={subNavClass}>
+              <NavLink
+                to="/customers/add"
+                className={subNavClass}
+              >
                 <FaPlus className="mr-2 text-[9px]" />
                 Add Customer
               </NavLink>
+
             </div>
           )}
         </div>
 
-        {/* =========================================
+        {/* ===================================================
             REPORTS
-        ========================================== */}
+        ==================================================== */}
+
         <div className="relative group mt-1">
-          {/* Reports Button */}
+
           <button
             type="button"
             onClick={() => {
@@ -409,7 +471,9 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
             >
               <FaChartBar className="shrink-0 text-sm" />
 
-              {sideBarOpen && <span className="font-medium">Reports</span>}
+              {sideBarOpen && (
+                <span className="font-medium">Reports</span>
+              )}
             </div>
 
             {sideBarOpen &&
@@ -420,15 +484,15 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
               ))}
           </button>
 
-          {/* =========================================
-      COLLAPSED REPORT HOVER MENU
-  ========================================== */}
+          {/* COLLAPSED REPORT HOVER MENU */}
+
           {!sideBarOpen && (
             <div className="pointer-events-none absolute left-[68px] top-0 z-[999] hidden w-48 group-hover:pointer-events-auto group-hover:block">
-              {/* Invisible bridge */}
+
               <div className="absolute -left-3 top-0 h-full w-3" />
 
               <div className="rounded-xl border border-slate-200 bg-white p-2 shadow-xl">
+
                 <div className="border-b border-slate-100 px-3 py-2">
                   <p className="text-sm font-semibold text-slate-800">
                     Reports
@@ -436,7 +500,7 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                 </div>
 
                 <div className="mt-1">
-                  {/* Sales Report */}
+
                   <NavLink
                     to="/reports/sales"
                     className={({ isActive }) =>
@@ -450,7 +514,6 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                     Sales Report
                   </NavLink>
 
-                  {/* Customer Report */}
                   <NavLink
                     to="/reports/customers"
                     className={({ isActive }) =>
@@ -464,7 +527,6 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                     Customer Report
                   </NavLink>
 
-                  {/* Payment Report */}
                   <NavLink
                     to="/reports/payments"
                     className={({ isActive }) =>
@@ -477,67 +539,234 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                   >
                     Payment Report
                   </NavLink>
+
                 </div>
               </div>
             </div>
           )}
 
-          {/* =========================================
-      EXPANDED REPORT SUBMENU
-  ========================================== */}
+          {/* EXPANDED REPORT SUBMENU */}
+
           {sideBarOpen && reportOpen && (
             <div className="ml-9 mt-1 space-y-1 border-l border-slate-200 pl-2">
-              <NavLink to="/reports/sales" className={subNavClass}>
+
+              <NavLink
+                to="/reports/sales"
+                className={subNavClass}
+              >
                 Sales Report
               </NavLink>
 
-              <NavLink to="/reports/customers" className={subNavClass}>
+              <NavLink
+                to="/reports/customers"
+                className={subNavClass}
+              >
                 Customer Report
               </NavLink>
 
-              <NavLink to="/reports/payments" className={subNavClass}>
+              <NavLink
+                to="/reports/payments"
+                className={subNavClass}
+              >
                 Payment Report
               </NavLink>
+
             </div>
           )}
         </div>
-        {/* =========================================
+
+        {/* ===================================================
             NOTIFICATIONS
-        ========================================== */}
+        ==================================================== */}
+
         <NavLink
           to="/notifications"
           className={mainNavClass}
           title={!sideBarOpen ? "Notifications" : ""}
         >
           <div className="relative">
+
             <FaBell className="shrink-0 text-sm" />
 
-            {/* Notification Indicator */}
             <span className="absolute -right-1.5 -top-1.5 h-2 w-2 rounded-full border-2 border-white bg-orange-500" />
+
           </div>
 
           {sideBarOpen && (
             <div className="flex flex-1 items-center justify-between">
-              <span className="font-medium">Notifications</span>
+              <span className="font-medium">
+                Notifications
+              </span>
             </div>
           )}
         </NavLink>
 
-        {/* =========================================
+        {/* ===================================================
             SETTINGS
-        ========================================== */}
-        <NavLink
-          to="/settings"
-          className={mainNavClass}
-          title={!sideBarOpen ? "Settings" : ""}
-        >
-          <FaCog className="shrink-0 text-sm" />
+        ==================================================== */}
 
-          {sideBarOpen && <span className="font-medium">Settings</span>}
-        </NavLink>
+        <div className="relative group mt-1">
+
+          {/* SETTINGS BUTTON */}
+
+          <button
+            type="button"
+            onClick={() => {
+
+              if (!sideBarOpen) {
+                setSideBarOpen(true);
+                setSettingOpen(true);
+                return;
+              }
+
+              setSettingOpen((prev) => !prev);
+
+            }}
+            className={`flex w-full items-center rounded-xl transition-all duration-200 ${
+              sideBarOpen
+                ? "justify-between px-3 py-2.5"
+                : "justify-center px-2 py-3"
+            } ${
+              isSettingSection
+                ? "bg-orange-500 text-white shadow-sm"
+                : "text-slate-600 hover:bg-slate-200 hover:text-slate-900"
+            }`}
+            title={!sideBarOpen ? "Settings" : ""}
+          >
+
+            <div
+              className={`flex items-center ${
+                sideBarOpen ? "gap-3" : "justify-center"
+              }`}
+            >
+              <FaCog className="shrink-0 text-sm" />
+
+              {sideBarOpen && (
+                <span className="font-medium">
+                  Settings
+                </span>
+              )}
+            </div>
+
+            {sideBarOpen &&
+              (settingOpen ? (
+                <FaChevronDown className="text-[10px]" />
+              ) : (
+                <FaChevronRight className="text-[10px]" />
+              ))}
+
+          </button>
+
+
+          {/* =================================================
+              COLLAPSED SETTINGS HOVER MENU
+          ================================================= */}
+
+          {!sideBarOpen && (
+
+            <div className="pointer-events-none absolute left-[68px] top-0 z-[999] hidden w-52 group-hover:pointer-events-auto group-hover:block">
+
+              {/* Invisible bridge */}
+
+              <div className="absolute -left-3 top-0 h-full w-3" />
+
+              <div className="rounded-xl border border-slate-200 bg-white p-2 shadow-xl">
+
+                {/* MENU TITLE */}
+
+                <div className="border-b border-slate-100 px-3 py-2">
+
+                  <p className="text-sm font-semibold text-slate-800">
+                    Settings
+                  </p>
+
+                </div>
+
+
+                <div className="mt-1">
+
+                  {/* STUDIO SETTINGS */}
+
+                  <NavLink
+                    to="/settings/studio"
+                    className={({ isActive }) =>
+                      `flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm transition ${
+                        isActive
+                          ? "bg-orange-50 font-semibold text-orange-600"
+                          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                      }`
+                    }
+                  >
+                    <FaSlidersH className="text-xs" />
+                    Studio Settings
+                  </NavLink>
+
+
+                  {/* RESET & CLEANUP */}
+
+                  <NavLink
+                    to="/settings/reset-cleanup"
+                    className={({ isActive }) =>
+                      `flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm transition ${
+                        isActive
+                          ? "bg-orange-50 font-semibold text-orange-600"
+                          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                      }`
+                    }
+                  >
+                    <FaBroom className="text-xs" />
+                    Reset & CleanUp
+                  </NavLink>
+
+                </div>
+
+              </div>
+
+            </div>
+          )}
+
+
+          {/* =================================================
+              EXPANDED SETTINGS SUBMENU
+          ================================================= */}
+
+          {sideBarOpen && settingOpen && (
+
+            <div className="ml-9 mt-1 space-y-1 border-l border-slate-200 pl-2">
+
+              {/* STUDIO SETTINGS */}
+
+              <NavLink
+                to="/settings/studio"
+                className={subNavClass}
+              >
+                <FaSlidersH className="mr-2 text-[11px]" />
+                Studio Settings
+              </NavLink>
+
+
+              {/* RESET & CLEANUP */}
+
+              <NavLink
+                to="/settings/reset-cleanup"
+                className={subNavClass}
+              >
+                <FaBroom className="mr-2 text-[11px]" />
+                Reset & CleanUp
+              </NavLink>
+
+            </div>
+          )}
+
+        </div>
+
       </nav>
     </aside>
   );
 };
 
 export default Sidebar;
+
+
+
+

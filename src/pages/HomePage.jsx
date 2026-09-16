@@ -136,17 +136,7 @@ const HomePage = () => {
         {/* Content */}
         <div className="p-5 md:p-8">
           {/* Welcome */}
-          <div className="mb-7 flex flex-col justify-between gap-4 md:flex-row md:items-center">
-            <div>
-              <h3 className="text-2xl font-bold text-slate-900">
-                Welcome Back👋
-              </h3>
-
-              <p className="mt-1 text-sm text-slate-500">
-                Here's what's happening with your billing system today.
-              </p>
-            </div>
-          </div>
+         
 
           {/* ================= STATS ================= */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
