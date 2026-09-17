@@ -132,7 +132,9 @@ const EstimateHeader = ({ register, errors, setValue }) => {
         <div className="mb-7 flex flex-col gap-5 border-b border-slate-100 pb-6 md:flex-row md:items-center md:justify-between">
           {/* PPP */}
           <div className="flex items-center gap-2">
-            <label className="font-semibold text-slate-600">सीलीप नं:</label>
+            <label className="font-semibold text-slate-600 dark:text-slate-300">
+              सीलीप नं:
+            </label>
 
             <input
               type="text"
@@ -144,14 +146,18 @@ const EstimateHeader = ({ register, errors, setValue }) => {
 
           {/* TITLE */}
           <div className="text-center">
-            <h1 className="text-xl font-bold text-slate-900">Estimate Slip</h1>
+            <h1 className="text-xl font-bold text-slate-900 dark:text-white">
+              Estimate Slip
+            </h1>
 
             <p className="mt-1 text-xs text-slate-400">Printing Estimate</p>
           </div>
 
           {/* DATE */}
           <div className="flex items-center gap-2">
-            <label className="font-semibold text-slate-600">मिति:</label>
+            <label className="font-semibold text-slate-600 dark:text-slate-300">
+              मिति:
+            </label>
 
             <input
               type="date"
@@ -181,7 +187,7 @@ const EstimateHeader = ({ register, errors, setValue }) => {
               </div>
 
               <div>
-                <h2 className="font-semibold text-slate-800">
+                <h2 className="font-semibold text-slate-800 dark:text-slate-300">
                   Customer Information
                 </h2>
 
@@ -221,7 +227,7 @@ const EstimateHeader = ({ register, errors, setValue }) => {
                       ? selectedCustomer.name
                       : "Search customer..."
                   }
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-10 pr-4 text-sm outline-none transition focus:border-orange-500 focus:bg-white focus:ring-2 focus:ring-orange-100"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 dark:bg-slate-800 py-3 pl-10 pr-4 text-sm outline-none transition focus:border-orange-500  focus:ring-2 focus:ring-orange-100"
                 />
               </div>
 
@@ -253,11 +259,11 @@ const EstimateHeader = ({ register, errors, setValue }) => {
                       </div>
 
                       <div>
-                        <p className="text-sm font-semibold text-slate-800">
+                        <p className="text-sm font-semibold text-slate-800 dark:text-slate-300">
                           {customer.name}
                         </p>
 
-                        <p className="text-xs text-slate-400">
+                        <p className="text-xs text-slate-400 dark:text-slate-300">
                           {customer.contact}
                         </p>
                       </div>
@@ -265,7 +271,9 @@ const EstimateHeader = ({ register, errors, setValue }) => {
                   ))
                 ) : (
                   <div className="px-4 py-5 text-center">
-                    <p className="text-sm text-slate-500">No customer found.</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                      No customer found.
+                    </p>
 
                     <button
                       type="button"
@@ -287,7 +295,7 @@ const EstimateHeader = ({ register, errors, setValue }) => {
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
             {/* NAME */}
             <div>
-              <label className="mb-2 block text-sm font-medium text-slate-600">
+              <label className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-300">
                 नाम
                 <span className="ml-1 text-orange-500">*</span>
               </label>
@@ -304,7 +312,7 @@ const EstimateHeader = ({ register, errors, setValue }) => {
                   className={`w-full rounded-xl border py-3 pl-10 pr-4 text-sm outline-none transition ${
                     selectedCustomer
                       ? "border-orange-100 bg-orange-50/50 text-slate-700"
-                      : "border-slate-200 bg-slate-50 focus:border-orange-500 focus:bg-white focus:ring-2 focus:ring-orange-100"
+                      : "border-slate-200 bg-slate-50 dark:bg-slate-500 focus:border-orange-500  focus:ring-2 focus:ring-orange-100"
                   }`}
                   placeholder="Customer name"
                 />
@@ -319,7 +327,7 @@ const EstimateHeader = ({ register, errors, setValue }) => {
 
             {/* PAN */}
             <div>
-              <label className="mb-2 block text-sm font-medium text-slate-600">
+              <label className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-300">
                 पान नं
               </label>
 
@@ -331,14 +339,14 @@ const EstimateHeader = ({ register, errors, setValue }) => {
                   {...register("panNumber")}
                   readOnly={!!selectedCustomer}
                   placeholder="PAN number"
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-10 pr-4 text-sm outline-none transition focus:border-orange-500 focus:bg-white focus:ring-2 focus:ring-orange-100"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 dark:bg-slate-500 py-3 pl-10 pr-4 text-sm outline-none transition focus:border-orange-500  focus:ring-2 focus:ring-orange-100"
                 />
               </div>
             </div>
 
             {/* CONTACT */}
             <div>
-              <label className="mb-2 block text-sm font-medium text-slate-600">
+              <label className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-300">
                 सम्पर्क नं
               </label>
 
@@ -350,14 +358,14 @@ const EstimateHeader = ({ register, errors, setValue }) => {
                   {...register("contactNumber")}
                   readOnly={!!selectedCustomer}
                   placeholder="Contact number"
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-10 pr-4 text-sm outline-none transition focus:border-orange-500 focus:bg-white focus:ring-2 focus:ring-orange-100"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 dark:bg-slate-500 py-3 pl-10 pr-4 text-sm outline-none transition focus:border-orange-500 focus:bg-white focus:ring-2 focus:ring-orange-100"
                 />
               </div>
             </div>
 
             {/* ADDRESS */}
             <div>
-              <label className="mb-2 block text-sm font-medium text-slate-600">
+              <label className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-300">
                 ठेगाना
               </label>
 
@@ -369,7 +377,7 @@ const EstimateHeader = ({ register, errors, setValue }) => {
                   {...register("address")}
                   readOnly={!!selectedCustomer}
                   placeholder="Customer address"
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-10 pr-4 text-sm outline-none transition focus:border-orange-500 focus:bg-white focus:ring-2 focus:ring-orange-100"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 dark:bg-slate-500 py-3 pl-10 pr-4 text-sm outline-none transition focus:border-orange-500  focus:ring-2 focus:ring-orange-100"
                 />
               </div>
             </div>
@@ -383,11 +391,11 @@ const EstimateHeader = ({ register, errors, setValue }) => {
 
       {showCustomerModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 px-4 backdrop-blur-sm">
-          <div className="w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-2xl">
+          <div className="w-full max-w-lg overflow-hidden rounded-2xl bg-white dark:bg-slate-700 shadow-2xl">
             {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-slate-100 px-6 py-5">
               <div>
-                <h2 className="text-lg font-bold text-slate-900">
+                <h2 className="text-lg font-bold text-slate-900 dark:text-slate-300">
                   Add New Customer
                 </h2>
 
@@ -409,7 +417,7 @@ const EstimateHeader = ({ register, errors, setValue }) => {
             <div className="space-y-5 p-6">
               {/* Name */}
               <div>
-                <label className="mb-2 block text-sm font-medium text-slate-600">
+                <label className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-300">
                   Customer Name
                   <span className="ml-1 text-orange-500">*</span>
                 </label>
@@ -430,7 +438,7 @@ const EstimateHeader = ({ register, errors, setValue }) => {
 
               {/* Contact */}
               <div>
-                <label className="mb-2 block text-sm font-medium text-slate-600">
+                <label className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-300">
                   Contact Number
                 </label>
 
@@ -450,7 +458,7 @@ const EstimateHeader = ({ register, errors, setValue }) => {
 
               {/* PAN */}
               <div>
-                <label className="mb-2 block text-sm font-medium text-slate-600">
+                <label className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-300">
                   PAN Number
                 </label>
 
@@ -470,7 +478,7 @@ const EstimateHeader = ({ register, errors, setValue }) => {
 
               {/* Address */}
               <div>
-                <label className="mb-2 block text-sm font-medium text-slate-600">
+                <label className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-300">
                   Address
                 </label>
 
@@ -490,7 +498,7 @@ const EstimateHeader = ({ register, errors, setValue }) => {
             </div>
 
             {/* Modal Footer */}
-            <div className="flex justify-end gap-3 border-t border-slate-100 bg-slate-50 px-6 py-4">
+            <div className="flex justify-end gap-3 border-t border-slate-100 bg-slate-50 dark:bg-slate-700 px-6 py-4">
               <button
                 type="button"
                 onClick={() => setShowCustomerModal(false)}

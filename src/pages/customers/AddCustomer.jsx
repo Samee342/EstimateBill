@@ -28,27 +28,27 @@ const AddCustomer = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-8 sm:px-6 lg:px-10">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-800 px-4 py-8 sm:px-6 lg:px-10">
       <div className="mx-auto max-w-4xl">
         {/* Header */}
         <div className="mb-5">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-300 sm:text-3xl">
               Add Customer
             </h1>
           </div>
         </div>
 
         {/* Form Card */}
-        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white dark:bg-slate-800 shadow-sm">
           {/* Card Header */}
-          <div className="border-b border-slate-100 bg-slate-50/70 px-3 py-2  sm:px-8">
+          <div className="border-b border-slate-100 bg-slate-50/70 dark:bg-slate-800 px-3 py-2  sm:px-8">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-100 text-orange-600">
                 <FaUser />
               </div>
               <div>
-                <h2 className="font-semibold text-slate-900">
+                <h2 className="font-semibold text-slate-900 dark:text-slate-300">
                   Customer Information
                 </h2>
                 <p className="mt-1 text-sm text-slate-500">
@@ -70,7 +70,7 @@ const AddCustomer = () => {
                 <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                   {/* Full Name */}
                   <div className="sm:col-span-2">
-                    <label className="mb-2 block text-sm font-medium text-slate-700">
+                    <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
                       Full Name
                       <span className="ml-1 text-orange-500">*</span>
                     </label>
@@ -81,7 +81,7 @@ const AddCustomer = () => {
                       <input
                         type="text"
                         placeholder="Enter customer's full name"
-                        className={`w-full rounded-xl border bg-white py-3 pl-11 pr-4 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:ring-2 ${
+                        className={`w-full rounded-xl border bg-white dark:bg-slate-700 dark:text-slate-300 py-3 pl-11 pr-4 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:ring-2 ${
                           errors.fullName
                             ? "border-red-400 focus:border-red-500 focus:ring-red-100"
                             : "border-slate-200 focus:border-orange-500 focus:ring-orange-100"
@@ -105,7 +105,7 @@ const AddCustomer = () => {
 
                   {/* Phone */}
                   <div>
-                    <label className="mb-2 block text-sm font-medium text-slate-700">
+                    <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
                       Phone Number
                       <span className="ml-1 text-orange-500">*</span>
                     </label>
@@ -116,7 +116,7 @@ const AddCustomer = () => {
                       <input
                         type="tel"
                         placeholder="98XXXXXXXX"
-                        className={`w-full rounded-xl border bg-white py-3 pl-11 pr-4 text-sm outline-none transition placeholder:text-slate-400 focus:ring-2 ${
+                        className={`w-full rounded-xl border bg-white dark:bg-slate-700 dark:text-slate-300 py-3 pl-11 pr-4 text-sm outline-none transition placeholder:text-slate-400 focus:ring-2 ${
                           errors.phone
                             ? "border-red-400 focus:border-red-500 focus:ring-red-100"
                             : "border-slate-200 focus:border-orange-500 focus:ring-orange-100"
@@ -140,7 +140,7 @@ const AddCustomer = () => {
 
                   {/* Email */}
                   <div>
-                    <label className="mb-2 block text-sm font-medium text-slate-700">
+                    <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
                       Email Address
                     </label>
 
@@ -150,7 +150,7 @@ const AddCustomer = () => {
                       <input
                         type="email"
                         placeholder="customer@example.com"
-                        className={`w-full rounded-xl border bg-white py-3 pl-11 pr-4 text-sm outline-none transition placeholder:text-slate-400 focus:border-orange-500 focus:ring-2 focus:ring-orange-100 ${
+                        className={`w-full rounded-xl border bg-white dark:bg-slate-700 dark:text-slate-300 py-3 pl-11 pr-4 text-sm outline-none transition placeholder:text-slate-400 focus:border-orange-500 focus:ring-2 focus:ring-orange-100 ${
                           errors.email ? "border-red-400" : "border-slate-200"
                         }`}
                         {...register("email", {
@@ -180,7 +180,7 @@ const AddCustomer = () => {
                 <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                   {/* Company */}
                   <div>
-                    <label className="mb-2 block text-sm font-medium text-slate-700">
+                    <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
                       Company / Business
                     </label>
 
@@ -190,7 +190,7 @@ const AddCustomer = () => {
                       <input
                         type="text"
                         placeholder="Company name"
-                        className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-11 pr-4 text-sm outline-none transition placeholder:text-slate-400 focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+                        className="w-full rounded-xl border border-slate-200 bg-white dark:bg-slate-700 dark:text-slate-300 py-3 pl-11 pr-4 text-sm outline-none transition placeholder:text-slate-400 focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
                         {...register("company")}
                       />
                     </div>
@@ -198,12 +198,12 @@ const AddCustomer = () => {
 
                   {/* Customer Type */}
                   <div>
-                    <label className="mb-2 block text-sm font-medium text-slate-700">
+                    <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
                       Customer Type
                     </label>
 
                     <select
-                      className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+                      className="w-full rounded-xl border border-slate-200 bg-white dark:bg-slate-700 dark:text-slate-300 px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
                       {...register("customerType")}
                     >
                       <option value="individual">Individual</option>
@@ -225,7 +225,7 @@ const AddCustomer = () => {
                   <textarea
                     rows="3"
                     placeholder="Enter customer's address"
-                    className="w-full resize-none rounded-xl border border-slate-200 bg-white py-3 pl-11 pr-4 text-sm outline-none transition placeholder:text-slate-400 focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+                    className="w-full resize-none rounded-xl border border-slate-200 bg-white dark:text-slate-300 dark:bg-slate-800  py-3 pl-11 pr-4 text-sm outline-none transition placeholder:text-slate-400 focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
                     {...register("address")}
                   />
                 </div>
@@ -240,18 +240,18 @@ const AddCustomer = () => {
                 <textarea
                   rows="3"
                   placeholder="Add any additional notes about this customer..."
-                  className="w-full resize-none rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+                  className="w-full resize-none rounded-xl border border-slate-200 bg-white dark:bg-slate-700 dark:text-slate-300  px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
                   {...register("notes")}
                 />
               </div>
             </div>
 
             {/* Footer */}
-            <div className="flex flex-col-reverse gap-3 border-t border-slate-100 bg-slate-50/50 px-6 py-5 sm:flex-row sm:justify-end sm:px-8">
+            <div className="flex flex-col-reverse gap-3 border-t border-slate-100 dark:bg-slate-800 bg-slate-50/50 px-6 py-5 sm:flex-row sm:justify-end sm:px-8">
               <button
                 type="button"
                 onClick={() => reset()}
-                className="rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50"
+                className="rounded-xl border border-slate-200 bg-white dark:bg-slate-700 px-5 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50"
               >
                 Cancel
               </button>

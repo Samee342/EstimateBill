@@ -14,6 +14,8 @@ import {
 const HomePage = () => {
   const navigate = useNavigate();
 
+  // ================= STATS DATA =================
+
   const stats = [
     {
       title: "Total Estimates",
@@ -40,6 +42,8 @@ const HomePage = () => {
       icon: FiDollarSign,
     },
   ];
+
+  // ================= ESTIMATES DATA =================
 
   const estimates = [
     {
@@ -79,9 +83,7 @@ const HomePage = () => {
     },
   ];
 
-  // =========================================
-  // GRAPH DATA
-  // =========================================
+  // ================= REVENUE GRAPH DATA =================
 
   const revenueData = [
     { month: "Jan", height: 45, color: "bg-orange-400" },
@@ -98,9 +100,7 @@ const HomePage = () => {
     { month: "Dec", height: 100, color: "bg-orange-500" },
   ];
 
-  // =========================================
-  // STATUS STYLE
-  // =========================================
+  // ================= STATUS STYLE =================
 
   const getStatusStyle = (status) => {
     switch (status) {
@@ -118,8 +118,40 @@ const HomePage = () => {
     }
   };
 
+  // ================= QUICK ACTIONS =================
+
+  const quickActions = [
+    {
+      title: "New Project",
+      description: "Create customer estimate Bill",
+      icon: FiPlus,
+      iconStyle: "bg-orange-100 text-orange-600",
+      hoverStyle:
+        "hover:border-orange-200 hover:bg-orange-50 dark:hover:bg-orange-500/10",
+      onClick: () => navigate("/projects/create-project"),
+    },
+    {
+      title: "Add Customer",
+      description: "Register a new customer",
+      icon: FiUsers,
+      iconStyle: "bg-blue-50 text-blue-600",
+      hoverStyle:
+        "hover:border-blue-200 hover:bg-blue-50 dark:hover:bg-blue-500/10",
+      onClick: () => navigate("/customers/add"),
+    },
+    {
+      title: "Print Estimate",
+      description: "Print pending estimates",
+      icon: FiPrinter,
+      iconStyle: "bg-green-50 text-green-600",
+      hoverStyle:
+        "hover:border-green-200 hover:bg-green-50 dark:hover:bg-green-500/10",
+      onClick: undefined,
+    },
+  ];
+
   return (
-    <div className="min-h-screen bg-[#f7f8fa] text-slate-800">
+    <div className="min-h-screen bg-[#f7f8fa] text-slate-800 dark:bg-slate-900 dark:text-slate-100">
       <main>
         <div className="p-5 md:p-8">
 
@@ -132,20 +164,20 @@ const HomePage = () => {
               return (
                 <div
                   key={index}
-                  className="rounded-2xl border border-slate-200 bg-white p-5"
+                  className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-700 dark:bg-slate-800"
                 >
                   <div className="flex items-start justify-between">
                     <div>
-                      <p className="text-sm font-medium text-slate-500">
+                      <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
                         {stat.title}
                       </p>
 
-                      <h3 className="mt-2 text-2xl font-bold text-slate-900">
+                      <h3 className="mt-2 text-2xl font-bold text-slate-900 dark:text-slate-100">
                         {stat.value}
                       </h3>
                     </div>
 
-                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-orange-50 text-orange-500">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-orange-50 text-orange-500 dark:bg-slate-700">
                       <Icon size={21} />
                     </div>
                   </div>
@@ -170,11 +202,10 @@ const HomePage = () => {
 
             {/* ================= REVENUE OVERVIEW ================= */}
 
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 xl:col-span-2">
-
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-800 xl:col-span-2">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-bold text-slate-900">
+                  <h3 className="font-bold text-slate-900 dark:text-slate-100">
                     Revenue Overview
                   </h3>
 
@@ -183,13 +214,13 @@ const HomePage = () => {
                   </p>
                 </div>
 
-                <select className="rounded-lg border border-slate-200 px-3 py-2 text-xs text-slate-600 outline-none">
+                <select className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-600 outline-none dark:border-slate-600 dark:bg-slate-700 dark:text-slate-300">
                   <option>Last 6 Months</option>
                   <option>Last 12 Months</option>
                 </select>
               </div>
 
-              {/* ================= COLORFUL BAR CHART ================= */}
+              {/* ================= BAR CHART ================= */}
 
               <div className="mt-8 flex h-56 items-end gap-3">
                 {revenueData.map((item, index) => (
@@ -202,7 +233,7 @@ const HomePage = () => {
                         height: `${item.height}%`,
                       }}
                       className={`w-full rounded-t-lg ${item.color} transition-all duration-300 group-hover:scale-y-105 group-hover:brightness-95`}
-                    ></div>
+                    />
                   </div>
                 ))}
               </div>
@@ -220,8 +251,8 @@ const HomePage = () => {
 
             {/* ================= QUICK ACTIONS ================= */}
 
-            <div className="rounded-2xl border border-slate-200 bg-white p-6">
-              <h3 className="font-bold text-slate-900">
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-800">
+              <h3 className="font-bold text-slate-900 dark:text-white">
                 Quick Actions
               </h3>
 
@@ -230,87 +261,49 @@ const HomePage = () => {
               </p>
 
               <div className="mt-5 space-y-3">
+                {quickActions.map((action, index) => {
+                  const Icon = action.icon;
 
-                {/* NEW PROJECT */}
+                  return (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={action.onClick}
+                      disabled={!action.onClick}
+                      className={`flex w-full items-center gap-4 rounded-xl border border-slate-200 p-4 text-left transition dark:border-slate-700 ${action.hoverStyle} ${
+                        !action.onClick
+                          ? "cursor-not-allowed opacity-70"
+                          : "cursor-pointer"
+                      }`}
+                    >
+                      <div
+                        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${action.iconStyle}`}
+                      >
+                        <Icon />
+                      </div>
 
-                <button
-                  type="button"
-                  onClick={() =>
-                    navigate("/projects/create-project")
-                  }
-                  className="flex w-full items-center gap-4 rounded-xl border border-slate-200 p-4 text-left transition hover:border-orange-200 hover:bg-orange-50"
-                >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-100 text-orange-600">
-                    <FiPlus />
-                  </div>
+                      <div>
+                        <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+                          {action.title}
+                        </p>
 
-                  <div>
-                    <p className="text-sm font-semibold">
-                      New Project
-                    </p>
-
-                    <p className="text-xs text-slate-400">
-                      Create customer estimate Bill
-                    </p>
-                  </div>
-                </button>
-
-                {/* ADD CUSTOMER */}
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    navigate("/customers/add")
-                  }
-                  className="flex w-full items-center gap-4 rounded-xl border border-slate-200 p-4 text-left transition hover:border-blue-200 hover:bg-blue-50"
-                >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
-                    <FiUsers />
-                  </div>
-
-                  <div>
-                    <p className="text-sm font-semibold">
-                      Add Customer
-                    </p>
-
-                    <p className="text-xs text-slate-400">
-                      Register a new customer
-                    </p>
-                  </div>
-                </button>
-
-                {/* PRINT ESTIMATE */}
-
-                <button
-                  type="button"
-                  className="flex w-full items-center gap-4 rounded-xl border border-slate-200 p-4 text-left transition hover:bg-slate-50"
-                >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-50 text-green-600">
-                    <FiPrinter />
-                  </div>
-
-                  <div>
-                    <p className="text-sm font-semibold">
-                      Print Estimate
-                    </p>
-
-                    <p className="text-xs text-slate-400">
-                      Print pending estimates
-                    </p>
-                  </div>
-                </button>
-
+                        <p className="mt-1 text-xs text-slate-400">
+                          {action.description}
+                        </p>
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>
 
           {/* ================= RECENT ESTIMATES ================= */}
 
-          <div className="mt-6 rounded-2xl border border-slate-200 bg-white">
-
-            <div className="flex flex-col justify-between gap-3 border-b border-slate-200 p-6 sm:flex-row sm:items-center">
+          <div className="mt-6 rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800">
+            <div className="flex flex-col justify-between gap-3 border-b border-slate-200 p-6 dark:border-slate-700 sm:flex-row sm:items-center">
               <div>
-                <h3 className="font-bold text-slate-900">
+                <h3 className="font-bold text-slate-900 dark:text-white">
                   Recent Estimates
                 </h3>
 
@@ -322,7 +315,7 @@ const HomePage = () => {
               <button
                 type="button"
                 onClick={() => navigate("/projects")}
-                className="text-sm font-semibold text-orange-500 hover:text-orange-600"
+                className="text-sm font-semibold text-orange-500 transition hover:text-orange-600"
               >
                 View All
               </button>
@@ -333,8 +326,7 @@ const HomePage = () => {
             <div className="hidden overflow-x-auto md:block">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-slate-100 text-left">
-
+                  <tr className="border-b border-slate-100 text-left dark:border-slate-700">
                     <th className="px-6 py-4 text-xs font-semibold uppercase text-slate-400">
                       Estimate ID
                     </th>
@@ -354,7 +346,6 @@ const HomePage = () => {
                     <th className="px-6 py-4 text-xs font-semibold uppercase text-slate-400">
                       Status
                     </th>
-
                   </tr>
                 </thead>
 
@@ -362,9 +353,8 @@ const HomePage = () => {
                   {estimates.map((estimate) => (
                     <tr
                       key={estimate.id}
-                      className="border-b border-slate-100 last:border-0 hover:bg-slate-50"
+                      className="border-b border-slate-100 last:border-0 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-700"
                     >
-
                       <td className="px-6 py-4">
                         <span className="text-sm font-semibold text-orange-600">
                           {estimate.id}
@@ -373,23 +363,21 @@ const HomePage = () => {
 
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-
-                          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-600">
+                          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-600 dark:bg-slate-700 dark:text-slate-200">
                             {estimate.customer.charAt(0)}
                           </div>
 
-                          <span className="text-sm font-medium text-slate-700">
+                          <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
                             {estimate.customer}
                           </span>
-
                         </div>
                       </td>
 
-                      <td className="px-6 py-4 text-sm text-slate-500">
+                      <td className="px-6 py-4 text-sm text-slate-500 dark:text-slate-400">
                         {estimate.date}
                       </td>
 
-                      <td className="px-6 py-4 text-sm font-semibold text-slate-800">
+                      <td className="px-6 py-4 text-sm font-semibold text-slate-800 dark:text-slate-100">
                         {estimate.amount}
                       </td>
 
@@ -402,7 +390,6 @@ const HomePage = () => {
                           {estimate.status}
                         </span>
                       </td>
-
                     </tr>
                   ))}
                 </tbody>
@@ -415,11 +402,9 @@ const HomePage = () => {
               {estimates.map((estimate) => (
                 <div
                   key={estimate.id}
-                  className="rounded-xl border border-slate-200 p-4"
+                  className="rounded-xl border border-slate-200 p-4 dark:border-slate-700"
                 >
-
                   <div className="flex items-center justify-between">
-
                     <span className="text-sm font-bold text-orange-600">
                       {estimate.id}
                     </span>
@@ -431,13 +416,11 @@ const HomePage = () => {
                     >
                       {estimate.status}
                     </span>
-
                   </div>
 
-                  <div className="mt-3 flex justify-between">
-
+                  <div className="mt-3 flex justify-between gap-3">
                     <div>
-                      <p className="text-sm font-semibold">
+                      <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
                         {estimate.customer}
                       </p>
 
@@ -446,18 +429,14 @@ const HomePage = () => {
                       </p>
                     </div>
 
-                    <p className="text-sm font-bold">
+                    <p className="text-sm font-bold text-slate-800 dark:text-slate-100">
                       {estimate.amount}
                     </p>
-
                   </div>
-
                 </div>
               ))}
             </div>
-
           </div>
-
         </div>
       </main>
     </div>

@@ -141,14 +141,16 @@ const AllCustomers = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 p-6">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-700 p-6">
       {/* PAGE HEADER */}
       <div className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center">
         <div>
           <div className="flex items-center gap-2">
             <FiUsers className="text-xl text-orange-500" />
 
-            <h1 className="text-2xl font-bold text-slate-800">All Customers</h1>
+            <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-300">
+              All Customers
+            </h1>
           </div>
 
           <p className="mt-1 text-sm text-slate-500">
@@ -169,16 +171,16 @@ const AllCustomers = () => {
       {/* SUMMARY CARDS */}
       <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {/* Total Customers */}
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="rounded-xl border border-slate-200 bg-white dark:bg-slate-800 p-5 shadow-sm">
           <p className="text-sm font-medium text-slate-500">Total Customers</p>
 
-          <h2 className="mt-2 text-2xl font-bold text-slate-800">
+          <h2 className="mt-2 text-2xl font-bold text-slate-800 dark:text-slate-300">
             {customers.length}
           </h2>
         </div>
 
         {/* Active */}
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="rounded-xl border border-slate-200 bg-white dark:bg-slate-800 p-5 shadow-sm">
           <p className="text-sm font-medium text-slate-500">Active Customers</p>
 
           <h2 className="mt-2 text-2xl font-bold text-green-600">
@@ -190,7 +192,7 @@ const AllCustomers = () => {
         </div>
 
         {/* Projects */}
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="rounded-xl border border-slate-200 bg-white dark:bg-slate-800 p-5 shadow-sm">
           <p className="text-sm font-medium text-slate-500">Total Projects</p>
 
           <h2 className="mt-2 text-2xl font-bold text-blue-600">
@@ -202,7 +204,7 @@ const AllCustomers = () => {
         </div>
 
         {/* Revenue */}
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="rounded-xl border border-slate-200 bg-white dark:bg-slate-800 p-5 shadow-sm">
           <p className="text-sm font-medium text-slate-500">Total Business</p>
 
           <h2 className="mt-2 text-2xl font-bold text-orange-500">
@@ -215,7 +217,7 @@ const AllCustomers = () => {
       </div>
 
       {/* TABLE CARD */}
-      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white dark:bg-slate-800 shadow-sm">
         {/* SEARCH + FILTER */}
         <div className="flex flex-col gap-3 border-b border-slate-200 p-4 md:flex-row md:items-center md:justify-between">
           {/* Search */}
@@ -238,7 +240,7 @@ const AllCustomers = () => {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-700 outline-none focus:border-orange-500"
+            className="rounded-lg border border-slate-300 bg-white dark:bg-slate-500 px-4 py-2.5 text-sm text-slate-700 outline-none focus:border-orange-500"
           >
             <option value="All">All Status</option>
             <option value="Active">Active</option>
@@ -250,7 +252,7 @@ const AllCustomers = () => {
         <div className="hidden overflow-x-auto md:block">
           <table className="w-full min-w-[1000px]">
             <thead>
-              <tr className="border-b border-slate-200 bg-slate-50 text-left">
+              <tr className="border-b border-slate-200 bg-slate-50 dark:bg-slate-800 text-left">
                 <th className="px-5 py-4 text-xs font-semibold uppercase text-slate-500">
                   Customer
                 </th>
@@ -282,7 +284,7 @@ const AllCustomers = () => {
                 filteredCustomers.map((customer) => (
                   <tr
                     key={customer.id}
-                    className="border-b border-slate-100 transition hover:bg-slate-50"
+                    className="border-b border-slate-100 transition hover:bg-slate-50 hover:bg-slate-800"
                   >
                     {/* CUSTOMER */}
                     <td className="px-5 py-4">
@@ -313,14 +315,14 @@ const AllCustomers = () => {
 
                     {/* PROJECTS */}
                     <td className="px-5 py-4">
-                      <span className="font-medium text-slate-700">
+                      <span className="font-medium text-slate-700 dark:text-slate-300">
                         {customer.projects}
                       </span>
                     </td>
 
                     {/* TOTAL */}
                     <td className="px-5 py-4">
-                      <span className="font-semibold text-slate-800">
+                      <span className="font-semibold text-slate-800 dark:text-slate-300">
                         Rs. {customer.totalAmount.toLocaleString()}
                       </span>
                     </td>

@@ -78,20 +78,12 @@ const CreateProject = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-700 px-4 py-6 sm:px-6 lg:px-8">
       {/* Page Header */}
       <div className="mx-auto mb-6 max-w-7xl">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <div className="flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-orange-500" />
-
-              <span className="text-xs font-semibold uppercase tracking-wider text-orange-600">
-                Projects
-              </span>
-            </div>
-
-            <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900">
+            <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-200">
               Create Project
             </h1>
 
@@ -103,7 +95,7 @@ const CreateProject = () => {
           <button
             type="button"
             onClick={() => navigate("/projects")}
-            className="w-fit rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-600 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
+            className="w-fit rounded-lg border border-slate-200  bg-white dark:bg-slate-600 px-4 py-2.5 text-sm font-medium text-slate-600 dark:text-white shadow-sm transition hover:border-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
           >
             ← Back to Projects
           </button>
@@ -114,15 +106,15 @@ const CreateProject = () => {
         {/* =========================================
             ESTIMATE HEADER
         ========================================== */}
-        <div className="mb-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-          <div className="border-b border-slate-100 bg-white px-6 py-5">
+        <div className="mb-6 overflow-hidden rounded-2xl border border-slate-200 bg-white dark:bg-slate-800 shadow-sm">
+          <div className="border-b border-slate-100 bg-white dark:bg-slate-800 px-6 py-5">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50">
                 <span className="text-lg text-orange-600">#</span>
               </div>
 
               <div>
-                <h2 className="font-semibold text-slate-900">
+                <h2 className="font-semibold text-slate-900 dark:text-slate-200">
                   Estimate Information
                 </h2>
 
@@ -143,11 +135,13 @@ const CreateProject = () => {
         {/* =========================================
             PRINTING ITEMS
         ========================================== */}
-        <div className="mb-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div className="mb-6 overflow-hidden rounded-2xl border border-slate-200 bg-white dark:bg-slate-800 shadow-sm">
           <div className="border-b border-slate-100 px-6 py-5">
             <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h2 className="font-semibold text-slate-900">Printing Items</h2>
+                <h2 className="font-semibold text-slate-900 dark:text-slate-200">
+                  Printing Items
+                </h2>
 
                 <p className="mt-1 text-xs text-slate-500">
                   Add the products and printing details for this estimate.
@@ -180,7 +174,7 @@ const CreateProject = () => {
             TOTAL
         ========================================== */}
         <div className="mb-6 flex justify-end">
-          <div className="w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm sm:w-96">
+          <div className="w-full overflow-hidden rounded-2xl border border-slate-200 bg-white dark:bg-slate-800 shadow-sm sm:w-96">
             <div className="border-b border-slate-100 px-5 py-4">
               <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                 Estimate Total
@@ -212,7 +206,7 @@ const CreateProject = () => {
           <button
             type="button"
             onClick={() => navigate("/projects")}
-            className="rounded-xl border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-600 shadow-sm transition hover:bg-slate-50"
+            className="rounded-xl border border-slate-200 bg-white dark:bg-slate-800 px-6 py-3 text-sm font-semibold text-slate-600 shadow-sm transition hover:bg-slate-50"
           >
             Cancel
           </button>
