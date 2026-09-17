@@ -1,103 +1,338 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+} from "react-router-dom";
+
 import "./App.css";
 
-import { lazy, useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { useSelector } from "react-redux";
 
-// ========================================
-// PUBLIC PAGES
-// ========================================
+import { getCurrentUser } from "./utils/auth";
 
-const Login = lazy(() => import("./pages/auth/LoginPage"));
+/* ======================================================
+   PUBLIC PAGES
+====================================================== */
 
-const Register = lazy(() => import("./pages/auth/RegisterPage"));
-
-const ForgotPassword = lazy(
-  () => import("./pages/auth/ForgotPasswordPage")
+const Login = lazy(() =>
+  import("./pages/auth/LoginPage")
 );
 
-const SetupPage = lazy(
-  () => import("./pages/auth/SetupPage")
+const Register = lazy(() =>
+  import("./pages/auth/RegisterPage")
 );
 
-// ========================================
-// ADMIN LAYOUT
-// ========================================
-
-const AdminLayout = lazy(
-  () => import("./layout/AdminLayout")
+const ForgotPassword = lazy(() =>
+  import("./pages/auth/ForgotPasswordPage")
 );
 
-// ========================================
-// DASHBOARD
-// ========================================
-
-const Home = lazy(
-  () => import("./pages/HomePage")
+const SetupPage = lazy(() =>
+  import("./pages/auth/SetupPage")
 );
 
-// ========================================
-// PROJECT PAGES
-// ========================================
+/* ======================================================
+   LAYOUTS
+====================================================== */
 
-const ProjectPage = lazy(
-  () => import("./pages/project/AllProject")
+const AdminLayout = lazy(() =>
+  import("./layout/AdminLayout")
 );
 
-const CreateProject = lazy(
-  () => import("./pages/project/CreateProject")
+const StaffLayout = lazy(() =>
+  import("./layout/StaffLayout")
 );
 
-// ========================================
-// CUSTOMER PAGES
-// ========================================
+/* ======================================================
+   ADMIN PAGES
+====================================================== */
 
-const AllCustomers = lazy(
-  () => import("./pages/customers/AllCustomersPage")
+/* Dashboard */
+
+const Home = lazy(() =>
+  import("./pages/HomePage")
 );
 
-const AddCustomer = lazy(
-  () => import("./pages/customers/AddCustomer")
+/* Projects */
+
+const ProjectPage = lazy(() =>
+  import("./pages/project/AllProject")
 );
 
-// ========================================
-// REPORT PAGES
-// ========================================
-
-const SalesReport = lazy(
-  () => import("./pages/Reports/SalesReport")
+const CreateProject = lazy(() =>
+  import("./pages/project/CreateProject")
 );
 
-const CustomerReport = lazy(
-  () => import("./pages/Reports/CustomerReport")
+/* Customers */
+
+const AllCustomers = lazy(() =>
+  import("./pages/customers/AllCustomersPage")
 );
 
-const PaymentReport = lazy(
-  () => import("./pages/Reports/PaymentReport")
+const AddCustomer = lazy(() =>
+  import("./pages/customers/AddCustomer")
 );
 
-// ========================================
-// NOTIFICATION
-// ========================================
+/* Reports */
 
-const Notification = lazy(
-  () => import("./pages/Notification/Notification")
+const SalesReport = lazy(() =>
+  import("./pages/Reports/SalesReport")
 );
 
-// ========================================
-// SETTINGS PAGES
-// ========================================
-
-const ResetCleanup = lazy(
-  () => import("./pages/settings/ResetCleanup")
+const CustomerReport = lazy(() =>
+  import("./pages/Reports/CustomerReport")
 );
 
-const StudioSettings = lazy(
-  () => import("./pages/settings/StudioSettings")
+const PaymentReport = lazy(() =>
+  import("./pages/Reports/PaymentReport")
 );
+
+/* Notification */
+
+const Notification = lazy(() =>
+  import("./pages/Notification/Notification")
+);
+
+/* Settings */
+
+const ResetCleanup = lazy(() =>
+  import("./pages/settings/ResetCleanup")
+);
+
+const StudioSettings = lazy(() =>
+  import("./pages/settings/StudioSettings")
+);
+
+/* ======================================================
+   STAFF PAGES
+====================================================== */
+
+/* Dashboard */
+
+const StaffDashboard = lazy(() =>
+  import("./pages/staff/StaffDashboard")
+);
+
+/* Tasks */
+
+const StaffTasks = lazy(() =>
+  import("./pages/staff/StaffTasks")
+);
+
+/* Orders */
+
+const StaffOrders = lazy(() =>
+  import("./pages/staff/StaffOrders")
+);
+
+const StaffOrderDetails = lazy(() =>
+  import("./pages/staff/StaffOrderDetails")
+);
+
+/* Customers */
+
+const StaffCustomers = lazy(() =>
+  import("./pages/staff/StaffCustomers")
+);
+
+/* Profile */
+
+const StaffProfile = lazy(() =>
+  import("./pages/staff/StaffProfile")
+);
+
+/* ======================================================
+   LOADING SCREEN
+====================================================== */
+
+const LoadingScreen = () => {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-950">
+      <div className="text-center">
+
+        <div className="mx-auto mb-3 h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-orange-600 dark:border-slate-700 dark:border-t-orange-500" />
+
+        <p className="text-sm text-slate-500">
+          Loading...
+        </p>
+
+      </div>
+    </div>
+  );
+};
+
+/* ======================================================
+   ADMIN ROUTE PROTECTION
+====================================================== */
+
+const AdminRoute = ({ children }) => {
+  const user = getCurrentUser();
+
+  /* User not logged in */
+
+  if (!user) {
+    return (
+      <Navigate
+        to="/login"
+        replace
+      />
+    );
+  }
+
+  /* Logged in but not admin */
+
+  if (user.role !== "admin") {
+    return (
+      <Navigate
+        to="/staff"
+        replace
+      />
+    );
+  }
+
+  return children;
+};
+
+/* ======================================================
+   STAFF ROUTE PROTECTION
+====================================================== */
+
+const StaffRoute = ({ children }) => {
+  const user = getCurrentUser();
+
+  /* User not logged in */
+
+  if (!user) {
+    return (
+      <Navigate
+        to="/login"
+        replace
+      />
+    );
+  }
+
+  /* Logged in but not staff */
+
+  if (user.role !== "staff") {
+    return (
+      <Navigate
+        to="/dashboard"
+        replace
+      />
+    );
+  }
+
+  return children;
+};
+
+/* ======================================================
+   ROOT REDIRECT
+====================================================== */
+
+const RootRedirect = () => {
+  const user = getCurrentUser();
+
+  /* No user */
+
+  if (!user) {
+    return (
+      <Navigate
+        to="/login"
+        replace
+      />
+    );
+  }
+
+  /* Admin */
+
+  if (user.role === "admin") {
+    return (
+      <Navigate
+        to="/dashboard"
+        replace
+      />
+    );
+  }
+
+  /* Staff */
+
+  if (user.role === "staff") {
+    return (
+      <Navigate
+        to="/staff"
+        replace
+      />
+    );
+  }
+
+  /* Unknown role */
+
+  return (
+    <Navigate
+      to="/login"
+      replace
+    />
+  );
+};
+
+/* ======================================================
+   404 PAGE
+====================================================== */
+
+const NotFound = () => {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-slate-50 p-6 dark:bg-slate-950">
+
+      <div className="text-center">
+
+        <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-slate-100 dark:bg-slate-800">
+          <span className="text-2xl font-bold text-slate-400">
+            404
+          </span>
+        </div>
+
+        <h1 className="mt-5 text-3xl font-bold text-slate-900 dark:text-white">
+          Page Not Found
+        </h1>
+
+        <p className="mt-2 text-sm text-slate-500">
+          The page you are looking for does not exist.
+        </p>
+
+        <button
+          type="button"
+          onClick={() => {
+            window.location.href = "/";
+          }}
+          className="mt-6 rounded-xl bg-orange-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-orange-700"
+        >
+          Go Home
+        </button>
+
+      </div>
+
+    </div>
+  );
+};
+
+/* ======================================================
+   APP
+====================================================== */
 
 function App() {
-  const theme = useSelector((state) => state.theme.theme);
+
+  /* ====================================================
+     REDUX THEME
+  ==================================================== */
+
+  const theme = useSelector(
+    (state) => state.theme.theme
+  );
+
+  /* ====================================================
+     DARK MODE
+  ==================================================== */
 
   useEffect(() => {
     document.documentElement.classList.toggle(
@@ -106,124 +341,208 @@ function App() {
     );
   }, [theme]);
 
+  /* ====================================================
+     ROUTER
+  ==================================================== */
+
   return (
     <BrowserRouter>
-      <Routes>
 
-        {/* ========================================
-            PUBLIC PAGES
-        ======================================== */}
+      <Suspense fallback={<LoadingScreen />}>
 
-        <Route
-          path="/login"
-          element={<Login />}
-        />
+        <Routes>
 
-        <Route
-          path="/register"
-          element={<Register />}
-        />
+          {/* ==================================================
+              PUBLIC
+          ================================================== */}
 
-        <Route
-          path="/forgot-password"
-          element={<ForgotPassword />}
-        />
-
-        <Route
-          path="/setup"
-          element={<SetupPage />}
-        />
-
-        {/* ========================================
-            ADMIN DASHBOARD
-        ======================================== */}
-
-        <Route element={<AdminLayout />}>
-
-          {/* Dashboard */}
           <Route
-            index
-            element={<Home />}
+            path="/login"
+            element={<Login />}
           />
 
           <Route
-            path="/dashboard"
-            element={<Home />}
-          />
-
-          {/* ======================================
-              PROJECTS
-          ====================================== */}
-
-          <Route
-            path="/projects"
-            element={<ProjectPage />}
+            path="/register"
+            element={<Register />}
           />
 
           <Route
-            path="/projects/create-project"
-            element={<CreateProject />}
-          />
-
-          {/* ======================================
-              CUSTOMERS
-          ====================================== */}
-
-          <Route
-            path="/customers"
-            element={<AllCustomers />}
+            path="/forgot-password"
+            element={<ForgotPassword />}
           />
 
           <Route
-            path="/customers/add"
-            element={<AddCustomer />}
+            path="/setup"
+            element={<SetupPage />}
           />
 
-          {/* ======================================
-              REPORTS
-          ====================================== */}
+          {/* ==================================================
+              ROOT
+          ================================================== */}
 
           <Route
-            path="/reports/sales"
-            element={<SalesReport />}
+            path="/"
+            element={<RootRedirect />}
           />
+
+          {/* ==================================================
+              ADMIN
+          ================================================== */}
 
           <Route
-            path="/reports/customers"
-            element={<CustomerReport />}
-          />
+            element={
+              <AdminRoute>
+                <AdminLayout />
+              </AdminRoute>
+            }
+          >
+
+            {/* Dashboard */}
+
+            <Route
+              path="/dashboard"
+              element={<Home />}
+            />
+
+            {/* Projects */}
+
+            <Route
+              path="/projects"
+              element={<ProjectPage />}
+            />
+
+            <Route
+              path="/projects/create-project"
+              element={<CreateProject />}
+            />
+
+            {/* Customers */}
+
+            <Route
+              path="/customers"
+              element={<AllCustomers />}
+            />
+
+            <Route
+              path="/customers/add"
+              element={<AddCustomer />}
+            />
+
+            {/* Reports */}
+
+            <Route
+              path="/reports/sales"
+              element={<SalesReport />}
+            />
+
+            <Route
+              path="/reports/customers"
+              element={<CustomerReport />}
+            />
+
+            <Route
+              path="/reports/payments"
+              element={<PaymentReport />}
+            />
+
+            {/* Notifications */}
+
+            <Route
+              path="/notifications"
+              element={<Notification />}
+            />
+
+            {/* Settings */}
+
+            <Route
+              path="/settings/studio"
+              element={<StudioSettings />}
+            />
+
+            <Route
+              path="/settings/reset-cleanup"
+              element={<ResetCleanup />}
+            />
+
+          </Route>
+
+          {/* ==================================================
+              STAFF
+          ================================================== */}
 
           <Route
-            path="/reports/payments"
-            element={<PaymentReport />}
-          />
+            element={
+              <StaffRoute>
+                <StaffLayout />
+              </StaffRoute>
+            }
+          >
 
-          {/* ======================================
-              NOTIFICATIONS
-          ====================================== */}
+            {/* ----------------------------------------------
+                STAFF DASHBOARD
+            ---------------------------------------------- */}
+
+            <Route
+              path="/staff"
+              element={<StaffDashboard />}
+            />
+
+            {/* ----------------------------------------------
+                MY TASKS
+            ---------------------------------------------- */}
+
+            <Route
+              path="/staff/tasks"
+              element={<StaffTasks />}
+            />
+
+            {/* ----------------------------------------------
+                MY ORDERS
+            ---------------------------------------------- */}
+
+            <Route
+              path="/staff/orders"
+              element={<StaffOrders />}
+            />
+
+            <Route
+              path="/staff/orders/:orderId"
+              element={<StaffOrderDetails />}
+            />
+
+            {/* ----------------------------------------------
+                CUSTOMERS
+            ---------------------------------------------- */}
+
+            <Route
+              path="/staff/customers"
+              element={<StaffCustomers />}
+            />
+
+            {/* ----------------------------------------------
+                PROFILE
+            ---------------------------------------------- */}
+
+            <Route
+              path="/staff/profile"
+              element={<StaffProfile />}
+            />
+
+          </Route>
+
+          {/* ==================================================
+              404
+          ================================================== */}
 
           <Route
-            path="/notifications"
-            element={<Notification />}
+            path="*"
+            element={<NotFound />}
           />
 
-          {/* ======================================
-              SETTINGS
-          ====================================== */}
+        </Routes>
 
-          <Route
-            path="/settings/studio"
-            element={<StudioSettings />}
-          />
+      </Suspense>
 
-          <Route
-            path="/settings/reset-cleanup"
-            element={<ResetCleanup />}
-          />
-
-        </Route>
-
-      </Routes>
     </BrowserRouter>
   );
 }

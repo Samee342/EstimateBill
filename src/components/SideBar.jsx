@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import {
   FaThLarge,
@@ -12,13 +11,27 @@ import {
   FaPlus,
   FaSlidersH,
   FaBroom,
+  FaSignOutAlt,
 } from "react-icons/fa";
-import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
-import { NavLink, useLocation } from "react-router-dom";
+
+import {
+  IoIosArrowForward,
+  IoIosArrowBack,
+} from "react-icons/io";
+
+import {
+  NavLink,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
+
 import Logo from "../assets/Logo.jpeg";
+
+import { logoutUser } from "../utils/auth";
 
 const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const [reportOpen, setReportOpen] = useState(false);
   const [projectOpen, setProjectOpen] = useState(false);
@@ -29,6 +42,18 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
   const isProjectSection = location.pathname.startsWith("/projects");
   const isCustomerSection = location.pathname.startsWith("/customers");
   const isSettingSection = location.pathname.startsWith("/settings");
+
+  // =========================================
+  // LOGOUT
+  // =========================================
+
+  const handleLogout = () => {
+    logoutUser();
+
+    navigate("/login", {
+      replace: true,
+    });
+  };
 
   // =========================================
   // OPEN CURRENT SECTION AUTOMATICALLY
@@ -112,7 +137,11 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
       <div
         className={`relative flex h-20 shrink-0 items-center border-b
           border-slate-100 dark:border-slate-800
-          ${sideBarOpen ? "justify-between px-5" : "justify-center px-2"}
+          ${
+            sideBarOpen
+              ? "justify-between px-5"
+              : "justify-center px-2"
+          }
         `}
       >
         {/* Logo */}
@@ -219,7 +248,6 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
         ====================================================== */}
 
         <div className="group relative mt-1">
-
           <button
             type="button"
             onClick={() => {
@@ -268,11 +296,9 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
 
           {!sideBarOpen && (
             <div className="pointer-events-none absolute left-[68px] top-0 z-[999] hidden w-48 group-hover:pointer-events-auto group-hover:block">
-
               <div className="absolute -left-3 top-0 h-full w-3" />
 
               <div className="rounded-xl border border-slate-200 bg-white p-2 shadow-xl dark:border-slate-700 dark:bg-slate-900">
-
                 <div className="border-b border-slate-100 px-3 py-2 dark:border-slate-800">
                   <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
                     Projects
@@ -280,7 +306,6 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                 </div>
 
                 <div className="mt-1">
-
                   <NavLink
                     to="/projects"
                     end
@@ -308,7 +333,6 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                     <FaPlus className="text-[9px]" />
                     Create Project
                   </NavLink>
-
                 </div>
               </div>
             </div>
@@ -318,7 +342,6 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
 
           {sideBarOpen && projectOpen && (
             <div className="ml-9 mt-1 space-y-1 border-l border-slate-200 pl-2 dark:border-slate-700">
-
               <NavLink
                 to="/projects"
                 end
@@ -334,7 +357,6 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                 <FaPlus className="mr-2 text-[9px]" />
                 Create Project
               </NavLink>
-
             </div>
           )}
         </div>
@@ -344,7 +366,6 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
         ====================================================== */}
 
         <div className="group relative mt-1">
-
           <button
             type="button"
             onClick={() => {
@@ -393,11 +414,9 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
 
           {!sideBarOpen && (
             <div className="pointer-events-none absolute left-[68px] top-0 z-[999] hidden w-48 group-hover:pointer-events-auto group-hover:block">
-
               <div className="absolute -left-3 top-0 h-full w-3" />
 
               <div className="rounded-xl border border-slate-200 bg-white p-2 shadow-xl dark:border-slate-700 dark:bg-slate-900">
-
                 <div className="border-b border-slate-100 px-3 py-2 dark:border-slate-800">
                   <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
                     Customers
@@ -405,7 +424,6 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                 </div>
 
                 <div className="mt-1">
-
                   <NavLink
                     to="/customers"
                     end
@@ -433,7 +451,6 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                     <FaPlus className="text-[9px]" />
                     Add Customer
                   </NavLink>
-
                 </div>
               </div>
             </div>
@@ -443,7 +460,6 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
 
           {sideBarOpen && customerOpen && (
             <div className="ml-9 mt-1 space-y-1 border-l border-slate-200 pl-2 dark:border-slate-700">
-
               <NavLink
                 to="/customers"
                 end
@@ -459,7 +475,6 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                 <FaPlus className="mr-2 text-[9px]" />
                 Add Customer
               </NavLink>
-
             </div>
           )}
         </div>
@@ -469,7 +484,6 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
         ====================================================== */}
 
         <div className="group relative mt-1">
-
           <button
             type="button"
             onClick={() => {
@@ -518,11 +532,9 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
 
           {!sideBarOpen && (
             <div className="pointer-events-none absolute left-[68px] top-0 z-[999] hidden w-48 group-hover:pointer-events-auto group-hover:block">
-
               <div className="absolute -left-3 top-0 h-full w-3" />
 
               <div className="rounded-xl border border-slate-200 bg-white p-2 shadow-xl dark:border-slate-700 dark:bg-slate-900">
-
                 <div className="border-b border-slate-100 px-3 py-2 dark:border-slate-800">
                   <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
                     Reports
@@ -530,7 +542,6 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                 </div>
 
                 <div className="mt-1">
-
                   <NavLink
                     to="/reports/sales"
                     className={({ isActive }) =>
@@ -569,7 +580,6 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                   >
                     Payment Report
                   </NavLink>
-
                 </div>
               </div>
             </div>
@@ -579,7 +589,6 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
 
           {sideBarOpen && reportOpen && (
             <div className="ml-9 mt-1 space-y-1 border-l border-slate-200 pl-2 dark:border-slate-700">
-
               <NavLink
                 to="/reports/sales"
                 className={subNavClass}
@@ -600,7 +609,6 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
               >
                 Payment Report
               </NavLink>
-
             </div>
           )}
         </div>
@@ -615,11 +623,9 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
           title={!sideBarOpen ? "Notifications" : ""}
         >
           <div className="relative">
-
             <FaBell className="shrink-0 text-sm" />
 
             <span className="absolute -right-1.5 -top-1.5 h-2 w-2 rounded-full border-2 border-white bg-orange-500 dark:border-slate-900" />
-
           </div>
 
           {sideBarOpen && (
@@ -636,9 +642,6 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
         ====================================================== */}
 
         <div className="group relative mt-1">
-
-          {/* SETTINGS BUTTON */}
-
           <button
             type="button"
             onClick={() => {
@@ -661,13 +664,11 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
             }`}
             title={!sideBarOpen ? "Settings" : ""}
           >
-
             <div
               className={`flex items-center ${
                 sideBarOpen ? "gap-3" : "justify-center"
               }`}
             >
-
               <FaCog className="shrink-0 text-sm" />
 
               {sideBarOpen && (
@@ -675,7 +676,6 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                   Settings
                 </span>
               )}
-
             </div>
 
             {sideBarOpen &&
@@ -684,32 +684,22 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
               ) : (
                 <FaChevronRight className="text-[10px]" />
               ))}
-
           </button>
 
-          {/* =================================================
-              COLLAPSED SETTINGS MENU
-          ================================================= */}
+          {/* Collapsed Settings Menu */}
 
           {!sideBarOpen && (
             <div className="pointer-events-none absolute left-[68px] top-0 z-[999] hidden w-52 group-hover:pointer-events-auto group-hover:block">
-
               <div className="absolute -left-3 top-0 h-full w-3" />
 
               <div className="rounded-xl border border-slate-200 bg-white p-2 shadow-xl dark:border-slate-700 dark:bg-slate-900">
-
                 <div className="border-b border-slate-100 px-3 py-2 dark:border-slate-800">
-
                   <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
                     Settings
                   </p>
-
                 </div>
 
                 <div className="mt-1">
-
-                  {/* STUDIO SETTINGS */}
-
                   <NavLink
                     to="/settings/studio"
                     className={({ isActive }) =>
@@ -724,8 +714,6 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                     Studio Settings
                   </NavLink>
 
-                  {/* RESET & CLEANUP */}
-
                   <NavLink
                     to="/settings/reset-cleanup"
                     className={({ isActive }) =>
@@ -739,24 +727,15 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                     <FaBroom className="text-xs" />
                     Reset & CleanUp
                   </NavLink>
-
                 </div>
-
               </div>
-
             </div>
           )}
 
-          {/* =================================================
-              EXPANDED SETTINGS MENU
-          ================================================= */}
+          {/* Expanded Settings Menu */}
 
           {sideBarOpen && settingOpen && (
-
             <div className="ml-9 mt-1 space-y-1 border-l border-slate-200 pl-2 dark:border-slate-700">
-
-              {/* STUDIO SETTINGS */}
-
               <NavLink
                 to="/settings/studio"
                 className={subNavClass}
@@ -765,8 +744,6 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                 Studio Settings
               </NavLink>
 
-              {/* RESET & CLEANUP */}
-
               <NavLink
                 to="/settings/reset-cleanup"
                 className={subNavClass}
@@ -774,17 +751,37 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                 <FaBroom className="mr-2 text-[11px]" />
                 Reset & CleanUp
               </NavLink>
-
             </div>
-
           )}
-
         </div>
-
       </nav>
+
+      {/* =====================================================
+          LOGOUT
+      ====================================================== */}
+
+      <div className="shrink-0 border-t border-slate-100 p-3 dark:border-slate-800">
+        <button
+          type="button"
+          onClick={handleLogout}
+          title={!sideBarOpen ? "Logout" : ""}
+          className={`group flex w-full items-center rounded-xl text-red-500 transition-all duration-200 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/30 ${
+            sideBarOpen
+              ? "gap-3 px-3 py-3"
+              : "justify-center px-2 py-3"
+          }`}
+        >
+          <FaSignOutAlt className="shrink-0 text-sm" />
+
+          {sideBarOpen && (
+            <span className="font-medium">
+              Logout
+            </span>
+          )}
+        </button>
+      </div>
     </aside>
   );
 };
 
 export default Sidebar;
-
