@@ -1,3 +1,4 @@
+
 import React, { useMemo, useState } from "react";
 import {
   FiDollarSign,
@@ -188,6 +189,73 @@ const SalesReport = () => {
     ...printingTypes.map((item) => item.amount)
   );
 
+  // ------------------------------------
+  // Monthly Sales Data
+  // ------------------------------------
+
+  const monthlySales = [
+    {
+      month: "Jan",
+      height: 45,
+      color: "bg-orange-400",
+    },
+    {
+      month: "Feb",
+      height: 55,
+      color: "bg-blue-400",
+    },
+    {
+      month: "Mar",
+      height: 42,
+      color: "bg-green-400",
+    },
+    {
+      month: "Apr",
+      height: 65,
+      color: "bg-purple-400",
+    },
+    {
+      month: "May",
+      height: 58,
+      color: "bg-pink-400",
+    },
+    {
+      month: "Jun",
+      height: 72,
+      color: "bg-cyan-400",
+    },
+    {
+      month: "Jul",
+      height: 63,
+      color: "bg-yellow-400",
+    },
+    {
+      month: "Aug",
+      height: 82,
+      color: "bg-red-400",
+    },
+    {
+      month: "Sep",
+      height: 70,
+      color: "bg-indigo-400",
+    },
+    {
+      month: "Oct",
+      height: 88,
+      color: "bg-emerald-400",
+    },
+    {
+      month: "Nov",
+      height: 76,
+      color: "bg-violet-400",
+    },
+    {
+      month: "Dec",
+      height: 95,
+      color: "bg-orange-500",
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-[#f7f8fa] text-slate-800">
       {/* Header */}
@@ -212,7 +280,10 @@ const SalesReport = () => {
             </p>
           </div>
 
-          <button className="flex w-fit items-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-orange-600">
+          <button
+            type="button"
+            className="flex w-fit items-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-orange-600"
+          >
             <FiDownload size={17} />
             Export Report
           </button>
@@ -235,7 +306,7 @@ const SalesReport = () => {
                 placeholder="Search customer, project or ID..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-10 pr-4 text-sm outline-none focus:border-orange-400 focus:bg-white"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-10 pr-4 text-sm outline-none transition focus:border-orange-400 focus:bg-white"
               />
             </div>
 
@@ -243,7 +314,7 @@ const SalesReport = () => {
               <select
                 value={period}
                 onChange={(e) => setPeriod(e.target.value)}
-                className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none"
+                className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-orange-400"
               >
                 <option>This Month</option>
                 <option>Last Month</option>
@@ -254,7 +325,7 @@ const SalesReport = () => {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none"
+                className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-orange-400"
               >
                 <option value="All">All Status</option>
                 <option value="Paid">Paid</option>
@@ -268,12 +339,14 @@ const SalesReport = () => {
         {/* Stats */}
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {/* Total Sales */}
+
           <div className="rounded-2xl border border-slate-200 bg-white p-5">
             <div className="flex justify-between">
               <div>
                 <p className="text-sm text-slate-500">Total Sales</p>
 
-                <h3 className="mt-2 text-2xl font-bold">
+                <h3 className="mt-2 text-2xl font-bold text-slate-900">
                   Rs. {totalSales.toLocaleString()}
                 </h3>
               </div>
@@ -288,12 +361,14 @@ const SalesReport = () => {
             </p>
           </div>
 
+          {/* Received */}
+
           <div className="rounded-2xl border border-slate-200 bg-white p-5">
             <div className="flex justify-between">
               <div>
                 <p className="text-sm text-slate-500">Received</p>
 
-                <h3 className="mt-2 text-2xl font-bold">
+                <h3 className="mt-2 text-2xl font-bold text-slate-900">
                   Rs. {totalReceived.toLocaleString()}
                 </h3>
               </div>
@@ -308,12 +383,14 @@ const SalesReport = () => {
             </p>
           </div>
 
+          {/* Pending */}
+
           <div className="rounded-2xl border border-slate-200 bg-white p-5">
             <div className="flex justify-between">
               <div>
                 <p className="text-sm text-slate-500">Pending</p>
 
-                <h3 className="mt-2 text-2xl font-bold">
+                <h3 className="mt-2 text-2xl font-bold text-slate-900">
                   Rs. {totalPending.toLocaleString()}
                 </h3>
               </div>
@@ -328,12 +405,14 @@ const SalesReport = () => {
             </p>
           </div>
 
+          {/* Total Orders */}
+
           <div className="rounded-2xl border border-slate-200 bg-white p-5">
             <div className="flex justify-between">
               <div>
                 <p className="text-sm text-slate-500">Total Orders</p>
 
-                <h3 className="mt-2 text-2xl font-bold">
+                <h3 className="mt-2 text-2xl font-bold text-slate-900">
                   {salesData.length}
                 </h3>
               </div>
@@ -366,34 +445,23 @@ const SalesReport = () => {
             </div>
 
             <div className="mt-8 flex h-56 items-end gap-3">
-              {[45, 55, 42, 65, 58, 72, 63, 82, 70, 88, 76, 95].map(
-                (height, index) => (
+              {monthlySales.map((item) => (
+                <div
+                  key={item.month}
+                  className="group flex h-full flex-1 items-end"
+                >
                   <div
-                    key={index}
-                    className="group flex h-full flex-1 items-end"
-                  >
-                    <div
-                      style={{ height: `${height}%` }}
-                      className="w-full rounded-t-lg bg-orange-400 transition group-hover:bg-orange-500"
-                    />
-                  </div>
-                )
-              )}
+                    style={{ height: `${item.height}%` }}
+                    className={`w-full rounded-t-lg ${item.color} transition-all duration-300 group-hover:scale-y-105 group-hover:brightness-95`}
+                  />
+                </div>
+              ))}
             </div>
 
             <div className="mt-3 flex justify-between text-[11px] text-slate-400">
-              <span>Jan</span>
-              <span>Feb</span>
-              <span>Mar</span>
-              <span>Apr</span>
-              <span>May</span>
-              <span>Jun</span>
-              <span>Jul</span>
-              <span>Aug</span>
-              <span>Sep</span>
-              <span>Oct</span>
-              <span>Nov</span>
-              <span>Dec</span>
+              {monthlySales.map((item) => (
+                <span key={item.month}>{item.month}</span>
+              ))}
             </div>
           </div>
 
@@ -605,6 +673,20 @@ const SalesReport = () => {
               </div>
             ))}
           </div>
+
+          {/* No Results */}
+
+          {filteredSales.length === 0 && (
+            <div className="p-10 text-center">
+              <p className="text-sm font-medium text-slate-500">
+                No sales transactions found.
+              </p>
+
+              <p className="mt-1 text-xs text-slate-400">
+                Try changing your search or status filter.
+              </p>
+            </div>
+          )}
         </div>
       </main>
     </div>
@@ -612,3 +694,4 @@ const SalesReport = () => {
 };
 
 export default SalesReport;
+

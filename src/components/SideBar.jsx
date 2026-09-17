@@ -83,7 +83,7 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
     } ${
       isActive
         ? "bg-orange-500 text-white shadow-sm"
-        : "text-slate-600 hover:bg-slate-200 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
+        : "text-slate-600 hover:text-orange-500 dark:text-slate-300 dark:hover:text-orange-400"
     }`;
 
   // =========================================
@@ -93,8 +93,8 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
   const subNavClass = ({ isActive }) =>
     `flex items-center rounded-lg px-3 py-2 text-sm transition-all duration-200 ${
       isActive
-        ? "bg-orange-50 font-semibold text-orange-600 dark:bg-orange-500/10 dark:text-orange-400"
-        : "text-slate-500 hover:bg-slate-100 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+        ? "bg-orange-500 font-semibold text-white shadow-sm"
+        : "text-slate-500 hover:text-orange-500 dark:text-slate-400 dark:hover:text-orange-400"
     }`;
 
   return (
@@ -159,8 +159,8 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
             className="
               flex h-8 w-8 items-center justify-center rounded-lg
               text-slate-400 transition
-              hover:bg-slate-100 hover:text-slate-700
-              dark:hover:bg-slate-800 dark:hover:text-slate-200
+              hover:text-orange-500
+              dark:hover:text-orange-400
             "
             aria-label="Collapse sidebar"
           >
@@ -238,7 +238,7 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
             } ${
               isProjectSection
                 ? "bg-orange-500 text-white shadow-sm"
-                : "text-slate-600 hover:bg-slate-200 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
+                : "text-slate-600 hover:text-orange-500 dark:text-slate-300 dark:hover:text-orange-400"
             }`}
             title={!sideBarOpen ? "Projects" : ""}
           >
@@ -287,8 +287,8 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                     className={({ isActive }) =>
                       `flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm transition ${
                         isActive
-                          ? "bg-orange-50 font-semibold text-orange-600 dark:bg-orange-500/10 dark:text-orange-400"
-                          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
+                          ? "bg-orange-500 font-semibold text-white"
+                          : "text-slate-600 hover:text-orange-500 dark:text-slate-300 dark:hover:text-orange-400"
                       }`
                     }
                   >
@@ -300,8 +300,8 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                     className={({ isActive }) =>
                       `flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm transition ${
                         isActive
-                          ? "bg-orange-50 font-semibold text-orange-600 dark:bg-orange-500/10 dark:text-orange-400"
-                          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
+                          ? "bg-orange-500 font-semibold text-white"
+                          : "text-slate-600 hover:text-orange-500 dark:text-slate-300 dark:hover:text-orange-400"
                       }`
                     }
                   >
@@ -363,7 +363,7 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
             } ${
               isCustomerSection
                 ? "bg-orange-500 text-white shadow-sm"
-                : "text-slate-600 hover:bg-slate-200 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
+                : "text-slate-600 hover:text-orange-500 dark:text-slate-300 dark:hover:text-orange-400"
             }`}
             title={!sideBarOpen ? "Customers" : ""}
           >
@@ -412,8 +412,8 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                     className={({ isActive }) =>
                       `block rounded-lg px-3 py-2.5 text-sm transition ${
                         isActive
-                          ? "bg-orange-50 font-semibold text-orange-600 dark:bg-orange-500/10 dark:text-orange-400"
-                          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
+                          ? "bg-orange-500 font-semibold text-white"
+                          : "text-slate-600 hover:text-orange-500 dark:text-slate-300 dark:hover:text-orange-400"
                       }`
                     }
                   >
@@ -425,8 +425,8 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                     className={({ isActive }) =>
                       `flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm transition ${
                         isActive
-                          ? "bg-orange-50 font-semibold text-orange-600 dark:bg-orange-500/10 dark:text-orange-400"
-                          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
+                          ? "bg-orange-500 font-semibold text-white"
+                          : "text-slate-600 hover:text-orange-500 dark:text-slate-300 dark:hover:text-orange-400"
                       }`
                     }
                   >
@@ -488,7 +488,7 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
             } ${
               isReportSection
                 ? "bg-orange-500 text-white shadow-sm"
-                : "text-slate-600 hover:bg-slate-200 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
+                : "text-slate-600 hover:text-orange-500 dark:text-slate-300 dark:hover:text-orange-400"
             }`}
             title={!sideBarOpen ? "Reports" : ""}
           >
@@ -536,8 +536,8 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                     className={({ isActive }) =>
                       `block rounded-lg px-3 py-2.5 text-sm transition ${
                         isActive
-                          ? "bg-orange-50 font-semibold text-orange-600 dark:bg-orange-500/10 dark:text-orange-400"
-                          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
+                          ? "bg-orange-500 font-semibold text-white"
+                          : "text-slate-600 hover:text-orange-500 dark:text-slate-300 dark:hover:text-orange-400"
                       }`
                     }
                   >
@@ -549,8 +549,8 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                     className={({ isActive }) =>
                       `block rounded-lg px-3 py-2.5 text-sm transition ${
                         isActive
-                          ? "bg-orange-50 font-semibold text-orange-600 dark:bg-orange-500/10 dark:text-orange-400"
-                          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
+                          ? "bg-orange-500 font-semibold text-white"
+                          : "text-slate-600 hover:text-orange-500 dark:text-slate-300 dark:hover:text-orange-400"
                       }`
                     }
                   >
@@ -562,8 +562,8 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                     className={({ isActive }) =>
                       `block rounded-lg px-3 py-2.5 text-sm transition ${
                         isActive
-                          ? "bg-orange-50 font-semibold text-orange-600 dark:bg-orange-500/10 dark:text-orange-400"
-                          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
+                          ? "bg-orange-500 font-semibold text-white"
+                          : "text-slate-600 hover:text-orange-500 dark:text-slate-300 dark:hover:text-orange-400"
                       }`
                     }
                   >
@@ -642,7 +642,6 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
           <button
             type="button"
             onClick={() => {
-
               if (!sideBarOpen) {
                 setSideBarOpen(true);
                 setSettingOpen(true);
@@ -650,7 +649,6 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
               }
 
               setSettingOpen((prev) => !prev);
-
             }}
             className={`flex w-full items-center rounded-xl transition-all duration-200 ${
               sideBarOpen
@@ -659,7 +657,7 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
             } ${
               isSettingSection
                 ? "bg-orange-500 text-white shadow-sm"
-                : "text-slate-600 hover:bg-slate-200 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
+                : "text-slate-600 hover:text-orange-500 dark:text-slate-300 dark:hover:text-orange-400"
             }`}
             title={!sideBarOpen ? "Settings" : ""}
           >
@@ -689,7 +687,6 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
 
           </button>
 
-
           {/* =================================================
               COLLAPSED SETTINGS MENU
           ================================================= */}
@@ -718,8 +715,8 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                     className={({ isActive }) =>
                       `flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm transition ${
                         isActive
-                          ? "bg-orange-50 font-semibold text-orange-600 dark:bg-orange-500/10 dark:text-orange-400"
-                          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
+                          ? "bg-orange-500 font-semibold text-white"
+                          : "text-slate-600 hover:text-orange-500 dark:text-slate-300 dark:hover:text-orange-400"
                       }`
                     }
                   >
@@ -734,8 +731,8 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                     className={({ isActive }) =>
                       `flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm transition ${
                         isActive
-                          ? "bg-orange-50 font-semibold text-orange-600 dark:bg-orange-500/10 dark:text-orange-400"
-                          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
+                          ? "bg-orange-500 font-semibold text-white"
+                          : "text-slate-600 hover:text-orange-500 dark:text-slate-300 dark:hover:text-orange-400"
                       }`
                     }
                   >
@@ -749,7 +746,6 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
 
             </div>
           )}
-
 
           {/* =================================================
               EXPANDED SETTINGS MENU
@@ -768,7 +764,6 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                 <FaSlidersH className="mr-2 text-[11px]" />
                 Studio Settings
               </NavLink>
-
 
               {/* RESET & CLEANUP */}
 
