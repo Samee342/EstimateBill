@@ -88,12 +88,11 @@ const HomePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f7f8fa] text-slate-800">
+    <div className="min-h-screen bg-[#f7f8fa] text-slate-800 dark:bg-slate-700">
       <main>
         {/* Content */}
         <div className="p-5 md:p-8">
           {/* Welcome */}
-         
 
           {/* ================= STATS ================= */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -103,7 +102,7 @@ const HomePage = () => {
               return (
                 <div
                   key={index}
-                  className="rounded-2xl border border-slate-200 bg-white p-5"
+                  className="rounded-2xl border border-slate-200 bg-white dark:bg-slate-800 p-5"
                 >
                   <div className="flex items-start justify-between">
                     <div>
@@ -111,12 +110,12 @@ const HomePage = () => {
                         {stat.title}
                       </p>
 
-                      <h3 className="mt-2 text-2xl font-bold text-slate-900">
+                      <h3 className="mt-2 text-2xl font-bold text-slate-900 dark:text-slate-300">
                         {stat.value}
                       </h3>
                     </div>
 
-                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-orange-50 text-orange-500">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-orange-50 dark:bg-slate-200 text-orange-500">
                       <Icon size={21} />
                     </div>
                   </div>
@@ -138,17 +137,19 @@ const HomePage = () => {
           {/* ================= MIDDLE SECTION ================= */}
           <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-3">
             {/* Revenue Overview */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 xl:col-span-2">
+            <div className="rounded-2xl border border-slate-200 bg-white dark:bg-slate-800 p-6 xl:col-span-2">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-bold text-slate-900">Revenue Overview</h3>
+                  <h3 className="font-bold text-slate-900 dark:text-slate-100">
+                    Revenue Overview
+                  </h3>
 
                   <p className="mt-1 text-xs text-slate-400">
                     Monthly revenue performance
                   </p>
                 </div>
 
-                <select className="rounded-lg border border-slate-200 px-3 py-2 text-xs text-slate-600 outline-none">
+                <select className="rounded-lg border border-slate-200 px-3 py-2 text-xs dark:text-slate-300 text-slate-600 outline-none">
                   <option>Last 6 Months</option>
                   <option>Last 12 Months</option>
                 </select>
@@ -188,47 +189,55 @@ const HomePage = () => {
             </div>
 
             {/* Quick Actions */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-6">
-              <h3 className="font-bold text-slate-900">Quick Actions</h3>
+            <div className="rounded-2xl border border-slate-200 bg-white dark:bg-slate-800 p-6">
+              <h3 className="font-bold text-slate-900 dark:text-white">
+                Quick Actions
+              </h3>
 
               <p className="mt-1 text-xs text-slate-400">
                 Frequently used actions
               </p>
 
               <div className="mt-5 space-y-3">
-                <button className="flex w-full items-center gap-4 rounded-xl border border-slate-200 p-4 text-left transition hover:border-orange-200 hover:bg-orange-50">
+                <button className="flex w-full items-center gap-4 rounded-xl border border-slate-200 p-4 text-left transition hover:border-orange-200 hover:bg-orange-50 dark:hover:bg-orange-500">
                   <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-100 text-orange-600">
                     <FiPlus />
                   </div>
 
                   <div>
-                    <p className="text-sm font-semibold">New Project</p>
+                    <p className="text-sm font-semibold dark:text-slate-200">
+                      New Project
+                    </p>
                     <p className="text-xs text-slate-400">
                       Create customer estimate Bill
                     </p>
                   </div>
                 </button>
 
-                <button className="flex w-full items-center gap-4 rounded-xl border border-slate-200 p-4 text-left transition hover:bg-slate-50">
+                <button className="flex w-full items-center gap-4 rounded-xl border border-slate-200 p-4 text-left transition hover:bg-slate-50 dark:hover:bg-slate-700">
                   <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
                     <FiUsers />
                   </div>
 
                   <div>
-                    <p className="text-sm font-semibold">Add Customer</p>
+                    <p className="text-sm font-semibold dark:text-slate-200">
+                      Add Customer
+                    </p>
                     <p className="text-xs text-slate-400">
                       Register a new customer
                     </p>
                   </div>
                 </button>
 
-                <button className="flex w-full items-center gap-4 rounded-xl border border-slate-200 p-4 text-left transition hover:bg-slate-50">
+                <button className="flex w-full items-center gap-4 rounded-xl border border-slate-200 p-4 text-left transition hover:bg-slate-50 dark:hover:bg-slate-700">
                   <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-50 text-green-600">
                     <FiPrinter />
                   </div>
 
                   <div>
-                    <p className="text-sm font-semibold">Print Estimate</p>
+                    <p className="text-sm font-semibold dark:text-slate-200">
+                      Print Estimate
+                    </p>
                     <p className="text-xs text-slate-400">
                       Print pending estimates
                     </p>
@@ -239,10 +248,12 @@ const HomePage = () => {
           </div>
 
           {/* ================= RECENT ESTIMATES ================= */}
-          <div className="mt-6 rounded-2xl border border-slate-200 bg-white">
+          <div className="mt-6 rounded-2xl border border-slate-200 bg-white dark:bg-slate-800">
             <div className="flex flex-col justify-between gap-3 border-b border-slate-200 p-6 sm:flex-row sm:items-center">
               <div>
-                <h3 className="font-bold text-slate-900">Recent Estimates</h3>
+                <h3 className="font-bold text-slate-900 dark:text-white">
+                  Recent Estimates
+                </h3>
 
                 <p className="mt-1 text-xs text-slate-400">
                   Latest customer estimates and bills
@@ -285,7 +296,7 @@ const HomePage = () => {
                   {estimates.map((estimate) => (
                     <tr
                       key={estimate.id}
-                      className="border-b border-slate-100 last:border-0 hover:bg-slate-50"
+                      className="border-b border-slate-100 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-700"
                     >
                       <td className="px-6 py-4">
                         <span className="text-sm font-semibold text-orange-600">
@@ -299,7 +310,7 @@ const HomePage = () => {
                             {estimate.customer.charAt(0)}
                           </div>
 
-                          <span className="text-sm font-medium text-slate-700">
+                          <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
                             {estimate.customer}
                           </span>
                         </div>
@@ -309,7 +320,7 @@ const HomePage = () => {
                         {estimate.date}
                       </td>
 
-                      <td className="px-6 py-4 text-sm font-semibold text-slate-800">
+                      <td className="px-6 py-4 text-sm font-semibold text-slate-800 dark:text-slate-100">
                         {estimate.amount}
                       </td>
 

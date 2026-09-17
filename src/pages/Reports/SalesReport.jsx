@@ -103,15 +103,9 @@ const SalesReport = () => {
   // Total Sales
   // ------------------------------------
 
-  const totalSales = salesData.reduce(
-    (total, sale) => total + sale.amount,
-    0
-  );
+  const totalSales = salesData.reduce((total, sale) => total + sale.amount, 0);
 
-  const totalReceived = salesData.reduce(
-    (total, sale) => total + sale.paid,
-    0
-  );
+  const totalReceived = salesData.reduce((total, sale) => total + sale.paid, 0);
 
   const totalPending = totalSales - totalReceived;
 
@@ -184,15 +178,13 @@ const SalesReport = () => {
     },
   ];
 
-  const maxPrintingSale = Math.max(
-    ...printingTypes.map((item) => item.amount)
-  );
+  const maxPrintingSale = Math.max(...printingTypes.map((item) => item.amount));
 
   return (
-    <div className="min-h-screen bg-[#f7f8fa] text-slate-800">
+    <div className="min-h-screen bg-[#f7f8fa] text-slate-800 dark:bg-slate-800">
       {/* Header */}
 
-      <header className="border-b border-slate-200 bg-white px-5 py-5 md:px-8">
+      <header className="border-b border-slate-200 bg-white dark:bg-slate-800 px-5 py-5 md:px-8">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <div className="flex items-center gap-2">
@@ -203,7 +195,7 @@ const SalesReport = () => {
               </span>
             </div>
 
-            <h1 className="mt-1 text-2xl font-bold text-slate-900">
+            <h1 className="mt-1 text-2xl font-bold text-slate-900 dark:text-slate-300">
               Sales Report
             </h1>
 
@@ -222,7 +214,7 @@ const SalesReport = () => {
       <main className="p-5 md:p-8">
         {/* Filters */}
 
-        <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-4">
+        <div className="mb-6 rounded-2xl border border-slate-200 bg-white dark:bg-slate-800 p-4">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div className="relative w-full lg:max-w-md">
               <FiSearch
@@ -235,7 +227,7 @@ const SalesReport = () => {
                 placeholder="Search customer, project or ID..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-10 pr-4 text-sm outline-none focus:border-orange-400 focus:bg-white"
+                className="w-full rounded-xl border dark:text-slate-300 border-slate-200 bg-slate-50 dark:bg-slate-700  py-3 pl-10 pr-4 text-sm outline-none focus:border-orange-400"
               />
             </div>
 
@@ -243,7 +235,7 @@ const SalesReport = () => {
               <select
                 value={period}
                 onChange={(e) => setPeriod(e.target.value)}
-                className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none"
+                className="rounded-xl border border-slate-200 bg-white dark:text-slate-300 dark:bg-slate-700 px-4 py-3 text-sm outline-none"
               >
                 <option>This Month</option>
                 <option>Last Month</option>
@@ -254,7 +246,7 @@ const SalesReport = () => {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none"
+                className="rounded-xl border border-slate-200 bg-white dark:text-slate-300 dark:bg-slate-700 px-4 py-3 text-sm outline-none"
               >
                 <option value="All">All Status</option>
                 <option value="Paid">Paid</option>
@@ -268,12 +260,12 @@ const SalesReport = () => {
         {/* Stats */}
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <div className="rounded-2xl border border-slate-200 bg-white p-5">
+          <div className="rounded-2xl border border-slate-200 bg-white dark:bg-slate-800 p-5">
             <div className="flex justify-between">
               <div>
                 <p className="text-sm text-slate-500">Total Sales</p>
 
-                <h3 className="mt-2 text-2xl font-bold">
+                <h3 className="mt-2 text-2xl font-bold dark:text-slate-300">
                   Rs. {totalSales.toLocaleString()}
                 </h3>
               </div>
@@ -288,12 +280,12 @@ const SalesReport = () => {
             </p>
           </div>
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-5">
+          <div className="rounded-2xl border border-slate-200 bg-white dark:bg-slate-800 p-5">
             <div className="flex justify-between">
               <div>
                 <p className="text-sm text-slate-500">Received</p>
 
-                <h3 className="mt-2 text-2xl font-bold">
+                <h3 className="mt-2 text-2xl font-bold dark:text-slate-300">
                   Rs. {totalReceived.toLocaleString()}
                 </h3>
               </div>
@@ -303,17 +295,15 @@ const SalesReport = () => {
               </div>
             </div>
 
-            <p className="mt-3 text-xs text-slate-400">
-              Amount collected
-            </p>
+            <p className="mt-3 text-xs text-slate-400">Amount collected</p>
           </div>
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-5">
+          <div className="rounded-2xl border border-slate-200 bg-white dark:bg-slate-800 p-5">
             <div className="flex justify-between">
               <div>
                 <p className="text-sm text-slate-500">Pending</p>
 
-                <h3 className="mt-2 text-2xl font-bold">
+                <h3 className="mt-2 text-2xl font-bold dark:text-slate-300">
                   Rs. {totalPending.toLocaleString()}
                 </h3>
               </div>
@@ -323,17 +313,15 @@ const SalesReport = () => {
               </div>
             </div>
 
-            <p className="mt-3 text-xs text-red-500">
-              Amount to collect
-            </p>
+            <p className="mt-3 text-xs text-red-500">Amount to collect</p>
           </div>
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-5">
+          <div className="rounded-2xl border border-slate-200 bg-white dark:bg-slate-800 p-5">
             <div className="flex justify-between">
               <div>
                 <p className="text-sm text-slate-500">Total Orders</p>
 
-                <h3 className="mt-2 text-2xl font-bold">
+                <h3 className="mt-2 text-2xl font-bold dark:text-slate-300">
                   {salesData.length}
                 </h3>
               </div>
@@ -343,9 +331,7 @@ const SalesReport = () => {
               </div>
             </div>
 
-            <p className="mt-3 text-xs text-slate-400">
-              Printing projects
-            </p>
+            <p className="mt-3 text-xs text-slate-400">Printing projects</p>
           </div>
         </div>
 
@@ -354,15 +340,13 @@ const SalesReport = () => {
         <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
           {/* Monthly Sales */}
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-6">
+          <div className="rounded-2xl border border-slate-200 bg-white dark:bg-slate-800 p-6">
             <div>
-              <h3 className="font-bold text-slate-900">
+              <h3 className="font-bold text-slate-900 dark:text-slate-300">
                 Monthly Sales
               </h3>
 
-              <p className="mt-1 text-xs text-slate-400">
-                Revenue performance
-              </p>
+              <p className="mt-1 text-xs text-slate-400">Revenue performance</p>
             </div>
 
             <div className="mt-8 flex h-56 items-end gap-3">
@@ -377,7 +361,7 @@ const SalesReport = () => {
                       className="w-full rounded-t-lg bg-orange-400 transition group-hover:bg-orange-500"
                     />
                   </div>
-                )
+                ),
               )}
             </div>
 
@@ -399,8 +383,8 @@ const SalesReport = () => {
 
           {/* Sales By Printing Type */}
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-6">
-            <h3 className="font-bold text-slate-900">
+          <div className="rounded-2xl border border-slate-200 bg-white dark:bg-slate-800 p-6">
+            <h3 className="font-bold text-slate-900 dark:text-slate-300">
               Sales by Printing Type
             </h3>
 
@@ -412,16 +396,16 @@ const SalesReport = () => {
               {printingTypes.map((item) => (
                 <div key={item.name}>
                   <div className="mb-2 flex justify-between">
-                    <span className="text-sm font-medium">
+                    <span className="text-sm font-medium dark:text-slate-300">
                       {item.name}
                     </span>
 
-                    <span className="text-sm font-semibold">
+                    <span className="text-sm font-semibold dark:text-slate-300">
                       Rs. {item.amount.toLocaleString()}
                     </span>
                   </div>
 
-                  <div className="h-2 rounded-full bg-slate-100">
+                  <div className="h-2 rounded-full bg-slate-100 ">
                     <div
                       style={{
                         width: `${(item.amount / maxPrintingSale) * 100}%`,
@@ -437,9 +421,9 @@ const SalesReport = () => {
 
         {/* Sales Table */}
 
-        <div className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+        <div className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white dark:bg-slate-800">
           <div className="border-b border-slate-200 p-6">
-            <h3 className="font-bold text-slate-900">
+            <h3 className="font-bold text-slate-900 dark:text-slate-300">
               Sales Transactions
             </h3>
 
@@ -486,19 +470,15 @@ const SalesReport = () => {
                 {filteredSales.map((sale) => (
                   <tr
                     key={sale.id}
-                    className="border-b border-slate-100 last:border-0 hover:bg-slate-50"
+                    className="border-b border-slate-100 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-800"
                   >
                     <td className="px-6 py-4">
-                      <p className="text-sm font-semibold">
-                        {sale.project}
-                      </p>
+                      <p className="text-sm font-semibold">{sale.project}</p>
 
-                      <p className="mt-1 text-xs text-orange-500">
-                        {sale.id}
-                      </p>
+                      <p className="mt-1 text-xs text-orange-500">{sale.id}</p>
                     </td>
 
-                    <td className="px-6 py-4 text-sm">
+                    <td className="px-6 py-4 text-sm dark:text-slate-300">
                       {sale.customer}
                     </td>
 
@@ -510,7 +490,7 @@ const SalesReport = () => {
                       {sale.date}
                     </td>
 
-                    <td className="px-6 py-4 text-sm font-semibold">
+                    <td className="px-6 py-4 text-sm font-semibold dark:text-slate-200">
                       Rs. {sale.amount.toLocaleString()}
                     </td>
 
@@ -521,7 +501,7 @@ const SalesReport = () => {
                     <td className="px-6 py-4">
                       <span
                         className={`rounded-full px-3 py-1.5 text-xs font-semibold ${getStatusStyle(
-                          sale.status
+                          sale.status,
                         )}`}
                       >
                         {sale.status}
@@ -543,18 +523,14 @@ const SalesReport = () => {
               >
                 <div className="flex justify-between">
                   <div>
-                    <p className="text-sm font-semibold">
-                      {sale.project}
-                    </p>
+                    <p className="text-sm font-semibold">{sale.project}</p>
 
-                    <p className="mt-1 text-xs text-orange-500">
-                      {sale.id}
-                    </p>
+                    <p className="mt-1 text-xs text-orange-500">{sale.id}</p>
                   </div>
 
                   <span
                     className={`h-fit rounded-full px-2.5 py-1 text-[11px] font-semibold ${getStatusStyle(
-                      sale.status
+                      sale.status,
                     )}`}
                   >
                     {sale.status}
@@ -563,29 +539,19 @@ const SalesReport = () => {
 
                 <div className="mt-4 grid grid-cols-2 gap-3">
                   <div>
-                    <p className="text-[11px] text-slate-400">
-                      Customer
-                    </p>
+                    <p className="text-[11px] text-slate-400">Customer</p>
 
-                    <p className="mt-1 text-sm font-medium">
-                      {sale.customer}
-                    </p>
+                    <p className="mt-1 text-sm font-medium">{sale.customer}</p>
                   </div>
 
                   <div>
-                    <p className="text-[11px] text-slate-400">
-                      Date
-                    </p>
+                    <p className="text-[11px] text-slate-400">Date</p>
 
-                    <p className="mt-1 text-sm">
-                      {sale.date}
-                    </p>
+                    <p className="mt-1 text-sm">{sale.date}</p>
                   </div>
 
                   <div>
-                    <p className="text-[11px] text-slate-400">
-                      Sale
-                    </p>
+                    <p className="text-[11px] text-slate-400">Sale</p>
 
                     <p className="mt-1 text-sm font-bold">
                       Rs. {sale.amount.toLocaleString()}
@@ -593,9 +559,7 @@ const SalesReport = () => {
                   </div>
 
                   <div>
-                    <p className="text-[11px] text-slate-400">
-                      Received
-                    </p>
+                    <p className="text-[11px] text-slate-400">Received</p>
 
                     <p className="mt-1 text-sm font-bold text-green-600">
                       Rs. {sale.paid.toLocaleString()}

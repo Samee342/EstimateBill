@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import {
   FiPlus,
@@ -130,8 +129,8 @@ const AllProject = () => {
               ...project,
               [field]: newDate,
             }
-          : project
-      )
+          : project,
+      ),
     );
   };
 
@@ -170,18 +169,14 @@ const AllProject = () => {
   });
 
   return (
-    <div className="min-h-screen bg-[#f7f8fa] text-slate-800">
+    <div className="min-h-screen bg-[#f7f8fa] text-slate-800 dark:bg-slate-700">
       {/* ================= HEADER ================= */}
 
-      <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-slate-200 bg-white/95 px-5 backdrop-blur md:px-8">
+      <header className=" top-0 z-30 flex h-20 items-center justify-between border-slate-200 bg-white/95 dark:bg-slate-700 px-5 backdrop-blur md:px-8">
         <div>
-          <h2 className="text-xl font-bold text-slate-900">
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white">
             All Projects
           </h2>
-
-          <p className="mt-1 text-xs text-slate-400">
-            Manage all your printing projects
-          </p>
         </div>
 
         <a
@@ -195,19 +190,17 @@ const AllProject = () => {
 
       {/* ================= MAIN CONTENT ================= */}
 
-      <div className="p-5 md:p-8">
+      <div className="p-5 md:p-5">
         {/* ================= SUMMARY CARDS ================= */}
 
         <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {/* Total */}
-          <div className="rounded-2xl border border-slate-200 bg-white p-5">
+          <div className="rounded-2xl border border-slate-200 bg-white dark:bg-slate-800 p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-slate-500">
-                  Total Projects
-                </p>
+                <p className="text-sm text-slate-500">Total Projects</p>
 
-                <h3 className="mt-2 text-2xl font-bold text-slate-900">
+                <h3 className="mt-2 text-2xl font-bold text-slate-900 dark:text-slate-200">
                   248
                 </h3>
               </div>
@@ -219,14 +212,12 @@ const AllProject = () => {
           </div>
 
           {/* Pending */}
-          <div className="rounded-2xl border border-slate-200 bg-white p-5">
+          <div className="rounded-2xl border border-slate-200 bg-white dark:bg-slate-800 p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-slate-500">
-                  Pending
-                </p>
+                <p className="text-sm text-slate-500">Pending</p>
 
-                <h3 className="mt-2 text-2xl font-bold text-slate-900">
+                <h3 className="mt-2 text-2xl font-bold text-slate-900 dark:text-slate-200">
                   32
                 </h3>
               </div>
@@ -238,14 +229,12 @@ const AllProject = () => {
           </div>
 
           {/* Printed */}
-          <div className="rounded-2xl border border-slate-200 bg-white p-5">
+          <div className="rounded-2xl border border-slate-200 bg-white dark:bg-slate-800 p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-slate-500">
-                  Printed
-                </p>
+                <p className="text-sm text-slate-500">Printed</p>
 
-                <h3 className="mt-2 text-2xl font-bold text-slate-900">
+                <h3 className="mt-2 text-2xl font-bold text-slate-900 dark:text-slate-200">
                   64
                 </h3>
               </div>
@@ -257,14 +246,12 @@ const AllProject = () => {
           </div>
 
           {/* Completed */}
-          <div className="rounded-2xl border border-slate-200 bg-white p-5">
+          <div className="rounded-2xl border border-slate-200 bg-white dark:bg-slate-800 p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-slate-500">
-                  Completed
-                </p>
+                <p className="text-sm text-slate-500">Completed</p>
 
-                <h3 className="mt-2 text-2xl font-bold text-slate-900">
+                <h3 className="mt-2 text-2xl font-bold text-slate-900 dark:text-slate-200">
                   152
                 </h3>
               </div>
@@ -278,13 +265,13 @@ const AllProject = () => {
 
         {/* ================= SEARCH + FILTER ================= */}
 
-        <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-4">
+        <div className="mb-6 rounded-2xl border border-slate-200 bg-white dark:bg-slate-800 p-4">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             {/* Search */}
             <div className="relative w-full md:max-w-md">
               <FiSearch
                 size={18}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600"
               />
 
               <input
@@ -292,20 +279,18 @@ const AllProject = () => {
                 placeholder="Search project, customer or ID..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-10 pr-4 text-sm outline-none transition focus:border-orange-400 focus:bg-white"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 dark:bg-slate-700 py-3 pl-10 pr-4 text-sm outline-none transition focus:border-orange-400"
               />
             </div>
 
             {/* Status */}
             <div className="flex items-center gap-2">
-              <span className="text-sm text-slate-500">
-                Status:
-              </span>
+              <span className="text-sm text-slate-500">Status:</span>
 
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600 outline-none focus:border-orange-400"
+                className="rounded-xl border border-slate-200 bg-white dark:bg-slate-800 px-4 py-3 text-sm text-slate-600 outline-none focus:border-orange-400"
               >
                 <option value="All">All</option>
                 <option value="Pending">Pending</option>
@@ -318,11 +303,11 @@ const AllProject = () => {
 
         {/* ================= PROJECT TABLE ================= */}
 
-        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white dark:bg-slate-800">
           {/* Table Header */}
           <div className="flex flex-col justify-between gap-2 border-b border-slate-200 p-6 sm:flex-row sm:items-center">
             <div>
-              <h3 className="font-bold text-slate-900">
+              <h3 className="font-bold text-slate-900 dark:text-white">
                 All Projects
               </h3>
 
@@ -372,17 +357,17 @@ const AllProject = () => {
                 {filteredProjects.map((project) => (
                   <tr
                     key={project.id}
-                    className="border-b border-slate-100 last:border-0 hover:bg-slate-50"
+                    className="border-b border-slate-100 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-700"
                   >
                     {/* Project */}
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-orange-500">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50  text-orange-500">
                           <FiFileText size={18} />
                         </div>
 
                         <div>
-                          <p className="text-sm font-semibold text-slate-800">
+                          <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
                             {project.name}
                           </p>
 
@@ -396,11 +381,11 @@ const AllProject = () => {
                     {/* Customer */}
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-600">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-400  text-xs font-bold text-slate-600">
                           {project.customer.charAt(0)}
                         </div>
 
-                        <span className="text-sm text-slate-700">
+                        <span className="text-sm text-slate-700 dark:text-slate-200">
                           {project.customer}
                         </span>
                       </div>
@@ -427,7 +412,7 @@ const AllProject = () => {
                               updateProjectDate(
                                 project.id,
                                 "date",
-                                e.target.value
+                                e.target.value,
                               )
                             }
                             className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
@@ -457,7 +442,7 @@ const AllProject = () => {
                               updateProjectDate(
                                 project.id,
                                 "dueDate",
-                                e.target.value
+                                e.target.value,
                               )
                             }
                             className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
@@ -468,7 +453,7 @@ const AllProject = () => {
 
                     {/* Amount */}
                     <td className="px-6 py-4">
-                      <span className="text-sm font-semibold text-slate-800">
+                      <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">
                         {project.amount}
                       </span>
                     </td>
@@ -477,7 +462,7 @@ const AllProject = () => {
                     <td className="px-6 py-4">
                       <span
                         className={`rounded-full px-3 py-1.5 text-xs font-semibold ${getStatusStyle(
-                          project.status
+                          project.status,
                         )}`}
                       >
                         {project.status}
@@ -512,9 +497,7 @@ const AllProject = () => {
                     </div>
 
                     <div>
-                      <p className="text-sm font-semibold">
-                        {project.name}
-                      </p>
+                      <p className="text-sm font-semibold">{project.name}</p>
 
                       <p className="mt-1 text-xs text-orange-500">
                         {project.id}
@@ -530,9 +513,7 @@ const AllProject = () => {
                 <div className="mt-4 grid grid-cols-2 gap-4">
                   {/* Customer */}
                   <div>
-                    <p className="text-[11px] text-slate-400">
-                      Customer
-                    </p>
+                    <p className="text-[11px] text-slate-400">Customer</p>
 
                     <p className="mt-1 text-sm font-medium">
                       {project.customer}
@@ -542,9 +523,7 @@ const AllProject = () => {
                   {/* ================= MOBILE DATE ================= */}
 
                   <div>
-                    <p className="text-[11px] text-slate-400">
-                      Date
-                    </p>
+                    <p className="text-[11px] text-slate-400">Date</p>
 
                     <div className="mt-1 flex items-center gap-2">
                       <span className="text-sm font-medium">
@@ -561,7 +540,7 @@ const AllProject = () => {
                             updateProjectDate(
                               project.id,
                               "date",
-                              e.target.value
+                              e.target.value,
                             )
                           }
                           className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
@@ -573,9 +552,7 @@ const AllProject = () => {
                   {/* ================= MOBILE DUE DATE ================= */}
 
                   <div>
-                    <p className="text-[11px] text-slate-400">
-                      Due Date
-                    </p>
+                    <p className="text-[11px] text-slate-400">Due Date</p>
 
                     <div className="mt-1 flex items-center gap-2">
                       <span className="text-sm font-medium text-orange-600">
@@ -592,7 +569,7 @@ const AllProject = () => {
                             updateProjectDate(
                               project.id,
                               "dueDate",
-                              e.target.value
+                              e.target.value,
                             )
                           }
                           className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
@@ -603,24 +580,18 @@ const AllProject = () => {
 
                   {/* Amount */}
                   <div>
-                    <p className="text-[11px] text-slate-400">
-                      Amount
-                    </p>
+                    <p className="text-[11px] text-slate-400">Amount</p>
 
-                    <p className="mt-1 text-sm font-bold">
-                      {project.amount}
-                    </p>
+                    <p className="mt-1 text-sm font-bold">{project.amount}</p>
                   </div>
 
                   {/* Status */}
                   <div>
-                    <p className="text-[11px] text-slate-400">
-                      Status
-                    </p>
+                    <p className="text-[11px] text-slate-400">Status</p>
 
                     <span
                       className={`mt-1 inline-block rounded-full px-2.5 py-1 text-[11px] font-semibold ${getStatusStyle(
-                        project.status
+                        project.status,
                       )}`}
                     >
                       {project.status}
@@ -635,10 +606,7 @@ const AllProject = () => {
 
           {filteredProjects.length === 0 && (
             <div className="p-12 text-center">
-              <FiFileText
-                size={35}
-                className="mx-auto text-slate-300"
-              />
+              <FiFileText size={35} className="mx-auto text-slate-300" />
 
               <h3 className="mt-3 font-semibold text-slate-700">
                 No projects found
@@ -656,4 +624,3 @@ const AllProject = () => {
 };
 
 export default AllProject;
-
