@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -10,6 +9,7 @@ import {
   FiPlus,
   FiClock,
 } from "react-icons/fi";
+import { FaMoneyBillWave } from "react-icons/fa";
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -39,7 +39,7 @@ const HomePage = () => {
       title: "Total Revenue",
       value: "Rs. 8,42,500",
       change: "+15.8%",
-      icon: FiDollarSign,
+      icon: FaMoneyBillWave,
     },
   ];
 
@@ -154,7 +154,6 @@ const HomePage = () => {
     <div className="min-h-screen bg-[#f7f8fa] text-slate-800 dark:bg-slate-900 dark:text-slate-100">
       <main>
         <div className="p-5 md:p-8">
-
           {/* ================= STATS ================= */}
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -199,7 +198,6 @@ const HomePage = () => {
           {/* ================= MIDDLE SECTION ================= */}
 
           <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-3">
-
             {/* ================= REVENUE OVERVIEW ================= */}
 
             <div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-800 xl:col-span-2">
@@ -242,9 +240,7 @@ const HomePage = () => {
 
               <div className="mt-3 flex justify-between text-[11px] text-slate-400">
                 {revenueData.map((item) => (
-                  <span key={item.month}>
-                    {item.month}
-                  </span>
+                  <span key={item.month}>{item.month}</span>
                 ))}
               </div>
             </div>
@@ -384,7 +380,7 @@ const HomePage = () => {
                       <td className="px-6 py-4">
                         <span
                           className={`rounded-full px-3 py-1.5 text-xs font-semibold ${getStatusStyle(
-                            estimate.status
+                            estimate.status,
                           )}`}
                         >
                           {estimate.status}
@@ -411,7 +407,7 @@ const HomePage = () => {
 
                     <span
                       className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${getStatusStyle(
-                        estimate.status
+                        estimate.status,
                       )}`}
                     >
                       {estimate.status}

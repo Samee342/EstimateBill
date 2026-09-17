@@ -1,4 +1,3 @@
-
 import React, { useMemo, useState } from "react";
 import {
   FiDollarSign,
@@ -9,6 +8,7 @@ import {
   FiDownload,
   FiClock,
 } from "react-icons/fi";
+import { FaMoneyBillWave } from "react-icons/fa";
 
 // ========================================
 // SALES DATA
@@ -240,19 +240,17 @@ const SalesReport = () => {
 
   const totalSales = filteredSales.reduce(
     (total, sale) => total + sale.amount,
-    0
+    0,
   );
 
   const totalReceived = filteredSales.reduce(
     (total, sale) => total + sale.paid,
-    0
+    0,
   );
 
   const totalPending = totalSales - totalReceived;
 
-  const maxPrintingSale = Math.max(
-    ...printingTypes.map((item) => item.amount)
-  );
+  const maxPrintingSale = Math.max(...printingTypes.map((item) => item.amount));
 
   // ========================================
   // EXPORT CSV
@@ -285,9 +283,7 @@ const SalesReport = () => {
 
     const csvContent = [headers, ...rows]
       .map((row) =>
-        row
-          .map((value) => `"${String(value).replace(/"/g, '""')}"`)
-          .join(",")
+        row.map((value) => `"${String(value).replace(/"/g, '""')}"`).join(","),
       )
       .join("\n");
 
@@ -318,7 +314,7 @@ const SalesReport = () => {
       title: "Total Sales",
       value: formatCurrency(totalSales),
       description: "Total sales amount",
-      icon: FiDollarSign,
+      icon: FaMoneyBillWave,
       iconStyle: "bg-orange-50 text-orange-500 dark:bg-orange-500/10",
     },
     {
@@ -350,7 +346,6 @@ const SalesReport = () => {
 
   return (
     <div className="min-h-screen bg-[#f7f8fa] text-slate-800 dark:bg-slate-900 dark:text-slate-100">
-
       {/* ================= HEADER ================= */}
 
       <header className="border-b border-slate-200 bg-white px-5 py-5 dark:border-slate-700 dark:bg-slate-800 md:px-8">
@@ -385,12 +380,10 @@ const SalesReport = () => {
       </header>
 
       <main className="p-5 md:p-8">
-
         {/* ================= FILTERS ================= */}
 
         <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-800">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-
             {/* SEARCH */}
 
             <div className="relative w-full lg:max-w-md">
@@ -476,7 +469,6 @@ const SalesReport = () => {
         {/* ================= CHARTS ================= */}
 
         <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
-
           {/* MONTHLY SALES */}
 
           <div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-800">
@@ -485,9 +477,7 @@ const SalesReport = () => {
                 Monthly Sales
               </h3>
 
-              <p className="mt-1 text-xs text-slate-400">
-                Revenue performance
-              </p>
+              <p className="mt-1 text-xs text-slate-400">Revenue performance</p>
             </div>
 
             <div className="mt-8 flex h-56 items-end gap-2 sm:gap-3">
@@ -553,7 +543,6 @@ const SalesReport = () => {
         {/* ================= SALES TRANSACTIONS ================= */}
 
         <div className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800">
-
           {/* TABLE HEADER */}
 
           <div className="border-b border-slate-200 p-6 dark:border-slate-700">
@@ -613,9 +602,7 @@ const SalesReport = () => {
                         {sale.project}
                       </p>
 
-                      <p className="mt-1 text-xs text-orange-500">
-                        {sale.id}
-                      </p>
+                      <p className="mt-1 text-xs text-orange-500">{sale.id}</p>
                     </td>
 
                     <td className="px-6 py-4 text-sm text-slate-700 dark:text-slate-300">
@@ -641,7 +628,7 @@ const SalesReport = () => {
                     <td className="px-6 py-4">
                       <span
                         className={`rounded-full px-3 py-1.5 text-xs font-semibold ${getStatusStyle(
-                          sale.status
+                          sale.status,
                         )}`}
                       >
                         {sale.status}
@@ -667,14 +654,12 @@ const SalesReport = () => {
                       {sale.project}
                     </p>
 
-                    <p className="mt-1 text-xs text-orange-500">
-                      {sale.id}
-                    </p>
+                    <p className="mt-1 text-xs text-orange-500">{sale.id}</p>
                   </div>
 
                   <span
                     className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold ${getStatusStyle(
-                      sale.status
+                      sale.status,
                     )}`}
                   >
                     {sale.status}
@@ -683,9 +668,7 @@ const SalesReport = () => {
 
                 <div className="mt-4 grid grid-cols-2 gap-3">
                   <div>
-                    <p className="text-[11px] text-slate-400">
-                      Customer
-                    </p>
+                    <p className="text-[11px] text-slate-400">Customer</p>
 
                     <p className="mt-1 text-sm font-medium text-slate-700 dark:text-slate-300">
                       {sale.customer}
@@ -693,9 +676,7 @@ const SalesReport = () => {
                   </div>
 
                   <div>
-                    <p className="text-[11px] text-slate-400">
-                      Date
-                    </p>
+                    <p className="text-[11px] text-slate-400">Date</p>
 
                     <p className="mt-1 text-sm text-slate-700 dark:text-slate-300">
                       {sale.date}
@@ -703,9 +684,7 @@ const SalesReport = () => {
                   </div>
 
                   <div>
-                    <p className="text-[11px] text-slate-400">
-                      Sale
-                    </p>
+                    <p className="text-[11px] text-slate-400">Sale</p>
 
                     <p className="mt-1 text-sm font-bold text-slate-800 dark:text-slate-200">
                       {formatCurrency(sale.amount)}
@@ -713,9 +692,7 @@ const SalesReport = () => {
                   </div>
 
                   <div>
-                    <p className="text-[11px] text-slate-400">
-                      Received
-                    </p>
+                    <p className="text-[11px] text-slate-400">Received</p>
 
                     <p className="mt-1 text-sm font-bold text-green-600">
                       {formatCurrency(sale.paid)}

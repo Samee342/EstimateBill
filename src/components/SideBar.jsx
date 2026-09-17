@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import {
   FaThLarge,
@@ -13,6 +12,7 @@ import {
   FaSlidersH,
   FaBroom,
 } from "react-icons/fa";
+import { FaRegTrashAlt } from "react-icons/fa";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 import { NavLink, useLocation } from "react-router-dom";
 import Logo from "../assets/Logo.jpeg";
@@ -77,9 +77,7 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
 
   const mainNavClass = ({ isActive }) =>
     `group relative flex items-center rounded-xl transition-all duration-200 ${
-      sideBarOpen
-        ? "gap-3 px-3 py-2.5"
-        : "justify-center px-2 py-3"
+      sideBarOpen ? "gap-3 px-3 py-2.5" : "justify-center px-2 py-3"
     } ${
       isActive
         ? "bg-orange-500 text-white shadow-sm"
@@ -98,8 +96,8 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
     }`;
 
   return (
-    <aside
-      className={`fixed left-0 top-0 z-40 flex h-screen flex-col overflow-visible border-r shadow-sm transition-all duration-300
+    <div
+      className={`no-print fixed left-0 top-0 z-40 flex h-screen flex-col overflow-visible border-r shadow-sm transition-all duration-300
         bg-white border-slate-200
         dark:bg-slate-900 dark:border-slate-800
         ${sideBarOpen ? "w-64" : "w-[76px]"}
@@ -194,7 +192,6 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
       ====================================================== */}
 
       <nav className="flex-1 overflow-visible px-3 py-5">
-
         {/* =====================================================
             DASHBOARD
         ====================================================== */}
@@ -207,11 +204,7 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
         >
           <FaThLarge className="shrink-0 text-sm" />
 
-          {sideBarOpen && (
-            <span className="font-medium">
-              Dashboard
-            </span>
-          )}
+          {sideBarOpen && <span className="font-medium">Dashboard</span>}
         </NavLink>
 
         {/* =====================================================
@@ -219,7 +212,6 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
         ====================================================== */}
 
         <div className="group relative mt-1">
-
           <button
             type="button"
             onClick={() => {
@@ -249,11 +241,7 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
             >
               <FaFolder className="shrink-0 text-sm" />
 
-              {sideBarOpen && (
-                <span className="font-medium">
-                  Projects
-                </span>
-              )}
+              {sideBarOpen && <span className="font-medium">Projects</span>}
             </div>
 
             {sideBarOpen &&
@@ -268,11 +256,9 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
 
           {!sideBarOpen && (
             <div className="pointer-events-none absolute left-[68px] top-0 z-[999] hidden w-48 group-hover:pointer-events-auto group-hover:block">
-
               <div className="absolute -left-3 top-0 h-full w-3" />
 
               <div className="rounded-xl border border-slate-200 bg-white p-2 shadow-xl dark:border-slate-700 dark:bg-slate-900">
-
                 <div className="border-b border-slate-100 px-3 py-2 dark:border-slate-800">
                   <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
                     Projects
@@ -280,7 +266,6 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                 </div>
 
                 <div className="mt-1">
-
                   <NavLink
                     to="/projects"
                     end
@@ -308,7 +293,6 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                     <FaPlus className="text-[9px]" />
                     Create Project
                   </NavLink>
-
                 </div>
               </div>
             </div>
@@ -318,23 +302,14 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
 
           {sideBarOpen && projectOpen && (
             <div className="ml-9 mt-1 space-y-1 border-l border-slate-200 pl-2 dark:border-slate-700">
-
-              <NavLink
-                to="/projects"
-                end
-                className={subNavClass}
-              >
+              <NavLink to="/projects" end className={subNavClass}>
                 All Projects
               </NavLink>
 
-              <NavLink
-                to="/projects/create-project"
-                className={subNavClass}
-              >
+              <NavLink to="/projects/create-project" className={subNavClass}>
                 <FaPlus className="mr-2 text-[9px]" />
                 Create Project
               </NavLink>
-
             </div>
           )}
         </div>
@@ -344,7 +319,6 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
         ====================================================== */}
 
         <div className="group relative mt-1">
-
           <button
             type="button"
             onClick={() => {
@@ -374,11 +348,7 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
             >
               <FaUsers className="shrink-0 text-sm" />
 
-              {sideBarOpen && (
-                <span className="font-medium">
-                  Customers
-                </span>
-              )}
+              {sideBarOpen && <span className="font-medium">Customers</span>}
             </div>
 
             {sideBarOpen &&
@@ -393,11 +363,9 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
 
           {!sideBarOpen && (
             <div className="pointer-events-none absolute left-[68px] top-0 z-[999] hidden w-48 group-hover:pointer-events-auto group-hover:block">
-
               <div className="absolute -left-3 top-0 h-full w-3" />
 
               <div className="rounded-xl border border-slate-200 bg-white p-2 shadow-xl dark:border-slate-700 dark:bg-slate-900">
-
                 <div className="border-b border-slate-100 px-3 py-2 dark:border-slate-800">
                   <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
                     Customers
@@ -405,7 +373,6 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                 </div>
 
                 <div className="mt-1">
-
                   <NavLink
                     to="/customers"
                     end
@@ -433,7 +400,6 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                     <FaPlus className="text-[9px]" />
                     Add Customer
                   </NavLink>
-
                 </div>
               </div>
             </div>
@@ -443,23 +409,14 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
 
           {sideBarOpen && customerOpen && (
             <div className="ml-9 mt-1 space-y-1 border-l border-slate-200 pl-2 dark:border-slate-700">
-
-              <NavLink
-                to="/customers"
-                end
-                className={subNavClass}
-              >
+              <NavLink to="/customers" end className={subNavClass}>
                 All Customers
               </NavLink>
 
-              <NavLink
-                to="/customers/add"
-                className={subNavClass}
-              >
+              <NavLink to="/customers/add" className={subNavClass}>
                 <FaPlus className="mr-2 text-[9px]" />
                 Add Customer
               </NavLink>
-
             </div>
           )}
         </div>
@@ -469,7 +426,6 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
         ====================================================== */}
 
         <div className="group relative mt-1">
-
           <button
             type="button"
             onClick={() => {
@@ -499,11 +455,7 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
             >
               <FaChartBar className="shrink-0 text-sm" />
 
-              {sideBarOpen && (
-                <span className="font-medium">
-                  Reports
-                </span>
-              )}
+              {sideBarOpen && <span className="font-medium">Reports</span>}
             </div>
 
             {sideBarOpen &&
@@ -518,11 +470,9 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
 
           {!sideBarOpen && (
             <div className="pointer-events-none absolute left-[68px] top-0 z-[999] hidden w-48 group-hover:pointer-events-auto group-hover:block">
-
               <div className="absolute -left-3 top-0 h-full w-3" />
 
               <div className="rounded-xl border border-slate-200 bg-white p-2 shadow-xl dark:border-slate-700 dark:bg-slate-900">
-
                 <div className="border-b border-slate-100 px-3 py-2 dark:border-slate-800">
                   <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
                     Reports
@@ -530,7 +480,6 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                 </div>
 
                 <div className="mt-1">
-
                   <NavLink
                     to="/reports/sales"
                     className={({ isActive }) =>
@@ -569,7 +518,6 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                   >
                     Payment Report
                   </NavLink>
-
                 </div>
               </div>
             </div>
@@ -579,28 +527,17 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
 
           {sideBarOpen && reportOpen && (
             <div className="ml-9 mt-1 space-y-1 border-l border-slate-200 pl-2 dark:border-slate-700">
-
-              <NavLink
-                to="/reports/sales"
-                className={subNavClass}
-              >
+              <NavLink to="/reports/sales" className={subNavClass}>
                 Sales Report
               </NavLink>
 
-              <NavLink
-                to="/reports/customers"
-                className={subNavClass}
-              >
+              <NavLink to="/reports/customers" className={subNavClass}>
                 Customer Report
               </NavLink>
 
-              <NavLink
-                to="/reports/payments"
-                className={subNavClass}
-              >
+              <NavLink to="/reports/payments" className={subNavClass}>
                 Payment Report
               </NavLink>
-
             </div>
           )}
         </div>
@@ -615,18 +552,14 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
           title={!sideBarOpen ? "Notifications" : ""}
         >
           <div className="relative">
-
             <FaBell className="shrink-0 text-sm" />
 
             <span className="absolute -right-1.5 -top-1.5 h-2 w-2 rounded-full border-2 border-white bg-orange-500 dark:border-slate-900" />
-
           </div>
 
           {sideBarOpen && (
             <div className="flex flex-1 items-center justify-between">
-              <span className="font-medium">
-                Notifications
-              </span>
+              <span className="font-medium">Notifications</span>
             </div>
           )}
         </NavLink>
@@ -636,7 +569,6 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
         ====================================================== */}
 
         <div className="group relative mt-1">
-
           {/* SETTINGS BUTTON */}
 
           <button
@@ -661,21 +593,14 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
             }`}
             title={!sideBarOpen ? "Settings" : ""}
           >
-
             <div
               className={`flex items-center ${
                 sideBarOpen ? "gap-3" : "justify-center"
               }`}
             >
-
               <FaCog className="shrink-0 text-sm" />
 
-              {sideBarOpen && (
-                <span className="font-medium">
-                  Settings
-                </span>
-              )}
-
+              {sideBarOpen && <span className="font-medium">Settings</span>}
             </div>
 
             {sideBarOpen &&
@@ -684,7 +609,6 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
               ) : (
                 <FaChevronRight className="text-[10px]" />
               ))}
-
           </button>
 
           {/* =================================================
@@ -693,21 +617,16 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
 
           {!sideBarOpen && (
             <div className="pointer-events-none absolute left-[68px] top-0 z-[999] hidden w-52 group-hover:pointer-events-auto group-hover:block">
-
               <div className="absolute -left-3 top-0 h-full w-3" />
 
               <div className="rounded-xl border border-slate-200 bg-white p-2 shadow-xl dark:border-slate-700 dark:bg-slate-900">
-
                 <div className="border-b border-slate-100 px-3 py-2 dark:border-slate-800">
-
                   <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
                     Settings
                   </p>
-
                 </div>
 
                 <div className="mt-1">
-
                   {/* STUDIO SETTINGS */}
 
                   <NavLink
@@ -739,11 +658,8 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                     <FaBroom className="text-xs" />
                     Reset & CleanUp
                   </NavLink>
-
                 </div>
-
               </div>
-
             </div>
           )}
 
@@ -752,39 +668,43 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
           ================================================= */}
 
           {sideBarOpen && settingOpen && (
-
             <div className="ml-9 mt-1 space-y-1 border-l border-slate-200 pl-2 dark:border-slate-700">
-
               {/* STUDIO SETTINGS */}
 
-              <NavLink
-                to="/settings/studio"
-                className={subNavClass}
-              >
+              <NavLink to="/settings/studio" className={subNavClass}>
                 <FaSlidersH className="mr-2 text-[11px]" />
                 Studio Settings
               </NavLink>
 
               {/* RESET & CLEANUP */}
 
-              <NavLink
-                to="/settings/reset-cleanup"
-                className={subNavClass}
-              >
+              <NavLink to="/settings/reset-cleanup" className={subNavClass}>
                 <FaBroom className="mr-2 text-[11px]" />
                 Reset & CleanUp
               </NavLink>
-
             </div>
-
           )}
-
         </div>
 
+        {/* Trash */}
+        <NavLink
+          to="/trash"
+          className={mainNavClass}
+          title={!sideBarOpen ? "Trash" : ""}
+        >
+          <div className="relative">
+            <FaRegTrashAlt className="shrink-0 text-sm" />
+          </div>
+
+          {sideBarOpen && (
+            <div className="flex flex-1 items-center justify-between">
+              <span className="font-medium">Trash</span>
+            </div>
+          )}
+        </NavLink>
       </nav>
-    </aside>
+    </div>
   );
 };
 
 export default Sidebar;
-

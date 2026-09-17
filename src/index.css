@@ -26,3 +26,254 @@
   /* Error */
   --color-error: #ef4444;
 }
+/* =========================================================
+   PRINT ESTIMATE
+========================================================= */
+
+.print-estimate {
+  display: none;
+}
+
+/* =========================================================
+   PRINT STYLES
+========================================================= */
+
+@media print {
+  /* A4 page */
+  @page {
+    size: A4;
+    margin: 10mm;
+  }
+
+  /* Hide normal application ONLY while printing */
+  .no-print {
+    display: none !important;
+  }
+
+  /* Remove sidebar space */
+  .print-main {
+    margin-left: 0 !important;
+    width: 100% !important;
+    min-height: auto !important;
+  }
+
+  /* Show print layout */
+  .print-estimate {
+    display: block !important;
+    width: 100%;
+    background: white !important;
+    color: black !important;
+    font-family: Arial, sans-serif;
+  }
+
+  html,
+  body,
+  #root {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    background: white !important;
+  }
+
+  /* =====================================================
+     HEADER
+  ===================================================== */
+
+  .print-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 2px solid #000;
+    padding-bottom: 12px;
+  }
+
+  .print-logo {
+    width: 170px;
+    max-height: 75px;
+    object-fit: contain;
+  }
+
+  .print-title-section {
+    text-align: right;
+  }
+
+  .print-title-section h1 {
+    margin: 0 0 5px;
+    font-size: 24px;
+    font-weight: 700;
+  }
+
+  .print-title-section p {
+    margin: 2px 0;
+    font-size: 12px;
+  }
+
+  /* =====================================================
+     SECTIONS
+  ===================================================== */
+
+  .print-section {
+    margin-top: 14px;
+  }
+
+  .print-section h2 {
+    margin: 0 0 7px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #000;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  /* =====================================================
+     CUSTOMER / PROJECT GRID
+  ===================================================== */
+
+  .customer-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 25px;
+    row-gap: 6px;
+    font-size: 11px;
+    line-height: 1.5;
+  }
+
+  .full-width {
+    grid-column: span 2;
+  }
+
+  /* =====================================================
+     TABLE
+  ===================================================== */
+
+  .print-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    font-size: 8.5px;
+  }
+
+  .print-table th,
+  .print-table td {
+    border: 1px solid #000;
+    padding: 5px 4px;
+    vertical-align: middle;
+    word-wrap: break-word;
+  }
+
+  .print-table th {
+    background: #f2f2f2 !important;
+    color: #000 !important;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  .print-table td {
+    text-align: center;
+  }
+
+  .print-table td:nth-child(2) {
+    text-align: left;
+  }
+
+  /* =====================================================
+     WORK SCHEDULE
+  ===================================================== */
+
+  .schedule-table {
+    font-size: 10px;
+  }
+
+  /* =====================================================
+     PRINTING DESCRIPTION
+  ===================================================== */
+
+  .printing-description {
+    min-height: 55px;
+    border: 1px solid #000;
+    padding: 8px;
+    font-size: 11px;
+    line-height: 1.5;
+  }
+
+  /* =====================================================
+     SUMMARY
+  ===================================================== */
+
+  .print-summary-wrapper {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 15px;
+  }
+
+  .print-summary {
+    width: 300px;
+    border-collapse: collapse;
+    font-size: 11px;
+  }
+
+  .print-summary td {
+    border: 1px solid #000;
+    padding: 6px 8px;
+  }
+
+  .print-summary td:first-child {
+    font-weight: 700;
+  }
+
+  .print-summary td:last-child {
+    text-align: right;
+  }
+
+  /* =====================================================
+     SIGNATURE
+  ===================================================== */
+
+  .print-signatures {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    margin-top: 55px;
+    font-size: 11px;
+  }
+
+  .print-signatures > div {
+    text-align: center;
+  }
+
+  .signature-line {
+    border-bottom: 1px solid #000;
+    margin-bottom: 5px;
+  }
+
+  .print-signatures p {
+    margin: 0;
+  }
+
+  /* =====================================================
+     FOOTER
+  ===================================================== */
+
+  .print-footer {
+    margin-top: 25px;
+    padding-top: 8px;
+    border-top: 1px solid #000;
+    text-align: center;
+    font-size: 9px;
+  }
+
+  .print-footer p {
+    margin: 2px 0;
+  }
+
+  /* =====================================================
+     PREVENT PAGE BREAKS
+  ===================================================== */
+
+  .print-section,
+  .print-table,
+  .print-summary,
+  .print-signatures {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}

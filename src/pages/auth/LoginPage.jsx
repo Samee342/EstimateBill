@@ -1,18 +1,30 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
 
+  const demoUser = {
+    email: "admin@example.com",
+    password: "123456",
+  };
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm();
 
+  const navigate = useNavigate();
+
   const onSubmit = async (data) => {
-    console.log(data);
+    if (data.email === demoUser.email && data.password === demoUser.password) {
+      localStorage.setItem("isLoggedIn", "true");
+      navigate("/dashboard");
+    } else {
+      alert("Invalid email or password");
+    }
   };
 
   return (

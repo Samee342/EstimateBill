@@ -8,6 +8,7 @@ import {
   FiDownload,
   FiFileText,
 } from "react-icons/fi";
+import { FaMoneyBillWave } from "react-icons/fa";
 
 const CustomerReport = () => {
   const [search, setSearch] = useState("");
@@ -105,17 +106,17 @@ const CustomerReport = () => {
 
   const totalBusiness = customers.reduce(
     (total, customer) => total + customer.totalAmount,
-    0
+    0,
   );
 
   const totalPaid = customers.reduce(
     (total, customer) => total + customer.paid,
-    0
+    0,
   );
 
   const totalDue = customers.reduce(
     (total, customer) => total + customer.due,
-    0
+    0,
   );
 
   const filteredCustomers = useMemo(() => {
@@ -123,15 +124,15 @@ const CustomerReport = () => {
       (customer) =>
         customer.name.toLowerCase().includes(search.toLowerCase()) ||
         customer.id.toLowerCase().includes(search.toLowerCase()) ||
-        customer.phone.includes(search)
+        customer.phone.includes(search),
     );
   }, [search]);
 
   return (
-    <div className="min-h-screen bg-[#f7f8fa] text-slate-800">
+    <div className="min-h-screen bg-[#f7f8fa] dark:bg-slate-800 text-slate-800">
       {/* Header */}
 
-      <header className="border-b border-slate-200 bg-white px-5 py-5 md:px-8">
+      <header className="border-b border-slate-200 bg-white dark:bg-slate-800 px-5 py-5 md:px-8">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <div className="flex items-center gap-2">
@@ -142,7 +143,7 @@ const CustomerReport = () => {
               </span>
             </div>
 
-            <h1 className="mt-1 text-2xl font-bold text-slate-900">
+            <h1 className="mt-1 text-2xl font-bold dark:text-slate-300 text-slate-900">
               Customer Report
             </h1>
 
@@ -161,7 +162,7 @@ const CustomerReport = () => {
       <main className="p-5 md:p-8">
         {/* Search */}
 
-        <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-4">
+        <div className="mb-6 rounded-2xl border border-slate-200 bg-white dark:bg-slate-800 p-4">
           <div className="relative w-full md:max-w-md">
             <FiSearch
               size={18}
@@ -173,7 +174,7 @@ const CustomerReport = () => {
               placeholder="Search customer..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-10 pr-4 text-sm outline-none focus:border-orange-400 focus:bg-white"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 dark:bg-slate-700 dark:text-slate-300 py-3 pl-10 pr-4 text-sm outline-none focus:border-orange-400 focus:bg-white"
             />
           </div>
         </div>
@@ -183,14 +184,12 @@ const CustomerReport = () => {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {/* Customers */}
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-5">
+          <div className="rounded-2xl border border-slate-200 bg-white dark:bg-slate-800 p-5">
             <div className="flex justify-between">
               <div>
-                <p className="text-sm text-slate-500">
-                  Total Customers
-                </p>
+                <p className="text-sm text-slate-500">Total Customers</p>
 
-                <h3 className="mt-2 text-2xl font-bold">
+                <h3 className="mt-2 text-2xl font-bold dark:text-slate-200">
                   {customers.length}
                 </h3>
               </div>
@@ -203,14 +202,12 @@ const CustomerReport = () => {
 
           {/* New */}
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-5">
+          <div className="rounded-2xl border border-slate-200 bg-white dark:bg-slate-800 p-5">
             <div className="flex justify-between">
               <div>
-                <p className="text-sm text-slate-500">
-                  New Customers
-                </p>
+                <p className="text-sm text-slate-500">New Customers</p>
 
-                <h3 className="mt-2 text-2xl font-bold">
+                <h3 className="mt-2 text-2xl font-bold dark:text-slate-200">
                   24
                 </h3>
               </div>
@@ -223,34 +220,30 @@ const CustomerReport = () => {
 
           {/* Business */}
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-5">
+          <div className="rounded-2xl border border-slate-200 bg-white dark:bg-slate-800 p-5">
             <div className="flex justify-between">
               <div>
-                <p className="text-sm text-slate-500">
-                  Customer Business
-                </p>
+                <p className="text-sm text-slate-500">Customer Business</p>
 
-                <h3 className="mt-2 text-2xl font-bold">
+                <h3 className="mt-2 text-2xl font-bold dark:text-slate-200">
                   Rs. {totalBusiness.toLocaleString()}
                 </h3>
               </div>
 
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-orange-50 text-orange-500">
-                <FiDollarSign size={21} />
+                <FaMoneyBillWave size={21} />
               </div>
             </div>
           </div>
 
           {/* Due */}
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-5">
+          <div className="rounded-2xl border border-slate-200 bg-white dark:bg-slate-800 p-5">
             <div className="flex justify-between">
               <div>
-                <p className="text-sm text-slate-500">
-                  Total Due
-                </p>
+                <p className="text-sm text-slate-500">Total Due</p>
 
-                <h3 className="mt-2 text-2xl font-bold">
+                <h3 className="mt-2 text-2xl font-bold dark:text-slate-200">
                   Rs. {totalDue.toLocaleString()}
                 </h3>
               </div>
@@ -264,9 +257,9 @@ const CustomerReport = () => {
 
         {/* Customer Table */}
 
-        <div className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+        <div className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white dark:bg-slate-800">
           <div className="border-b border-slate-200 p-6">
-            <h3 className="font-bold text-slate-900">
+            <h3 className="font-bold text-slate-900 dark:text-slate-300">
               Customer-wise Report
             </h3>
 
@@ -313,7 +306,7 @@ const CustomerReport = () => {
                 {filteredCustomers.map((customer) => (
                   <tr
                     key={customer.id}
-                    className="border-b border-slate-100 last:border-0 hover:bg-slate-50"
+                    className="border-b border-slate-100 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-800"
                   >
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
@@ -322,7 +315,7 @@ const CustomerReport = () => {
                         </div>
 
                         <div>
-                          <p className="text-sm font-semibold">
+                          <p className="text-sm font-semibold dark:text-slate-300">
                             {customer.name}
                           </p>
 
@@ -341,7 +334,7 @@ const CustomerReport = () => {
                       </div>
                     </td>
 
-                    <td className="px-6 py-4 text-sm font-semibold">
+                    <td className="px-6 py-4 text-sm font-semibold dark:text-slate-300">
                       Rs. {customer.totalAmount.toLocaleString()}
                     </td>
 
@@ -382,21 +375,15 @@ const CustomerReport = () => {
                   </div>
 
                   <div>
-                    <p className="text-sm font-semibold">
-                      {customer.name}
-                    </p>
+                    <p className="text-sm font-semibold">{customer.name}</p>
 
-                    <p className="text-xs text-slate-400">
-                      {customer.id}
-                    </p>
+                    <p className="text-xs text-slate-400">{customer.id}</p>
                   </div>
                 </div>
 
                 <div className="mt-4 grid grid-cols-2 gap-4">
                   <div>
-                    <p className="text-[11px] text-slate-400">
-                      Projects
-                    </p>
+                    <p className="text-[11px] text-slate-400">Projects</p>
 
                     <p className="mt-1 text-sm font-semibold">
                       {customer.projects}
@@ -404,9 +391,7 @@ const CustomerReport = () => {
                   </div>
 
                   <div>
-                    <p className="text-[11px] text-slate-400">
-                      Business
-                    </p>
+                    <p className="text-[11px] text-slate-400">Business</p>
 
                     <p className="mt-1 text-sm font-semibold">
                       Rs. {customer.totalAmount.toLocaleString()}
@@ -414,9 +399,7 @@ const CustomerReport = () => {
                   </div>
 
                   <div>
-                    <p className="text-[11px] text-slate-400">
-                      Paid
-                    </p>
+                    <p className="text-[11px] text-slate-400">Paid</p>
 
                     <p className="mt-1 text-sm font-semibold text-green-600">
                       Rs. {customer.paid.toLocaleString()}
@@ -424,9 +407,7 @@ const CustomerReport = () => {
                   </div>
 
                   <div>
-                    <p className="text-[11px] text-slate-400">
-                      Due
-                    </p>
+                    <p className="text-[11px] text-slate-400">Due</p>
 
                     <p className="mt-1 text-sm font-semibold text-red-500">
                       Rs. {customer.due.toLocaleString()}
@@ -440,10 +421,10 @@ const CustomerReport = () => {
 
         {/* Customer Summary */}
 
-        <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-6">
+        <div className="mt-6 rounded-2xl border border-slate-200 bg-white dark:bg-slate-800 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="font-bold text-slate-900">
+              <h3 className="font-bold text-slate-900 dark:text-slate-300">
                 Payment Summary
               </h3>
 
