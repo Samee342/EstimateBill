@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import "./App.css";
 
 import { lazy, useEffect } from "react";
@@ -101,10 +101,10 @@ function App() {
         <Route element={<ProtectedRoute />}>
           <Route element={<AdminLayout />}>
             {/* Dashboard */}
-            <Route index element={<Home />} />
+
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
             <Route path="/dashboard" element={<Home />} />
-
             {/* ======================================
               PROJECTS
           ====================================== */}
