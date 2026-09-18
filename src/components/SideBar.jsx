@@ -1,4 +1,6 @@
+
 import { useEffect, useState } from "react";
+
 import {
   FaThLarge,
   FaFolder,
@@ -12,6 +14,7 @@ import {
   FaSlidersH,
   FaBroom,
   FaSignOutAlt,
+  FaRegTrashAlt,
 } from "react-icons/fa";
 
 import {
@@ -26,7 +29,6 @@ import {
 } from "react-router-dom";
 
 import Logo from "../assets/Logo.jpeg";
-
 import { logoutUser } from "../utils/auth";
 
 const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
@@ -38,10 +40,17 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
   const [customerOpen, setCustomerOpen] = useState(false);
   const [settingOpen, setSettingOpen] = useState(false);
 
-  const isReportSection = location.pathname.startsWith("/reports");
-  const isProjectSection = location.pathname.startsWith("/projects");
-  const isCustomerSection = location.pathname.startsWith("/customers");
-  const isSettingSection = location.pathname.startsWith("/settings");
+  const isReportSection =
+    location.pathname.startsWith("/reports");
+
+  const isProjectSection =
+    location.pathname.startsWith("/projects");
+
+  const isCustomerSection =
+    location.pathname.startsWith("/customers");
+
+  const isSettingSection =
+    location.pathname.startsWith("/settings");
 
   // =========================================
   // LOGOUT
@@ -123,8 +132,8 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
     }`;
 
   return (
-    <aside
-      className={`fixed left-0 top-0 z-40 flex h-screen flex-col overflow-visible border-r shadow-sm transition-all duration-300
+    <div
+      className={`no-print fixed left-0 top-0 z-40 flex h-screen flex-col overflow-visible border-r shadow-sm transition-all duration-300
         bg-white border-slate-200
         dark:bg-slate-900 dark:border-slate-800
         ${sideBarOpen ? "w-64" : "w-[76px]"}
@@ -642,6 +651,9 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
         ====================================================== */}
 
         <div className="group relative mt-1">
+
+          {/* SETTINGS BUTTON */}
+
           <button
             type="button"
             onClick={() => {
@@ -700,6 +712,9 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                 </div>
 
                 <div className="mt-1">
+
+                  {/* STUDIO SETTINGS */}
+
                   <NavLink
                     to="/settings/studio"
                     className={({ isActive }) =>
@@ -714,6 +729,8 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                     Studio Settings
                   </NavLink>
 
+                  {/* RESET & CLEANUP */}
+
                   <NavLink
                     to="/settings/reset-cleanup"
                     className={({ isActive }) =>
@@ -727,6 +744,7 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                     <FaBroom className="text-xs" />
                     Reset & CleanUp
                   </NavLink>
+
                 </div>
               </div>
             </div>
@@ -736,6 +754,9 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
 
           {sideBarOpen && settingOpen && (
             <div className="ml-9 mt-1 space-y-1 border-l border-slate-200 pl-2 dark:border-slate-700">
+
+              {/* STUDIO SETTINGS */}
+
               <NavLink
                 to="/settings/studio"
                 className={subNavClass}
@@ -744,6 +765,8 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                 Studio Settings
               </NavLink>
 
+              {/* RESET & CLEANUP */}
+
               <NavLink
                 to="/settings/reset-cleanup"
                 className={subNavClass}
@@ -751,9 +774,33 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                 <FaBroom className="mr-2 text-[11px]" />
                 Reset & CleanUp
               </NavLink>
+
             </div>
           )}
         </div>
+
+        {/* =====================================================
+            TRASH
+        ====================================================== */}
+
+        <NavLink
+          to="/trash"
+          className={mainNavClass}
+          title={!sideBarOpen ? "Trash" : ""}
+        >
+          <div className="relative">
+            <FaRegTrashAlt className="shrink-0 text-sm" />
+          </div>
+
+          {sideBarOpen && (
+            <div className="flex flex-1 items-center justify-between">
+              <span className="font-medium">
+                Trash
+              </span>
+            </div>
+          )}
+        </NavLink>
+
       </nav>
 
       {/* =====================================================
@@ -780,8 +827,10 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
           )}
         </button>
       </div>
-    </aside>
+
+    </div>
   );
 };
 
 export default Sidebar;
+

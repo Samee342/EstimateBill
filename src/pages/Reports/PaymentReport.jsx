@@ -9,6 +9,7 @@ import {
   FiCreditCard,
   FiCalendar,
 } from "react-icons/fi";
+import { FaMoneyBillWave } from "react-icons/fa";
 
 const PaymentReport = () => {
   const [search, setSearch] = useState("");
@@ -119,18 +120,15 @@ const PaymentReport = () => {
 
   const totalInvoiced = payments.reduce(
     (total, payment) => total + payment.amount,
-    0
+    0,
   );
 
   const totalReceived = payments.reduce(
     (total, payment) => total + payment.paid,
-    0
+    0,
   );
 
-  const totalDue = payments.reduce(
-    (total, payment) => total + payment.due,
-    0
-  );
+  const totalDue = payments.reduce((total, payment) => total + payment.due, 0);
 
   const overdueAmount = payments
     .filter((payment) => payment.status === "Overdue")
@@ -189,30 +187,23 @@ const PaymentReport = () => {
   const filteredPayments = useMemo(() => {
     return payments.filter((payment) => {
       const matchesSearch =
-        payment.customer
-          .toLowerCase()
-          .includes(search.toLowerCase()) ||
-        payment.invoice
-          .toLowerCase()
-          .includes(search.toLowerCase()) ||
-        payment.project
-          .toLowerCase()
-          .includes(search.toLowerCase()) ||
+        payment.customer.toLowerCase().includes(search.toLowerCase()) ||
+        payment.invoice.toLowerCase().includes(search.toLowerCase()) ||
+        payment.project.toLowerCase().includes(search.toLowerCase()) ||
         payment.id.toLowerCase().includes(search.toLowerCase());
 
       const matchesPayment =
-        paymentFilter === "All" ||
-        payment.status === paymentFilter;
+        paymentFilter === "All" || payment.status === paymentFilter;
 
       return matchesSearch && matchesPayment;
     });
   }, [search, paymentFilter]);
 
   return (
-    <div className="min-h-screen bg-[#f7f8fa] text-slate-800">
+    <div className="min-h-screen bg-[#f7f8fa] dark:bg-slate-800 text-slate-800">
       {/* Header */}
 
-      <header className="border-b border-slate-200 bg-white px-5 py-5 md:px-8">
+      <header className="border-b border-slate-200 bg-white dark:bg-slate-800 px-5 py-5 md:px-8">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <div className="flex items-center gap-2">
@@ -223,7 +214,7 @@ const PaymentReport = () => {
               </span>
             </div>
 
-            <h1 className="mt-1 text-2xl font-bold text-slate-900">
+            <h1 className="mt-1 text-2xl font-bold text-slate-900 dark:text-slate-200">
               Payment Report
             </h1>
 
@@ -242,7 +233,7 @@ const PaymentReport = () => {
       <main className="p-5 md:p-8">
         {/* Search + Filter */}
 
-        <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-4">
+        <div className="mb-6 rounded-2xl border border-slate-200 bg-white dark:bg-slate-800  p-4">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div className="relative w-full md:max-w-md">
               <FiSearch
@@ -255,14 +246,14 @@ const PaymentReport = () => {
                 placeholder="Search customer, invoice or project..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-10 pr-4 text-sm outline-none focus:border-orange-400 focus:bg-white"
+                className="w-full rounded-xl border border-slate-200 dark:text-slate-200 dark:bg-slate-700 bg-slate-50 d py-3 pl-10 pr-4 text-sm outline-none focus:border-orange-400 "
               />
             </div>
 
             <select
               value={paymentFilter}
               onChange={(e) => setPaymentFilter(e.target.value)}
-              className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none"
+              className="rounded-xl border border-slate-200 bg-white dark:bg-slate-700 dark:text-slate-200 px-4 py-3 text-sm outline-none"
             >
               <option value="All">All Payments</option>
               <option value="Paid">Paid</option>
@@ -278,34 +269,30 @@ const PaymentReport = () => {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {/* Invoiced */}
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-5">
+          <div className="rounded-2xl border border-slate-200 bg-white dark:bg-slate-800 p-5">
             <div className="flex justify-between">
               <div>
-                <p className="text-sm text-slate-500">
-                  Total Invoiced
-                </p>
+                <p className="text-sm text-slate-500">Total Invoiced</p>
 
-                <h3 className="mt-2 text-2xl font-bold">
+                <h3 className="mt-2 text-2xl font-bold dark:text-slate-200">
                   Rs. {totalInvoiced.toLocaleString()}
                 </h3>
               </div>
 
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-orange-50 text-orange-500">
-                <FiDollarSign size={21} />
+                <FaMoneyBillWave size={21} />
               </div>
             </div>
           </div>
 
           {/* Received */}
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-5">
+          <div className="rounded-2xl border border-slate-200 bg-white dark:bg-slate-800 p-5">
             <div className="flex justify-between">
               <div>
-                <p className="text-sm text-slate-500">
-                  Total Received
-                </p>
+                <p className="text-sm text-slate-500">Total Received</p>
 
-                <h3 className="mt-2 text-2xl font-bold">
+                <h3 className="mt-2 text-2xl font-bold dark:text-slate-300">
                   Rs. {totalReceived.toLocaleString()}
                 </h3>
               </div>
@@ -318,14 +305,12 @@ const PaymentReport = () => {
 
           {/* Pending */}
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-5">
+          <div className="rounded-2xl border border-slate-200 bg-white dark:bg-slate-800 p-5">
             <div className="flex justify-between">
               <div>
-                <p className="text-sm text-slate-500">
-                  Pending Amount
-                </p>
+                <p className="text-sm text-slate-500">Pending Amount</p>
 
-                <h3 className="mt-2 text-2xl font-bold">
+                <h3 className="mt-2 text-2xl font-bold dark:text-slate-200">
                   Rs. {totalDue.toLocaleString()}
                 </h3>
               </div>
@@ -338,14 +323,12 @@ const PaymentReport = () => {
 
           {/* Overdue */}
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-5">
+          <div className="rounded-2xl border border-slate-200 bg-white dark:bg-slate-800 p-5">
             <div className="flex justify-between">
               <div>
-                <p className="text-sm text-slate-500">
-                  Overdue
-                </p>
+                <p className="text-sm text-slate-500">Overdue</p>
 
-                <h3 className="mt-2 text-2xl font-bold">
+                <h3 className="mt-2 text-2xl font-bold dark:text-slate-300">
                   Rs. {overdueAmount.toLocaleString()}
                 </h3>
               </div>
@@ -362,8 +345,8 @@ const PaymentReport = () => {
         <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
           {/* Payment Method Summary */}
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-6">
-            <h3 className="font-bold text-slate-900">
+          <div className="rounded-2xl border border-slate-200 bg-white dark:bg-slate-800 p-6">
+            <h3 className="font-bold text-slate-900 dark:text-slate-200">
               Payment Method Summary
             </h3>
 
@@ -371,14 +354,11 @@ const PaymentReport = () => {
               Amount received by payment method
             </p>
 
-            <div className="mt-6 space-y-4">
+            <div className="mt-6 space-y-4 dark:text-slate-200">
               {["Cash", "Bank", "eSewa", "Khalti"].map((method) => {
                 const amount = payments
                   .filter((payment) => payment.method === method)
-                  .reduce(
-                    (total, payment) => total + payment.paid,
-                    0
-                  );
+                  .reduce((total, payment) => total + payment.paid, 0);
 
                 return (
                   <div
@@ -388,15 +368,13 @@ const PaymentReport = () => {
                     <div className="flex items-center gap-3">
                       <div
                         className={`flex h-9 w-9 items-center justify-center rounded-lg ${getMethodStyle(
-                          method
+                          method,
                         )}`}
                       >
                         <FiCreditCard size={17} />
                       </div>
 
-                      <span className="text-sm font-medium">
-                        {method}
-                      </span>
+                      <span className="text-sm font-medium">{method}</span>
                     </div>
 
                     <span className="text-sm font-bold">
@@ -410,14 +388,14 @@ const PaymentReport = () => {
 
           {/* Collection Progress */}
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-6">
+          <div className="rounded-2xl border border-slate-200 bg-white dark:bg-slate-800 p-6">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-green-50 text-green-600">
                 <FiDollarSign />
               </div>
 
               <div>
-                <h3 className="font-bold text-slate-900">
+                <h3 className="font-bold text-slate-900 dark:text-slate-200">
                   Collection Progress
                 </h3>
 
@@ -429,15 +407,11 @@ const PaymentReport = () => {
 
             <div className="mt-8">
               <div className="flex justify-between">
-                <span className="text-sm text-slate-500">
-                  Collection Rate
-                </span>
+                <span className="text-sm text-slate-500">Collection Rate</span>
 
                 <span className="text-sm font-bold text-green-600">
                   {totalInvoiced
-                    ? Math.round(
-                        (totalReceived / totalInvoiced) * 100
-                      )
+                    ? Math.round((totalReceived / totalInvoiced) * 100)
                     : 0}
                   %
                 </span>
@@ -448,9 +422,7 @@ const PaymentReport = () => {
                   className="h-full rounded-full bg-green-500"
                   style={{
                     width: `${
-                      totalInvoiced
-                        ? (totalReceived / totalInvoiced) * 100
-                        : 0
+                      totalInvoiced ? (totalReceived / totalInvoiced) * 100 : 0
                     }%`,
                   }}
                 />
@@ -458,9 +430,7 @@ const PaymentReport = () => {
 
               <div className="mt-5 grid grid-cols-2 gap-4">
                 <div className="rounded-xl bg-green-50 p-4">
-                  <p className="text-xs text-green-700">
-                    Received
-                  </p>
+                  <p className="text-xs text-green-700">Received</p>
 
                   <p className="mt-1 text-lg font-bold text-green-700">
                     Rs. {totalReceived.toLocaleString()}
@@ -468,9 +438,7 @@ const PaymentReport = () => {
                 </div>
 
                 <div className="rounded-xl bg-red-50 p-4">
-                  <p className="text-xs text-red-700">
-                    Remaining
-                  </p>
+                  <p className="text-xs text-red-700">Remaining</p>
 
                   <p className="mt-1 text-lg font-bold text-red-700">
                     Rs. {totalDue.toLocaleString()}
@@ -483,9 +451,9 @@ const PaymentReport = () => {
 
         {/* Payment Transactions */}
 
-        <div className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+        <div className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white dark:bg-slate-800 ">
           <div className="border-b border-slate-200 p-6">
-            <h3 className="font-bold text-slate-900">
+            <h3 className="font-bold text-slate-900 dark:text-slate-200">
               Payment Transactions
             </h3>
 
@@ -542,10 +510,10 @@ const PaymentReport = () => {
                 {filteredPayments.map((payment) => (
                   <tr
                     key={payment.id}
-                    className="border-b border-slate-100 last:border-0 hover:bg-slate-50"
+                    className="border-b border-slate-100 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-700"
                   >
                     <td className="px-6 py-4">
-                      <p className="text-sm font-semibold">
+                      <p className="text-sm font-semibold dark:text-slate-200">
                         {payment.id}
                       </p>
 
@@ -554,7 +522,7 @@ const PaymentReport = () => {
                       </p>
                     </td>
 
-                    <td className="px-6 py-4 text-sm font-medium">
+                    <td className="px-6 py-4 text-sm font-medium dark:text-slate-200">
                       {payment.customer}
                     </td>
 
@@ -570,7 +538,7 @@ const PaymentReport = () => {
                       </div>
                     </td>
 
-                    <td className="px-6 py-4 text-sm font-semibold">
+                    <td className="px-6 py-4 text-sm font-semibold dark:text-slate-200">
                       Rs. {payment.amount.toLocaleString()}
                     </td>
 
@@ -585,7 +553,7 @@ const PaymentReport = () => {
                     <td className="px-6 py-4">
                       <span
                         className={`rounded-full px-3 py-1.5 text-xs font-semibold ${getMethodStyle(
-                          payment.method
+                          payment.method,
                         )}`}
                       >
                         {payment.method}
@@ -595,7 +563,7 @@ const PaymentReport = () => {
                     <td className="px-6 py-4">
                       <span
                         className={`rounded-full px-3 py-1.5 text-xs font-semibold ${getStatusStyle(
-                          payment.status
+                          payment.status,
                         )}`}
                       >
                         {payment.status}
@@ -617,9 +585,7 @@ const PaymentReport = () => {
               >
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="text-sm font-semibold">
-                      {payment.customer}
-                    </p>
+                    <p className="text-sm font-semibold">{payment.customer}</p>
 
                     <p className="mt-1 text-xs text-orange-500">
                       {payment.invoice}
@@ -628,7 +594,7 @@ const PaymentReport = () => {
 
                   <span
                     className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${getStatusStyle(
-                      payment.status
+                      payment.status,
                     )}`}
                   >
                     {payment.status}
@@ -637,9 +603,7 @@ const PaymentReport = () => {
 
                 <div className="mt-4 grid grid-cols-2 gap-4">
                   <div>
-                    <p className="text-[11px] text-slate-400">
-                      Amount
-                    </p>
+                    <p className="text-[11px] text-slate-400">Amount</p>
 
                     <p className="mt-1 text-sm font-bold">
                       Rs. {payment.amount.toLocaleString()}
@@ -647,9 +611,7 @@ const PaymentReport = () => {
                   </div>
 
                   <div>
-                    <p className="text-[11px] text-slate-400">
-                      Paid
-                    </p>
+                    <p className="text-[11px] text-slate-400">Paid</p>
 
                     <p className="mt-1 text-sm font-bold text-green-600">
                       Rs. {payment.paid.toLocaleString()}
@@ -657,9 +619,7 @@ const PaymentReport = () => {
                   </div>
 
                   <div>
-                    <p className="text-[11px] text-slate-400">
-                      Due
-                    </p>
+                    <p className="text-[11px] text-slate-400">Due</p>
 
                     <p className="mt-1 text-sm font-bold text-red-500">
                       Rs. {payment.due.toLocaleString()}
@@ -667,13 +627,11 @@ const PaymentReport = () => {
                   </div>
 
                   <div>
-                    <p className="text-[11px] text-slate-400">
-                      Method
-                    </p>
+                    <p className="text-[11px] text-slate-400">Method</p>
 
                     <span
                       className={`mt-1 inline-block rounded-full px-2.5 py-1 text-[11px] font-semibold ${getMethodStyle(
-                        payment.method
+                        payment.method,
                       )}`}
                     >
                       {payment.method}
