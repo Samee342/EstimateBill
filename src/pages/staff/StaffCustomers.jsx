@@ -85,22 +85,18 @@ const StaffCustomers = () => {
   }, [search]);
 
   const activeCustomers = customersData.filter(
-    (customer) => customer.status === "Active"
+    (customer) => customer.status === "Active",
   ).length;
 
   const totalProjects = customersData.reduce(
     (total, customer) => total + customer.projects,
-    0
+    0,
   );
 
   return (
     <div className="space-y-6">
       {/* HEADER */}
       <div>
-        <p className="text-xs font-bold uppercase tracking-wider text-orange-500">
-          Customers
-        </p>
-
         <h1 className="mt-1 text-2xl font-bold text-slate-900 dark:text-white">
           Customers
         </h1>
@@ -258,9 +254,7 @@ const StaffCustomers = () => {
                       <td className="px-5 py-4">
                         <div className="flex items-center gap-3">
                           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-100 text-sm font-bold text-orange-600 dark:bg-orange-500/10 dark:text-orange-400">
-                            {customer.name
-                              .charAt(0)
-                              .toUpperCase()}
+                            {customer.name.charAt(0).toUpperCase()}
                           </div>
 
                           <div>
@@ -323,9 +317,7 @@ const StaffCustomers = () => {
                       <td className="px-5 py-4">
                         <button
                           type="button"
-                          onClick={() =>
-                            setSelectedCustomer(customer)
-                          }
+                          onClick={() => setSelectedCustomer(customer)}
                           className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600 transition hover:border-orange-200 hover:bg-orange-50 hover:text-orange-600 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
                         >
                           <FiEye size={14} />
@@ -348,9 +340,7 @@ const StaffCustomers = () => {
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-3">
                       <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-orange-100 font-bold text-orange-600 dark:bg-orange-500/10 dark:text-orange-400">
-                        {customer.name
-                          .charAt(0)
-                          .toUpperCase()}
+                        {customer.name.charAt(0).toUpperCase()}
                       </div>
 
                       <div>
@@ -358,9 +348,7 @@ const StaffCustomers = () => {
                           {customer.name}
                         </h3>
 
-                        <p className="text-xs text-slate-400">
-                          {customer.id}
-                        </p>
+                        <p className="text-xs text-slate-400">{customer.id}</p>
                       </div>
                     </div>
 
@@ -399,9 +387,7 @@ const StaffCustomers = () => {
 
                   <button
                     type="button"
-                    onClick={() =>
-                      setSelectedCustomer(customer)
-                    }
+                    onClick={() => setSelectedCustomer(customer)}
                     className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-orange-600"
                   >
                     <FiEye size={15} />

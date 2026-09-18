@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 
@@ -40,17 +39,8 @@ const AdminLayout = () => {
   // LOGOUT
   // =========================
 
-  const handleLogout = () => {
-    logoutUser();
-
-    navigate("/login", {
-      replace: true,
-    });
-  };
-
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
-
       {/* =====================================================
           HEADER
       ====================================================== */}
@@ -69,13 +59,11 @@ const AdminLayout = () => {
           left: sideBarOpen ? "256px" : "76px",
         }}
       >
-
         {/* =====================================================
             LEFT SIDE
         ====================================================== */}
 
         <div className="flex min-w-0 flex-1 items-center gap-4">
-
           {/* SEARCH */}
 
           <div
@@ -139,7 +127,6 @@ const AdminLayout = () => {
         ====================================================== */}
 
         <div className="ml-4 flex shrink-0 items-center gap-3">
-
           {/* =====================================================
               THEME
           ====================================================== */}
@@ -159,11 +146,7 @@ const AdminLayout = () => {
             "
             aria-label="Toggle theme"
           >
-            {theme === "dark" ? (
-              <FiSun size={19} />
-            ) : (
-              <FiMoon size={19} />
-            )}
+            {theme === "dark" ? <FiSun size={19} /> : <FiMoon size={19} />}
           </button>
 
           {/* =====================================================
@@ -208,7 +191,6 @@ const AdminLayout = () => {
               md:flex
             "
           >
-
             {/* AVATAR */}
 
             <div
@@ -260,33 +242,6 @@ const AdminLayout = () => {
                 dark:text-slate-500
               "
             />
-
-            {/* =====================================================
-                LOGOUT
-            ====================================================== */}
-
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="
-                ml-2 flex items-center gap-2
-                rounded-lg
-                bg-red-50
-                px-3 py-2
-                text-sm font-medium
-                text-red-600
-                transition
-                hover:bg-red-100
-                dark:bg-red-950/30
-                dark:text-red-400
-                dark:hover:bg-red-950/50
-              "
-              aria-label="Logout"
-            >
-              <FiLogOut size={17} />
-
-              <span>Logout</span>
-            </button>
           </div>
         </div>
       </header>
@@ -296,10 +251,7 @@ const AdminLayout = () => {
       ====================================================== */}
 
       <div className="no-print">
-        <Sidebar
-          sideBarOpen={sideBarOpen}
-          setSideBarOpen={setSideBarOpen}
-        />
+        <Sidebar sideBarOpen={sideBarOpen} setSideBarOpen={setSideBarOpen} />
       </div>
 
       {/* =====================================================
@@ -322,4 +274,3 @@ const AdminLayout = () => {
 };
 
 export default AdminLayout;
-

@@ -20,7 +20,7 @@ import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 
-import Logo from "../assets/Logo.jpeg";
+import Logo from "../assets/Logo.png";
 
 const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
   const location = useLocation();

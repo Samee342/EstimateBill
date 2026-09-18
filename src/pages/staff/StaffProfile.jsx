@@ -45,95 +45,165 @@ const StaffProfile = () => {
       {/* =====================================================
           PROFILE HERO
       ====================================================== */}
-      <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
-        {/* Cover */}
-        <div className="relative h-36 overflow-hidden bg-gradient-to-r from-orange-600 via-orange-500 to-amber-400">
-          {/* Decorative circles */}
-          <div className="absolute -right-10 -top-16 h-48 w-48 rounded-full border-[30px] border-white/10" />
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <div className="flex flex-col lg:flex-row">
+          {/* =====================================================
+        LEFT IDENTITY PANEL
+    ====================================================== */}
+          <div className="relative overflow-hidden bg-orange-500 px-6 py-7 lg:w-[280px] lg:shrink-0">
+            {/* Subtle decorative elements */}
+            <div className="absolute -right-14 -top-14 h-32 w-32 rounded-full border-[18px] border-white/10" />
 
-          <div className="absolute right-24 top-10 h-20 w-20 rounded-full bg-white/10" />
+            <div className="absolute -bottom-16 -left-10 h-32 w-32 rounded-full border-[16px] border-white/10" />
 
-          <div className="absolute -bottom-10 left-1/3 h-28 w-28 rounded-full bg-white/10" />
-
-          <div className="absolute inset-0 bg-gradient-to-r from-black/5 to-white/5" />
-        </div>
-
-        {/* Profile Content */}
-        <div className="px-5 pb-6 md:px-7">
-          <div className="-mt-12 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-            {/* User */}
-            <div className="flex items-end gap-4">
+            <div className="relative flex items-center gap-4 lg:block">
               {/* Avatar */}
-              <div className="relative">
-                <div className="flex h-24 w-24 items-center justify-center rounded-3xl border-4 border-white bg-orange-100 text-3xl font-bold text-orange-600 shadow-lg dark:border-slate-900 dark:bg-orange-500/10 dark:text-orange-400">
-                  {userInitial}
-                </div>
-
-                {/* Online indicator */}
-                <span className="absolute bottom-1 right-1 h-5 w-5 rounded-full border-4 border-white bg-green-500 dark:border-slate-900" />
+              <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl border-4 border-white/20 bg-white text-2xl font-bold text-orange-600 shadow-lg">
+                {userInitial}
               </div>
 
-              {/* Name */}
-              <div className="pb-1">
-                <h2 className="text-xl font-bold text-slate-900 dark:text-white md:text-2xl">
+              <div className="mt-0 lg:mt-5">
+                <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-orange-100">
+                  PrintTech Staff
+                </p>
+
+                <h2 className="mt-1 text-xl font-bold text-white">
                   {userName}
                 </h2>
 
-                <div className="mt-1 flex flex-wrap items-center gap-2">
-                  <span className="text-sm text-slate-500 dark:text-slate-400">
-                    Production Staff
-                  </span>
+                <div className="mt-2 flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-green-300" />
 
-                  <span className="h-1 w-1 rounded-full bg-slate-300" />
-
-                  <span className="text-sm capitalize text-slate-500 dark:text-slate-400">
-                    {userRole}
+                  <span className="text-xs font-medium text-orange-50">
+                    Currently active
                   </span>
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* Active Badge */}
-            <div className="flex w-fit items-center gap-2 rounded-xl border border-green-200 bg-green-50 px-4 py-2.5 text-sm font-semibold text-green-700 dark:border-green-500/20 dark:bg-green-500/10 dark:text-green-400">
-              <span className="relative flex h-2.5 w-2.5">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
-                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-green-500" />
-              </span>
+          {/* =====================================================
+        CENTER USER INFORMATION
+    ====================================================== */}
+          <div className="flex-1 px-6 py-6">
+            <div className="mb-5">
+              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">
+                Account Information
+              </p>
 
-              Active Account
+              <h3 className="mt-1 text-lg font-bold text-slate-900 dark:text-white">
+                Staff Account
+              </h3>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              {/* Email */}
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-orange-600 dark:bg-orange-500/10 dark:text-orange-400">
+                  <FiMail size={17} />
+                </div>
+
+                <div className="min-w-0">
+                  <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+                    Email
+                  </p>
+
+                  <p className="mt-0.5 truncate text-sm font-semibold text-slate-800 dark:text-slate-200">
+                    {userEmail}
+                  </p>
+                </div>
+              </div>
+
+              {/* Role */}
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                  <FiBriefcase size={17} />
+                </div>
+
+                <div>
+                  <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+                    Role
+                  </p>
+
+                  <p className="mt-0.5 text-sm font-semibold capitalize text-slate-800 dark:text-slate-200">
+                    {userRole}
+                  </p>
+                </div>
+              </div>
+
+              {/* Department */}
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                  <FiActivity size={17} />
+                </div>
+
+                <div>
+                  <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+                    Department
+                  </p>
+
+                  <p className="mt-0.5 text-sm font-semibold text-slate-800 dark:text-slate-200">
+                    Production
+                  </p>
+                </div>
+              </div>
+
+              {/* Workspace */}
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                  <FiShield size={17} />
+                </div>
+
+                <div>
+                  <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+                    Access
+                  </p>
+
+                  <p className="mt-0.5 text-sm font-semibold text-slate-800 dark:text-slate-200">
+                    Staff Workspace
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* =====================================================
+        RIGHT STATUS PANEL
+    ====================================================== */}
+          <div className="border-t border-slate-100 px-6 py-6 lg:w-[190px] lg:shrink-0 lg:border-l lg:border-t-0 dark:border-slate-800">
+            <div className="flex h-full flex-col justify-between">
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">
+                  Status
+                </p>
+
+                <div className="mt-3 flex items-center gap-2">
+                  <span className="relative flex h-3 w-3">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-50" />
+
+                    <span className="relative inline-flex h-3 w-3 rounded-full bg-green-500" />
+                  </span>
+
+                  <span className="text-sm font-bold text-green-600 dark:text-green-400">
+                    Active
+                  </span>
+                </div>
+              </div>
+
+              <div className="mt-6 lg:mt-0">
+                <div className="rounded-xl bg-slate-50 px-3 py-3 dark:bg-slate-800/60">
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+                    Workspace
+                  </p>
+
+                  <p className="mt-1 text-xs font-semibold text-slate-700 dark:text-slate-300">
+                    Production Panel
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-
-      {/* =====================================================
-          QUICK STATS
-      ====================================================== */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <StatCard
-          icon={FiActivity}
-          label="Account Status"
-          value="Active"
-          iconBg="bg-green-50 dark:bg-green-500/10"
-          iconColor="text-green-600 dark:text-green-400"
-          valueColor="text-green-600 dark:text-green-400"
-        />
-
-        <StatCard
-          icon={FiBriefcase}
-          label="Department"
-          value="Production"
-          iconBg="bg-orange-50 dark:bg-orange-500/10"
-          iconColor="text-orange-600 dark:text-orange-400"
-        />
-
-        <StatCard
-          icon={FiClock}
-          label="Workspace"
-          value="Staff Panel"
-          iconBg="bg-blue-50 dark:bg-blue-500/10"
-          iconColor="text-blue-600 dark:text-blue-400"
-        />
       </div>
 
       {/* =====================================================
@@ -166,11 +236,7 @@ const StaffProfile = () => {
 
             {/* Details */}
             <div className="grid grid-cols-1 gap-1 p-4 sm:grid-cols-2">
-              <ProfileItem
-                icon={FiUser}
-                label="Full Name"
-                value={userName}
-              />
+              <ProfileItem icon={FiUser} label="Full Name" value={userName} />
 
               <ProfileItem
                 icon={FiMail}
@@ -218,11 +284,7 @@ const StaffProfile = () => {
             </div>
 
             <div className="space-y-1 p-4">
-              <InfoRow
-                icon={FiShield}
-                label="Role"
-                value="Staff"
-              />
+              <InfoRow icon={FiShield} label="Role" value="Staff" />
 
               <InfoRow
                 icon={FiBriefcase}
@@ -264,8 +326,8 @@ const StaffProfile = () => {
               </h3>
 
               <p className="mt-1 text-sm leading-6 text-slate-500 dark:text-slate-400">
-                Your staff account is designed to help you focus on
-                production work assigned to you.
+                Your staff account is designed to help you focus on production
+                work assigned to you.
               </p>
             </div>
           </div>
@@ -293,27 +355,18 @@ const StaffProfile = () => {
               </h3>
 
               <p className="mt-1 text-sm leading-6 text-slate-500 dark:text-slate-400">
-                Your account access is controlled by your PrintTech
-                workspace role.
+                Your account access is controlled by your PrintTech workspace
+                role.
               </p>
             </div>
           </div>
 
           <div className="mt-5 space-y-3">
-            <SecurityRow
-              label="Authentication"
-              value="Email & Password"
-            />
+            <SecurityRow label="Authentication" value="Email & Password" />
 
-            <SecurityRow
-              label="Account Type"
-              value="Staff Account"
-            />
+            <SecurityRow label="Account Type" value="Staff Account" />
 
-            <SecurityRow
-              label="Access Level"
-              value="Production"
-            />
+            <SecurityRow label="Access Level" value="Production" />
           </div>
         </div>
       </div>
@@ -333,8 +386,8 @@ const StaffProfile = () => {
             </h3>
 
             <p className="mt-1 text-sm leading-6 text-orange-700/80 dark:text-orange-300/70">
-              Update your assigned task status and progress regularly so
-              the admin can track the complete production workflow.
+              Update your assigned task status and progress regularly so the
+              admin can track the complete production workflow.
             </p>
           </div>
 
@@ -365,9 +418,7 @@ const StatCard = ({
         <div>
           <p className="text-xs font-medium text-slate-400">{label}</p>
 
-          <p className={`mt-2 text-lg font-bold ${valueColor}`}>
-            {value}
-          </p>
+          <p className={`mt-2 text-lg font-bold ${valueColor}`}>{value}</p>
         </div>
 
         <div
@@ -393,9 +444,7 @@ const ProfileItem = ({ icon: Icon, label, value }) => {
         </div>
 
         <div className="min-w-0">
-          <p className="text-xs font-medium text-slate-400">
-            {label}
-          </p>
+          <p className="text-xs font-medium text-slate-400">{label}</p>
 
           <p className="mt-1 break-words text-sm font-semibold text-slate-800 dark:text-slate-200">
             {value}
@@ -428,9 +477,7 @@ const InfoRow = ({
         </span>
       </div>
 
-      <span className={`text-sm font-semibold ${valueClass}`}>
-        {value}
-      </span>
+      <span className={`text-sm font-semibold ${valueClass}`}>{value}</span>
     </div>
   );
 };
@@ -442,10 +489,7 @@ const InfoRow = ({
 const PermissionItem = ({ text }) => {
   return (
     <div className="flex items-center gap-2 rounded-xl border border-slate-100 bg-slate-50 px-3 py-2.5 dark:border-slate-800 dark:bg-slate-800/50">
-      <FiCheckCircle
-        size={15}
-        className="shrink-0 text-green-500"
-      />
+      <FiCheckCircle size={15} className="shrink-0 text-green-500" />
 
       <span className="text-xs font-medium text-slate-600 dark:text-slate-300">
         {text}
