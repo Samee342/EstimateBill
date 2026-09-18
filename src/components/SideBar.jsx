@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 
 import {
@@ -17,19 +16,11 @@ import {
   FaRegTrashAlt,
 } from "react-icons/fa";
 
-import {
-  IoIosArrowForward,
-  IoIosArrowBack,
-} from "react-icons/io";
+import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 
-import {
-  NavLink,
-  useLocation,
-  useNavigate,
-} from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 
 import Logo from "../assets/Logo.jpeg";
-import { logoutUser } from "../utils/auth";
 
 const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
   const location = useLocation();
@@ -40,62 +31,49 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
   const [customerOpen, setCustomerOpen] = useState(false);
   const [settingOpen, setSettingOpen] = useState(false);
 
-  const isReportSection =
-    location.pathname.startsWith("/reports");
-
-  const isProjectSection =
-    location.pathname.startsWith("/projects");
-
-  const isCustomerSection =
-    location.pathname.startsWith("/customers");
-
-  const isSettingSection =
-    location.pathname.startsWith("/settings");
-
-  // =========================================
-  // LOGOUT
-  // =========================================
+  const isProjectSection = location.pathname.startsWith("/projects");
+  const isCustomerSection = location.pathname.startsWith("/customers");
+  const isReportSection = location.pathname.startsWith("/reports");
+  const isSettingSection = location.pathname.startsWith("/settings");
 
   const handleLogout = () => {
-    logoutUser();
+    // Remove authentication data
+    localStorage.removeItem("token");
+    localStorage.removeItem("authToken");
 
     navigate("/login", {
       replace: true,
     });
   };
 
-  // =========================================
-  // OPEN CURRENT SECTION AUTOMATICALLY
-  // =========================================
-
+  // Automatically open the active section
   useEffect(() => {
-    if (isProjectSection && sideBarOpen) {
+    if (!sideBarOpen) return;
+
+    if (isProjectSection) {
       setProjectOpen(true);
     }
 
-    if (isCustomerSection && sideBarOpen) {
+    if (isCustomerSection) {
       setCustomerOpen(true);
     }
 
-    if (isReportSection && sideBarOpen) {
+    if (isReportSection) {
       setReportOpen(true);
     }
 
-    if (isSettingSection && sideBarOpen) {
+    if (isSettingSection) {
       setSettingOpen(true);
     }
   }, [
+    sideBarOpen,
     isProjectSection,
     isCustomerSection,
     isReportSection,
     isSettingSection,
-    sideBarOpen,
   ]);
 
-  // =========================================
-  // CLOSE DROPDOWNS WHEN SIDEBAR COLLAPSES
-  // =========================================
-
+  // Close dropdowns when sidebar is collapsed
   useEffect(() => {
     if (!sideBarOpen) {
       setProjectOpen(false);
@@ -105,732 +83,398 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
     }
   }, [sideBarOpen]);
 
-  // =========================================
-  // MAIN NAVIGATION STYLE
-  // =========================================
-
   const mainNavClass = ({ isActive }) =>
-    `group relative flex items-center rounded-xl transition-all duration-200 ${
-      sideBarOpen
-        ? "gap-3 px-3 py-2.5"
-        : "justify-center px-2 py-3"
-    } ${
+    `group flex items-center ${
+      sideBarOpen ? "gap-3 px-4" : "justify-center px-0"
+    } h-11 rounded-lg text-sm font-medium transition-all duration-200 ${
       isActive
-        ? "bg-orange-500 text-white shadow-sm"
-        : "text-slate-600 hover:text-orange-500 dark:text-slate-300 dark:hover:text-orange-400"
+        ? "bg-orange-500 text-white"
+        : "text-slate-600 hover:bg-orange-50 hover:text-orange-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-orange-400"
     }`;
 
-  // =========================================
-  // SUB NAVIGATION STYLE
-  // =========================================
-
   const subNavClass = ({ isActive }) =>
-    `flex items-center rounded-lg px-3 py-2 text-sm transition-all duration-200 ${
+    `flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm transition-all duration-200 ${
       isActive
-        ? "bg-orange-500 font-semibold text-white shadow-sm"
-        : "text-slate-500 hover:text-orange-500 dark:text-slate-400 dark:hover:text-orange-400"
+        ? "bg-orange-50 font-medium text-orange-600 dark:bg-orange-500/10 dark:text-orange-400"
+        : "text-slate-600 hover:bg-slate-50 hover:text-orange-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-orange-400"
     }`;
 
   return (
-    <div
-      className={`no-print fixed left-0 top-0 z-40 flex h-screen flex-col overflow-visible border-r shadow-sm transition-all duration-300
-        bg-white border-slate-200
-        dark:bg-slate-900 dark:border-slate-800
-        ${sideBarOpen ? "w-64" : "w-[76px]"}
-      `}
+    <aside
+      className={`fixed left-0 top-0 z-50 flex h-screen flex-col border-r border-slate-200 bg-white shadow-sm transition-all duration-300 dark:border-slate-700 dark:bg-slate-900 ${
+        sideBarOpen ? "w-64" : "w-[76px]"
+      }`}
     >
-      {/* =====================================================
-          HEADER / LOGO
-      ====================================================== */}
-
+      {/* ================= HEADER ================= */}
       <div
-        className={`relative flex h-20 shrink-0 items-center border-b
-          border-slate-100 dark:border-slate-800
-          ${
-            sideBarOpen
-              ? "justify-between px-5"
-              : "justify-center px-2"
-          }
-        `}
+        className={`flex h-[72px] shrink-0 items-center border-b border-slate-200 dark:border-slate-700 ${
+          sideBarOpen ? "justify-between px-4" : "justify-center"
+        }`}
       >
-        {/* Logo */}
-
-        <div
-          className={`flex items-center ${
-            sideBarOpen ? "gap-3" : "justify-center"
-          }`}
-        >
-          <div
-            className="
-              flex h-10 w-10 shrink-0 items-center justify-center
-              overflow-hidden rounded-xl border
-              border-slate-200 bg-slate-50
-              dark:border-slate-700 dark:bg-slate-800
-            "
-          >
+        {sideBarOpen && (
+          <div className="flex min-w-0 items-center gap-3">
             <img
               src={Logo}
               alt="PrintTech"
-              className="h-full w-full object-contain"
+              className="h-10 w-10 rounded-lg object-cover"
             />
-          </div>
 
-          {sideBarOpen && (
             <div className="min-w-0">
-              <h1 className="truncate text-sm font-bold text-slate-900 dark:text-white">
+              <h1 className="truncate text-base font-bold text-slate-900 dark:text-white">
                 PrintTech
               </h1>
 
-              <p className="text-[10px] font-medium uppercase tracking-wider text-slate-400">
+              <p className="truncate text-xs text-slate-400 dark:text-slate-500">
                 Printing System
               </p>
             </div>
-          )}
-        </div>
+          </div>
+        )}
 
-        {/* Collapse Button */}
+        {!sideBarOpen && (
+          <img
+            src={Logo}
+            alt="PrintTech"
+            className="h-10 w-10 rounded-lg object-cover"
+          />
+        )}
 
         {sideBarOpen && (
           <button
             type="button"
             onClick={() => setSideBarOpen(false)}
-            className="
-              flex h-8 w-8 items-center justify-center rounded-lg
-              text-slate-400 transition
-              hover:text-orange-500
-              dark:hover:text-orange-400
-            "
-            aria-label="Collapse sidebar"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+            title="Collapse sidebar"
           >
-            <IoIosArrowBack className="text-lg" />
-          </button>
-        )}
-
-        {/* Expand Button */}
-
-        {!sideBarOpen && (
-          <button
-            type="button"
-            onClick={() => setSideBarOpen(true)}
-            className="
-              absolute -right-3 top-6 z-50 flex h-7 w-7
-              items-center justify-center rounded-full border
-              border-slate-200 bg-white text-slate-500 shadow-sm
-              transition hover:border-orange-300 hover:text-orange-600
-              dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400
-              dark:hover:border-orange-500 dark:hover:text-orange-400
-            "
-            aria-label="Expand sidebar"
-          >
-            <IoIosArrowForward className="text-sm" />
+            <IoIosArrowBack size={18} />
           </button>
         )}
       </div>
 
-      {/* =====================================================
-          NAVIGATION
-      ====================================================== */}
-
-      <nav className="flex-1 overflow-visible px-3 py-5">
-
-        {/* =====================================================
-            DASHBOARD
-        ====================================================== */}
-
-        <NavLink
-          to="/dashboard"
-          end
-          className={mainNavClass}
-          title={!sideBarOpen ? "Dashboard" : ""}
+      {/* ================= EXPAND BUTTON ================= */}
+      {!sideBarOpen && (
+        <button
+          type="button"
+          onClick={() => setSideBarOpen(true)}
+          className="absolute -right-3 top-[78px] flex h-7 w-7 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:text-orange-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
+          title="Expand sidebar"
         >
-          <FaThLarge className="shrink-0 text-sm" />
+          <IoIosArrowForward size={15} />
+        </button>
+      )}
 
-          {sideBarOpen && (
-            <span className="font-medium">
-              Dashboard
-            </span>
-          )}
-        </NavLink>
+      {/* ================= NAVIGATION ================= */}
+      <nav className="flex-1 overflow-y-auto px-3 py-5">
+        <div className="space-y-1">
+          {/* Dashboard */}
+          <NavLink to="/dashboard" className={mainNavClass}>
+            <FaThLarge size={17} className="shrink-0" />
 
-        {/* =====================================================
-            PROJECTS
-        ====================================================== */}
+            {sideBarOpen && <span>Dashboard</span>}
+          </NavLink>
 
-        <div className="group relative mt-1">
-          <button
-            type="button"
-            onClick={() => {
-              if (!sideBarOpen) {
-                setSideBarOpen(true);
-                setProjectOpen(true);
-                return;
-              }
-
-              setProjectOpen((prev) => !prev);
-            }}
-            className={`flex w-full items-center rounded-xl transition-all duration-200 ${
-              sideBarOpen
-                ? "justify-between px-3 py-2.5"
-                : "justify-center px-2 py-3"
-            } ${
-              isProjectSection
-                ? "bg-orange-500 text-white shadow-sm"
-                : "text-slate-600 hover:text-orange-500 dark:text-slate-300 dark:hover:text-orange-400"
-            }`}
-            title={!sideBarOpen ? "Projects" : ""}
-          >
-            <div
-              className={`flex items-center ${
-                sideBarOpen ? "gap-3" : "justify-center"
-              }`}
+          {/* ================= PROJECTS ================= */}
+          <div className="group relative">
+            <button
+              type="button"
+              onClick={() => {
+                if (sideBarOpen) {
+                  setProjectOpen((prev) => !prev);
+                }
+              }}
+              className={`flex h-11 w-full items-center rounded-lg text-sm font-medium transition-all duration-200 ${
+                isProjectSection
+                  ? "bg-orange-500 text-white"
+                  : "text-slate-600 hover:bg-orange-50 hover:text-orange-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-orange-400"
+              } ${sideBarOpen ? "gap-3 px-4" : "justify-center px-0"}`}
             >
-              <FaFolder className="shrink-0 text-sm" />
+              <FaFolder size={17} className="shrink-0" />
 
               {sideBarOpen && (
-                <span className="font-medium">
+                <>
+                  <span className="flex-1 text-left">Projects</span>
+
+                  {projectOpen ? (
+                    <FaChevronDown size={12} />
+                  ) : (
+                    <FaChevronRight size={12} />
+                  )}
+                </>
+              )}
+            </button>
+
+            {/* Collapsed Projects Flyout */}
+            {!sideBarOpen && (
+              <div className="absolute left-[68px] top-0 z-[999] hidden w-52 rounded-lg border border-slate-200 bg-white p-2 shadow-lg group-hover:block dark:border-slate-700 dark:bg-slate-900">
+                <p className="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
                   Projects
-                </span>
-              )}
-            </div>
+                </p>
 
-            {sideBarOpen &&
-              (projectOpen ? (
-                <FaChevronDown className="text-[10px]" />
-              ) : (
-                <FaChevronRight className="text-[10px]" />
-              ))}
-          </button>
+                <NavLink to="/projects" className={subNavClass}>
+                  <FaFolder size={14} />
+                  <span>All Projects</span>
+                </NavLink>
 
-          {/* Collapsed Project Menu */}
-
-          {!sideBarOpen && (
-            <div className="pointer-events-none absolute left-[68px] top-0 z-[999] hidden w-48 group-hover:pointer-events-auto group-hover:block">
-              <div className="absolute -left-3 top-0 h-full w-3" />
-
-              <div className="rounded-xl border border-slate-200 bg-white p-2 shadow-xl dark:border-slate-700 dark:bg-slate-900">
-                <div className="border-b border-slate-100 px-3 py-2 dark:border-slate-800">
-                  <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
-                    Projects
-                  </p>
-                </div>
-
-                <div className="mt-1">
-                  <NavLink
-                    to="/projects"
-                    end
-                    className={({ isActive }) =>
-                      `flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm transition ${
-                        isActive
-                          ? "bg-orange-500 font-semibold text-white"
-                          : "text-slate-600 hover:text-orange-500 dark:text-slate-300 dark:hover:text-orange-400"
-                      }`
-                    }
-                  >
-                    All Projects
-                  </NavLink>
-
-                  <NavLink
-                    to="/projects/create-project"
-                    className={({ isActive }) =>
-                      `flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm transition ${
-                        isActive
-                          ? "bg-orange-500 font-semibold text-white"
-                          : "text-slate-600 hover:text-orange-500 dark:text-slate-300 dark:hover:text-orange-400"
-                      }`
-                    }
-                  >
-                    <FaPlus className="text-[9px]" />
-                    Create Project
-                  </NavLink>
-                </div>
+                <NavLink to="/projects/create-project" className={subNavClass}>
+                  <FaPlus size={14} />
+                  <span>Create Project</span>
+                </NavLink>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Expanded Project Menu */}
+            {/* Expanded Projects */}
+            {sideBarOpen && projectOpen && (
+              <div className="mt-1 space-y-1 pl-7">
+                <NavLink to="/projects" end className={subNavClass}>
+                  <FaFolder size={14} />
+                  <span>All Projects</span>
+                </NavLink>
 
-          {sideBarOpen && projectOpen && (
-            <div className="ml-9 mt-1 space-y-1 border-l border-slate-200 pl-2 dark:border-slate-700">
-              <NavLink
-                to="/projects"
-                end
-                className={subNavClass}
-              >
-                All Projects
-              </NavLink>
+                <NavLink to="/projects/create-project" className={subNavClass}>
+                  <FaPlus size={14} />
+                  <span>Create Project</span>
+                </NavLink>
+              </div>
+            )}
+          </div>
 
-              <NavLink
-                to="/projects/create-project"
-                className={subNavClass}
-              >
-                <FaPlus className="mr-2 text-[9px]" />
-                Create Project
-              </NavLink>
-            </div>
-          )}
-        </div>
-
-        {/* =====================================================
-            CUSTOMERS
-        ====================================================== */}
-
-        <div className="group relative mt-1">
-          <button
-            type="button"
-            onClick={() => {
-              if (!sideBarOpen) {
-                setSideBarOpen(true);
-                setCustomerOpen(true);
-                return;
-              }
-
-              setCustomerOpen((prev) => !prev);
-            }}
-            className={`flex w-full items-center rounded-xl transition-all duration-200 ${
-              sideBarOpen
-                ? "justify-between px-3 py-2.5"
-                : "justify-center px-2 py-3"
-            } ${
-              isCustomerSection
-                ? "bg-orange-500 text-white shadow-sm"
-                : "text-slate-600 hover:text-orange-500 dark:text-slate-300 dark:hover:text-orange-400"
-            }`}
-            title={!sideBarOpen ? "Customers" : ""}
-          >
-            <div
-              className={`flex items-center ${
-                sideBarOpen ? "gap-3" : "justify-center"
-              }`}
+          {/* ================= CUSTOMERS ================= */}
+          <div className="group relative">
+            <button
+              type="button"
+              onClick={() => {
+                if (sideBarOpen) {
+                  setCustomerOpen((prev) => !prev);
+                }
+              }}
+              className={`flex h-11 w-full items-center rounded-lg text-sm font-medium transition-all duration-200 ${
+                isCustomerSection
+                  ? "bg-orange-500 text-white"
+                  : "text-slate-600 hover:bg-orange-50 hover:text-orange-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-orange-400"
+              } ${sideBarOpen ? "gap-3 px-4" : "justify-center px-0"}`}
             >
-              <FaUsers className="shrink-0 text-sm" />
+              <FaUsers size={17} className="shrink-0" />
 
               {sideBarOpen && (
-                <span className="font-medium">
+                <>
+                  <span className="flex-1 text-left">Customers</span>
+
+                  {customerOpen ? (
+                    <FaChevronDown size={12} />
+                  ) : (
+                    <FaChevronRight size={12} />
+                  )}
+                </>
+              )}
+            </button>
+
+            {/* Collapsed Customers Flyout */}
+            {!sideBarOpen && (
+              <div className="absolute left-[68px] top-0 z-[999] hidden w-52 rounded-lg border border-slate-200 bg-white p-2 shadow-lg group-hover:block dark:border-slate-700 dark:bg-slate-900">
+                <p className="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
                   Customers
-                </span>
-              )}
-            </div>
+                </p>
 
-            {sideBarOpen &&
-              (customerOpen ? (
-                <FaChevronDown className="text-[10px]" />
-              ) : (
-                <FaChevronRight className="text-[10px]" />
-              ))}
-          </button>
+                <NavLink to="/customers" end className={subNavClass}>
+                  <FaUsers size={14} />
+                  <span>All Customers</span>
+                </NavLink>
 
-          {/* Collapsed Customer Menu */}
-
-          {!sideBarOpen && (
-            <div className="pointer-events-none absolute left-[68px] top-0 z-[999] hidden w-48 group-hover:pointer-events-auto group-hover:block">
-              <div className="absolute -left-3 top-0 h-full w-3" />
-
-              <div className="rounded-xl border border-slate-200 bg-white p-2 shadow-xl dark:border-slate-700 dark:bg-slate-900">
-                <div className="border-b border-slate-100 px-3 py-2 dark:border-slate-800">
-                  <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
-                    Customers
-                  </p>
-                </div>
-
-                <div className="mt-1">
-                  <NavLink
-                    to="/customers"
-                    end
-                    className={({ isActive }) =>
-                      `block rounded-lg px-3 py-2.5 text-sm transition ${
-                        isActive
-                          ? "bg-orange-500 font-semibold text-white"
-                          : "text-slate-600 hover:text-orange-500 dark:text-slate-300 dark:hover:text-orange-400"
-                      }`
-                    }
-                  >
-                    All Customers
-                  </NavLink>
-
-                  <NavLink
-                    to="/customers/add"
-                    className={({ isActive }) =>
-                      `flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm transition ${
-                        isActive
-                          ? "bg-orange-500 font-semibold text-white"
-                          : "text-slate-600 hover:text-orange-500 dark:text-slate-300 dark:hover:text-orange-400"
-                      }`
-                    }
-                  >
-                    <FaPlus className="text-[9px]" />
-                    Add Customer
-                  </NavLink>
-                </div>
+                <NavLink to="/customers/add" className={subNavClass}>
+                  <FaPlus size={14} />
+                  <span>Add Customer</span>
+                </NavLink>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Expanded Customer Menu */}
+            {/* Expanded Customers */}
+            {sideBarOpen && customerOpen && (
+              <div className="mt-1 space-y-1 pl-7">
+                <NavLink to="/customers" end className={subNavClass}>
+                  <FaUsers size={14} />
+                  <span>All Customers</span>
+                </NavLink>
 
-          {sideBarOpen && customerOpen && (
-            <div className="ml-9 mt-1 space-y-1 border-l border-slate-200 pl-2 dark:border-slate-700">
-              <NavLink
-                to="/customers"
-                end
-                className={subNavClass}
-              >
-                All Customers
-              </NavLink>
+                <NavLink to="/customers/add" className={subNavClass}>
+                  <FaPlus size={14} />
+                  <span>Add Customer</span>
+                </NavLink>
+              </div>
+            )}
+          </div>
 
-              <NavLink
-                to="/customers/add"
-                className={subNavClass}
-              >
-                <FaPlus className="mr-2 text-[9px]" />
-                Add Customer
-              </NavLink>
-            </div>
-          )}
-        </div>
-
-        {/* =====================================================
-            REPORTS
-        ====================================================== */}
-
-        <div className="group relative mt-1">
-          <button
-            type="button"
-            onClick={() => {
-              if (!sideBarOpen) {
-                setSideBarOpen(true);
-                setReportOpen(true);
-                return;
-              }
-
-              setReportOpen((prev) => !prev);
-            }}
-            className={`flex w-full items-center rounded-xl transition-all duration-200 ${
-              sideBarOpen
-                ? "justify-between px-3 py-2.5"
-                : "justify-center px-2 py-3"
-            } ${
-              isReportSection
-                ? "bg-orange-500 text-white shadow-sm"
-                : "text-slate-600 hover:text-orange-500 dark:text-slate-300 dark:hover:text-orange-400"
-            }`}
-            title={!sideBarOpen ? "Reports" : ""}
-          >
-            <div
-              className={`flex items-center ${
-                sideBarOpen ? "gap-3" : "justify-center"
-              }`}
+          {/* ================= REPORTS ================= */}
+          <div className="group relative">
+            <button
+              type="button"
+              onClick={() => {
+                if (sideBarOpen) {
+                  setReportOpen((prev) => !prev);
+                }
+              }}
+              className={`flex h-11 w-full items-center rounded-lg text-sm font-medium transition-all duration-200 ${
+                isReportSection
+                  ? "bg-orange-500 text-white"
+                  : "text-slate-600 hover:bg-orange-50 hover:text-orange-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-orange-400"
+              } ${sideBarOpen ? "gap-3 px-4" : "justify-center px-0"}`}
             >
-              <FaChartBar className="shrink-0 text-sm" />
+              <FaChartBar size={17} className="shrink-0" />
 
               {sideBarOpen && (
-                <span className="font-medium">
+                <>
+                  <span className="flex-1 text-left">Reports</span>
+
+                  {reportOpen ? (
+                    <FaChevronDown size={12} />
+                  ) : (
+                    <FaChevronRight size={12} />
+                  )}
+                </>
+              )}
+            </button>
+
+            {/* Collapsed Reports Flyout */}
+            {!sideBarOpen && (
+              <div className="absolute left-[68px] top-0 z-[999] hidden w-52 rounded-lg border border-slate-200 bg-white p-2 shadow-lg group-hover:block dark:border-slate-700 dark:bg-slate-900">
+                <p className="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
                   Reports
-                </span>
-              )}
-            </div>
+                </p>
 
-            {sideBarOpen &&
-              (reportOpen ? (
-                <FaChevronDown className="text-[10px]" />
-              ) : (
-                <FaChevronRight className="text-[10px]" />
-              ))}
-          </button>
+                <NavLink to="/reports/sales" className={subNavClass}>
+                  <FaChartBar size={14} />
+                  <span>Sales Report</span>
+                </NavLink>
 
-          {/* Collapsed Reports Menu */}
+                <NavLink to="/reports/customers" className={subNavClass}>
+                  <FaUsers size={14} />
+                  <span>Customer Report</span>
+                </NavLink>
 
-          {!sideBarOpen && (
-            <div className="pointer-events-none absolute left-[68px] top-0 z-[999] hidden w-48 group-hover:pointer-events-auto group-hover:block">
-              <div className="absolute -left-3 top-0 h-full w-3" />
-
-              <div className="rounded-xl border border-slate-200 bg-white p-2 shadow-xl dark:border-slate-700 dark:bg-slate-900">
-                <div className="border-b border-slate-100 px-3 py-2 dark:border-slate-800">
-                  <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
-                    Reports
-                  </p>
-                </div>
-
-                <div className="mt-1">
-                  <NavLink
-                    to="/reports/sales"
-                    className={({ isActive }) =>
-                      `block rounded-lg px-3 py-2.5 text-sm transition ${
-                        isActive
-                          ? "bg-orange-500 font-semibold text-white"
-                          : "text-slate-600 hover:text-orange-500 dark:text-slate-300 dark:hover:text-orange-400"
-                      }`
-                    }
-                  >
-                    Sales Report
-                  </NavLink>
-
-                  <NavLink
-                    to="/reports/customers"
-                    className={({ isActive }) =>
-                      `block rounded-lg px-3 py-2.5 text-sm transition ${
-                        isActive
-                          ? "bg-orange-500 font-semibold text-white"
-                          : "text-slate-600 hover:text-orange-500 dark:text-slate-300 dark:hover:text-orange-400"
-                      }`
-                    }
-                  >
-                    Customer Report
-                  </NavLink>
-
-                  <NavLink
-                    to="/reports/payments"
-                    className={({ isActive }) =>
-                      `block rounded-lg px-3 py-2.5 text-sm transition ${
-                        isActive
-                          ? "bg-orange-500 font-semibold text-white"
-                          : "text-slate-600 hover:text-orange-500 dark:text-slate-300 dark:hover:text-orange-400"
-                      }`
-                    }
-                  >
-                    Payment Report
-                  </NavLink>
-                </div>
+                <NavLink to="/reports/payments" className={subNavClass}>
+                  <FaSlidersH size={14} />
+                  <span>Payment Report</span>
+                </NavLink>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Expanded Reports Menu */}
+            {/* Expanded Reports */}
+            {sideBarOpen && reportOpen && (
+              <div className="mt-1 space-y-1 pl-7">
+                <NavLink to="/reports/sales" className={subNavClass}>
+                  <FaChartBar size={14} />
+                  <span>Sales Report</span>
+                </NavLink>
 
-          {sideBarOpen && reportOpen && (
-            <div className="ml-9 mt-1 space-y-1 border-l border-slate-200 pl-2 dark:border-slate-700">
-              <NavLink
-                to="/reports/sales"
-                className={subNavClass}
-              >
-                Sales Report
-              </NavLink>
+                <NavLink to="/reports/customers" className={subNavClass}>
+                  <FaUsers size={14} />
+                  <span>Customer Report</span>
+                </NavLink>
 
-              <NavLink
-                to="/reports/customers"
-                className={subNavClass}
-              >
-                Customer Report
-              </NavLink>
-
-              <NavLink
-                to="/reports/payments"
-                className={subNavClass}
-              >
-                Payment Report
-              </NavLink>
-            </div>
-          )}
-        </div>
-
-        {/* =====================================================
-            NOTIFICATIONS
-        ====================================================== */}
-
-        <NavLink
-          to="/notifications"
-          className={mainNavClass}
-          title={!sideBarOpen ? "Notifications" : ""}
-        >
-          <div className="relative">
-            <FaBell className="shrink-0 text-sm" />
-
-            <span className="absolute -right-1.5 -top-1.5 h-2 w-2 rounded-full border-2 border-white bg-orange-500 dark:border-slate-900" />
+                <NavLink to="/reports/payments" className={subNavClass}>
+                  <FaSlidersH size={14} />
+                  <span>Payment Report</span>
+                </NavLink>
+              </div>
+            )}
           </div>
 
-          {sideBarOpen && (
-            <div className="flex flex-1 items-center justify-between">
-              <span className="font-medium">
-                Notifications
-              </span>
-            </div>
-          )}
-        </NavLink>
+          {/* ================= NOTIFICATIONS ================= */}
+          <NavLink to="/notifications" className={mainNavClass}>
+            <FaBell size={17} className="shrink-0" />
 
-        {/* =====================================================
-            SETTINGS
-        ====================================================== */}
+            {sideBarOpen && <span>Notifications</span>}
+          </NavLink>
 
-        <div className="group relative mt-1">
-
-          {/* SETTINGS BUTTON */}
-
-          <button
-            type="button"
-            onClick={() => {
-              if (!sideBarOpen) {
-                setSideBarOpen(true);
-                setSettingOpen(true);
-                return;
-              }
-
-              setSettingOpen((prev) => !prev);
-            }}
-            className={`flex w-full items-center rounded-xl transition-all duration-200 ${
-              sideBarOpen
-                ? "justify-between px-3 py-2.5"
-                : "justify-center px-2 py-3"
-            } ${
-              isSettingSection
-                ? "bg-orange-500 text-white shadow-sm"
-                : "text-slate-600 hover:text-orange-500 dark:text-slate-300 dark:hover:text-orange-400"
-            }`}
-            title={!sideBarOpen ? "Settings" : ""}
-          >
-            <div
-              className={`flex items-center ${
-                sideBarOpen ? "gap-3" : "justify-center"
-              }`}
+          {/* ================= SETTINGS ================= */}
+          <div className="group relative">
+            <button
+              type="button"
+              onClick={() => {
+                if (sideBarOpen) {
+                  setSettingOpen((prev) => !prev);
+                }
+              }}
+              className={`flex h-11 w-full items-center rounded-lg text-sm font-medium transition-all duration-200 ${
+                isSettingSection
+                  ? "bg-orange-500 text-white"
+                  : "text-slate-600 hover:bg-orange-50 hover:text-orange-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-orange-400"
+              } ${sideBarOpen ? "gap-3 px-4" : "justify-center px-0"}`}
             >
-              <FaCog className="shrink-0 text-sm" />
+              <FaCog size={17} className="shrink-0" />
 
               {sideBarOpen && (
-                <span className="font-medium">
-                  Settings
-                </span>
+                <>
+                  <span className="flex-1 text-left">Settings</span>
+
+                  {settingOpen ? (
+                    <FaChevronDown size={12} />
+                  ) : (
+                    <FaChevronRight size={12} />
+                  )}
+                </>
               )}
-            </div>
+            </button>
 
-            {sideBarOpen &&
-              (settingOpen ? (
-                <FaChevronDown className="text-[10px]" />
-              ) : (
-                <FaChevronRight className="text-[10px]" />
-              ))}
-          </button>
+            {/* Collapsed Settings Flyout */}
+            {!sideBarOpen && (
+              <div className="absolute left-[68px] top-0 z-[999] hidden w-52 rounded-lg border border-slate-200 bg-white p-2 shadow-lg group-hover:block dark:border-slate-700 dark:bg-slate-900">
+                <p className="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  Settings
+                </p>
 
-          {/* Collapsed Settings Menu */}
+                <NavLink to="/settings/studio" className={subNavClass}>
+                  <FaCog size={14} />
+                  <span>Studio Settings</span>
+                </NavLink>
 
-          {!sideBarOpen && (
-            <div className="pointer-events-none absolute left-[68px] top-0 z-[999] hidden w-52 group-hover:pointer-events-auto group-hover:block">
-              <div className="absolute -left-3 top-0 h-full w-3" />
-
-              <div className="rounded-xl border border-slate-200 bg-white p-2 shadow-xl dark:border-slate-700 dark:bg-slate-900">
-                <div className="border-b border-slate-100 px-3 py-2 dark:border-slate-800">
-                  <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
-                    Settings
-                  </p>
-                </div>
-
-                <div className="mt-1">
-
-                  {/* STUDIO SETTINGS */}
-
-                  <NavLink
-                    to="/settings/studio"
-                    className={({ isActive }) =>
-                      `flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm transition ${
-                        isActive
-                          ? "bg-orange-500 font-semibold text-white"
-                          : "text-slate-600 hover:text-orange-500 dark:text-slate-300 dark:hover:text-orange-400"
-                      }`
-                    }
-                  >
-                    <FaSlidersH className="text-xs" />
-                    Studio Settings
-                  </NavLink>
-
-                  {/* RESET & CLEANUP */}
-
-                  <NavLink
-                    to="/settings/reset-cleanup"
-                    className={({ isActive }) =>
-                      `flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm transition ${
-                        isActive
-                          ? "bg-orange-500 font-semibold text-white"
-                          : "text-slate-600 hover:text-orange-500 dark:text-slate-300 dark:hover:text-orange-400"
-                      }`
-                    }
-                  >
-                    <FaBroom className="text-xs" />
-                    Reset & CleanUp
-                  </NavLink>
-
-                </div>
+                <NavLink to="/settings/reset-cleanup" className={subNavClass}>
+                  <FaBroom size={14} />
+                  <span>Reset & Cleanup</span>
+                </NavLink>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Expanded Settings Menu */}
+            {/* Expanded Settings */}
+            {sideBarOpen && settingOpen && (
+              <div className="mt-1 space-y-1 pl-7">
+                <NavLink to="/settings/studio" className={subNavClass}>
+                  <FaCog size={14} />
+                  <span>Studio Settings</span>
+                </NavLink>
 
-          {sideBarOpen && settingOpen && (
-            <div className="ml-9 mt-1 space-y-1 border-l border-slate-200 pl-2 dark:border-slate-700">
-
-              {/* STUDIO SETTINGS */}
-
-              <NavLink
-                to="/settings/studio"
-                className={subNavClass}
-              >
-                <FaSlidersH className="mr-2 text-[11px]" />
-                Studio Settings
-              </NavLink>
-
-              {/* RESET & CLEANUP */}
-
-              <NavLink
-                to="/settings/reset-cleanup"
-                className={subNavClass}
-              >
-                <FaBroom className="mr-2 text-[11px]" />
-                Reset & CleanUp
-              </NavLink>
-
-            </div>
-          )}
-        </div>
-
-        {/* =====================================================
-            TRASH
-        ====================================================== */}
-
-        <NavLink
-          to="/trash"
-          className={mainNavClass}
-          title={!sideBarOpen ? "Trash" : ""}
-        >
-          <div className="relative">
-            <FaRegTrashAlt className="shrink-0 text-sm" />
+                <NavLink to="/settings/reset-cleanup" className={subNavClass}>
+                  <FaBroom size={14} />
+                  <span>Reset & Cleanup</span>
+                </NavLink>
+              </div>
+            )}
           </div>
 
-          {sideBarOpen && (
-            <div className="flex flex-1 items-center justify-between">
-              <span className="font-medium">
-                Trash
-              </span>
-            </div>
-          )}
-        </NavLink>
+          {/* ================= TRASH ================= */}
+          <NavLink to="/trash" className={mainNavClass}>
+            <FaRegTrashAlt size={17} className="shrink-0" />
 
+            {sideBarOpen && <span>Trash</span>}
+          </NavLink>
+        </div>
       </nav>
 
-      {/* =====================================================
-          LOGOUT
-      ====================================================== */}
-
-      <div className="shrink-0 border-t border-slate-100 p-3 dark:border-slate-800">
+      {/* ================= LOGOUT ================= */}
+      <div className="border-t border-slate-200 p-3 dark:border-slate-700">
         <button
           type="button"
           onClick={handleLogout}
-          title={!sideBarOpen ? "Logout" : ""}
-          className={`group flex w-full items-center rounded-xl text-red-500 transition-all duration-200 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/30 ${
-            sideBarOpen
-              ? "gap-3 px-3 py-3"
-              : "justify-center px-2 py-3"
+          className={`flex h-11 w-full items-center rounded-lg text-sm font-medium text-red-500 transition-all duration-200 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10 ${
+            sideBarOpen ? "gap-3 px-4" : "justify-center px-0"
           }`}
         >
-          <FaSignOutAlt className="shrink-0 text-sm" />
+          <FaSignOutAlt size={17} className="shrink-0" />
 
-          {sideBarOpen && (
-            <span className="font-medium">
-              Logout
-            </span>
-          )}
+          {sideBarOpen && <span>Logout</span>}
         </button>
       </div>
-
-    </div>
+    </aside>
   );
 };
 
 export default Sidebar;
-

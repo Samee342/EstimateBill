@@ -9,6 +9,8 @@ import {
   FiCheckCircle,
   FiPrinter,
 } from "react-icons/fi";
+import { FaEdit } from "react-icons/fa";
+import { MdDelete } from "react-icons/md";
 
 const AllProject = () => {
   const [search, setSearch] = useState("");
@@ -471,9 +473,14 @@ const AllProject = () => {
 
                     {/* Action */}
                     <td className="px-6 py-4">
-                      <button className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700">
-                        <FiMoreVertical size={18} />
-                      </button>
+                      <div className="flex items-center gap-3">
+                        <button className="rounded-lg p-2 text-yellow-600 hover:bg-yellow-100 hover:text-yellow-700">
+                          <FaEdit size={18} />
+                        </button>
+                        <button className="rounded-lg p-2 text-red-600 hover:bg-red-100 hover:text-red-700">
+                          <MdDelete size={18} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}

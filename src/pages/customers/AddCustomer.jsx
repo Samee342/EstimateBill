@@ -51,9 +51,6 @@ const AddCustomer = () => {
                 <h2 className="font-semibold text-slate-900 dark:text-slate-300">
                   Customer Information
                 </h2>
-                <p className="mt-1 text-sm text-slate-500">
-                  Add a new customer to your billing system.
-                </p>
               </div>
             </div>
           </div>

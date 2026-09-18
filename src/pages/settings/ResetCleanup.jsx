@@ -191,35 +191,6 @@ const ResetCleanup = () => {
         ======================================== */}
 
         <div className="space-y-4">
-          {/* NOTIFICATIONS */}
-
-          <div className="rounded-xl border border-slate-200 bg-white p-5 transition-colors dark:border-slate-700 dark:bg-slate-900">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex gap-4">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-orange-100 text-orange-600 dark:bg-orange-500/15 dark:text-orange-400">
-                  <FiBell size={19} />
-                </div>
-
-                <div>
-                  <h3 className="font-semibold text-slate-800 dark:text-slate-100">
-                    Clear Notifications
-                  </h3>
-
-                  <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                    Remove all saved notifications from this browser.
-                  </p>
-                </div>
-              </div>
-
-              <button
-                onClick={() => askConfirmation("notifications")}
-                className="rounded-lg border border-red-200 px-4 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-50 dark:border-red-500/30 dark:text-red-400 dark:hover:bg-red-500/10"
-              >
-                Clear Notifications
-              </button>
-            </div>
-          </div>
-
           {/* SETTINGS */}
 
           <div className="rounded-xl border border-slate-200 bg-white p-5 transition-colors dark:border-slate-700 dark:bg-slate-900">

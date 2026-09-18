@@ -8,7 +8,7 @@ import EstimateItems from "../../components/EstimateItems";
 import EstimateSummary from "../../components/EstimateSummary";
 import EstimateFooter from "../../components/EstimateFooter";
 
-import Logo from "../../assets/Logo.jpeg";
+import Logo from "../../assets/Logo.png";
 
 const CreateProject = () => {
   const navigate = useNavigate();

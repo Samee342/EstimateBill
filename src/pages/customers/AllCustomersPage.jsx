@@ -284,7 +284,7 @@ const AllCustomers = () => {
                 filteredCustomers.map((customer) => (
                   <tr
                     key={customer.id}
-                    className="border-b border-slate-100 transition hover:bg-slate-50 hover:bg-slate-800"
+                    className="border-b border-slate-100 transition hover:bg-slate-50 dark:hover:bg-slate-800"
                   >
                     {/* CUSTOMER */}
                     <td className="px-5 py-4">
@@ -343,15 +343,6 @@ const AllCustomers = () => {
                     {/* ACTION */}
                     <td className="px-5 py-4">
                       <div className="flex items-center justify-end gap-1">
-                        <button
-                          type="button"
-                          onClick={() => handleView(customer.id)}
-                          title="View"
-                          className="rounded-lg p-2 text-slate-500 transition hover:bg-blue-100 hover:text-blue-600"
-                        >
-                          <FiEye size={17} />
-                        </button>
-
                         <button
                           type="button"
                           onClick={() => handleEdit(customer.id)}

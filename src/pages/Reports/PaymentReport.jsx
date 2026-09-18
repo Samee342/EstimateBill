@@ -231,39 +231,6 @@ const PaymentReport = () => {
       </header>
 
       <main className="p-5 md:p-8">
-        {/* Search + Filter */}
-
-        <div className="mb-6 rounded-2xl border border-slate-200 bg-white dark:bg-slate-800  p-4">
-          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <div className="relative w-full md:max-w-md">
-              <FiSearch
-                size={18}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-              />
-
-              <input
-                type="text"
-                placeholder="Search customer, invoice or project..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 dark:text-slate-200 dark:bg-slate-700 bg-slate-50 d py-3 pl-10 pr-4 text-sm outline-none focus:border-orange-400 "
-              />
-            </div>
-
-            <select
-              value={paymentFilter}
-              onChange={(e) => setPaymentFilter(e.target.value)}
-              className="rounded-xl border border-slate-200 bg-white dark:bg-slate-700 dark:text-slate-200 px-4 py-3 text-sm outline-none"
-            >
-              <option value="All">All Payments</option>
-              <option value="Paid">Paid</option>
-              <option value="Partial">Partial</option>
-              <option value="Pending">Pending</option>
-              <option value="Overdue">Overdue</option>
-            </select>
-          </div>
-        </div>
-
         {/* Stats */}
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -449,6 +416,37 @@ const PaymentReport = () => {
           </div>
         </div>
 
+        <div className="mb-6 mt-10 rounded-2xl border border-slate-200 bg-white dark:bg-slate-800  p-4">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div className="relative w-full md:max-w-md">
+              <FiSearch
+                size={18}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+              />
+
+              <input
+                type="text"
+                placeholder="Search customer, invoice or project..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full rounded-xl border border-slate-200 dark:text-slate-200 dark:bg-slate-700 bg-slate-50 d py-3 pl-10 pr-4 text-sm outline-none focus:border-orange-400 "
+              />
+            </div>
+
+            <select
+              value={paymentFilter}
+              onChange={(e) => setPaymentFilter(e.target.value)}
+              className="rounded-xl border border-slate-200 bg-white dark:bg-slate-700 dark:text-slate-200 px-4 py-3 text-sm outline-none"
+            >
+              <option value="All">All Payments</option>
+              <option value="Paid">Paid</option>
+              <option value="Partial">Partial</option>
+              <option value="Pending">Pending</option>
+              <option value="Overdue">Overdue</option>
+            </select>
+          </div>
+        </div>
+
         {/* Payment Transactions */}
 
         <div className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white dark:bg-slate-800 ">
@@ -461,7 +459,6 @@ const PaymentReport = () => {
               Invoice and payment collection details
             </p>
           </div>
-
           {/* Desktop */}
 
           <div className="hidden overflow-x-auto md:block">

@@ -10,19 +10,19 @@ const RouteMeta = () => {
     let title = "PrintTech";
 
     if (path.startsWith("/projects")) {
-      title = "Projects | PrintTech";
+      title = "PrintTech | Projects  ";
     } else if (path.startsWith("/customers")) {
-      title = "Customers | PrintTech";
+      title = " PrintTech | Customers";
     } else if (path.startsWith("/reports")) {
-      title = "Reports | PrintTech";
+      title = " PrintTech | Reports";
     } else if (path.startsWith("/settings")) {
-      title = "Settings | PrintTech";
+      title = "PrintTech | Settings";
     } else if (path.startsWith("/notifications")) {
-      title = "Notifications | PrintTech";
+      title = "PrintTech | Notifications";
     } else if (path.startsWith("/trash")) {
-      title = "Trash | PrintTech";
-    } else if (path === "/") {
-      title = "Dashboard | PrintTech";
+      title = "PrintTech | Trash";
+    } else if (path === "/dashboard") {
+      title = "PrintTech | Dashboard";
     }
 
     document.title = title;
