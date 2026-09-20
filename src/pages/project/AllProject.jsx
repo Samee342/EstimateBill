@@ -16,8 +16,8 @@ const AllProject = () => {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
 
-  // Projects
-  // Date format: YYYY-MM-DD
+  // ================= PROJECT DATA =================
+
   const [projects, setProjects] = useState([
     {
       id: "PRJ-1001",
@@ -93,10 +93,8 @@ const AllProject = () => {
     },
   ]);
 
-  // -----------------------------
-  // Date ko readable format mein convert karega
-  // 2026-09-07 -> 07 Sep 2026
-  // -----------------------------
+  // ================= DATE FORMAT =================
+
   const formatDate = (date) => {
     if (!date) return "";
 
@@ -120,9 +118,8 @@ const AllProject = () => {
     return `${day} ${months[Number(month) - 1]} ${year}`;
   };
 
-  // -----------------------------
-  // Date update function
-  // -----------------------------
+  // ================= UPDATE DATE =================
+
   const updateProjectDate = (projectId, field, newDate) => {
     setProjects((previousProjects) =>
       previousProjects.map((project) =>
@@ -136,33 +133,33 @@ const AllProject = () => {
     );
   };
 
-  // -----------------------------
-  // Status Style
-  // -----------------------------
+  // ================= STATUS STYLE =================
+
   const getStatusStyle = (status) => {
     switch (status) {
       case "Completed":
-        return "bg-green-50 text-green-700";
+        return "bg-green-50 text-green-700 dark:bg-green-500/10 dark:text-green-400";
 
       case "Printed":
-        return "bg-blue-50 text-blue-700";
+        return "bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400";
 
       case "Pending":
-        return "bg-orange-50 text-orange-700";
+        return "bg-orange-50 text-orange-700 dark:bg-orange-500/10 dark:text-orange-400";
 
       default:
-        return "bg-slate-100 text-slate-600";
+        return "bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300";
     }
   };
 
-  // -----------------------------
-  // Search + Status Filter
-  // -----------------------------
+  // ================= SEARCH + FILTER =================
+
   const filteredProjects = projects.filter((project) => {
+    const searchValue = search.toLowerCase().trim();
+
     const matchesSearch =
-      project.name.toLowerCase().includes(search.toLowerCase()) ||
-      project.customer.toLowerCase().includes(search.toLowerCase()) ||
-      project.id.toLowerCase().includes(search.toLowerCase());
+      project.name.toLowerCase().includes(searchValue) ||
+      project.customer.toLowerCase().includes(searchValue) ||
+      project.id.toLowerCase().includes(searchValue);
 
     const matchesStatus =
       statusFilter === "All" || project.status === statusFilter;
@@ -171,109 +168,132 @@ const AllProject = () => {
   });
 
   return (
-    <div className="min-h-screen bg-[#f7f8fa] text-slate-800 dark:bg-slate-700">
-      {/* ================= HEADER ================= */}
+    <div className="min-h-screen overflow-x-hidden bg-[#f7f8fa] text-slate-800 dark:bg-slate-700 dark:text-slate-200">
+      {/* =====================================================
+          HEADER
+      ====================================================== */}
 
-      <header className=" top-0 z-30 flex h-20 items-center justify-between border-slate-200 bg-white/95 dark:bg-slate-700 px-5 backdrop-blur md:px-8">
-        <div>
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white">
-            All Projects
-          </h2>
+      <header className="border-b border-slate-200 bg-white dark:border-slate-600 dark:bg-slate-700">
+        <div className="flex min-h-20 flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 md:px-8">
+          <div>
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white sm:text-2xl">
+              All Projects
+            </h2>
+
+            <p className="mt-1 text-xs text-slate-400 sm:text-sm">
+              Manage and track your printing projects
+            </p>
+          </div>
+
+          <a
+            href="/projects/create-project"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-orange-600 sm:w-auto"
+          >
+            <FiPlus size={18} />
+            New Project
+          </a>
         </div>
-
-        <a
-          href="/projects/create-project"
-          className="flex items-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-orange-600"
-        >
-          <FiPlus size={18} />
-          New Project
-        </a>
       </header>
 
-      {/* ================= MAIN CONTENT ================= */}
+      {/* =====================================================
+          MAIN CONTENT
+      ====================================================== */}
 
-      <div className="p-5 md:p-5">
-        {/* ================= SUMMARY CARDS ================= */}
+      <main className="p-4 sm:p-5 md:p-6">
+        {/* =====================================================
+            SUMMARY CARDS
+        ====================================================== */}
 
-        <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="mb-6 grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
           {/* Total */}
-          <div className="rounded-2xl border border-slate-200 bg-white dark:bg-slate-800 p-5">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-slate-500">Total Projects</p>
+          <div className="rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-600 dark:bg-slate-800 sm:rounded-2xl sm:p-5">
+            <div className="flex items-center justify-between gap-2">
+              <div className="min-w-0">
+                <p className="truncate text-xs text-slate-500 dark:text-slate-400 sm:text-sm">
+                  Total Projects
+                </p>
 
-                <h3 className="mt-2 text-2xl font-bold text-slate-900 dark:text-slate-200">
+                <h3 className="mt-1 text-xl font-bold text-slate-900 dark:text-slate-200 sm:mt-2 sm:text-2xl">
                   248
                 </h3>
               </div>
 
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-orange-50 text-orange-500">
-                <FiFileText size={21} />
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-orange-50 text-orange-500 dark:bg-orange-500/10 sm:h-11 sm:w-11 sm:rounded-xl">
+                <FiFileText size={19} />
               </div>
             </div>
           </div>
 
           {/* Pending */}
-          <div className="rounded-2xl border border-slate-200 bg-white dark:bg-slate-800 p-5">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-slate-500">Pending</p>
+          <div className="rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-600 dark:bg-slate-800 sm:rounded-2xl sm:p-5">
+            <div className="flex items-center justify-between gap-2">
+              <div className="min-w-0">
+                <p className="truncate text-xs text-slate-500 dark:text-slate-400 sm:text-sm">
+                  Pending
+                </p>
 
-                <h3 className="mt-2 text-2xl font-bold text-slate-900 dark:text-slate-200">
+                <h3 className="mt-1 text-xl font-bold text-slate-900 dark:text-slate-200 sm:mt-2 sm:text-2xl">
                   32
                 </h3>
               </div>
 
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-orange-50 text-orange-500">
-                <FiClock size={21} />
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-orange-50 text-orange-500 dark:bg-orange-500/10 sm:h-11 sm:w-11 sm:rounded-xl">
+                <FiClock size={19} />
               </div>
             </div>
           </div>
 
           {/* Printed */}
-          <div className="rounded-2xl border border-slate-200 bg-white dark:bg-slate-800 p-5">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-slate-500">Printed</p>
+          <div className="rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-600 dark:bg-slate-800 sm:rounded-2xl sm:p-5">
+            <div className="flex items-center justify-between gap-2">
+              <div className="min-w-0">
+                <p className="truncate text-xs text-slate-500 dark:text-slate-400 sm:text-sm">
+                  Printed
+                </p>
 
-                <h3 className="mt-2 text-2xl font-bold text-slate-900 dark:text-slate-200">
+                <h3 className="mt-1 text-xl font-bold text-slate-900 dark:text-slate-200 sm:mt-2 sm:text-2xl">
                   64
                 </h3>
               </div>
 
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-blue-500">
-                <FiPrinter size={21} />
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-500 dark:bg-blue-500/10 sm:h-11 sm:w-11 sm:rounded-xl">
+                <FiPrinter size={19} />
               </div>
             </div>
           </div>
 
           {/* Completed */}
-          <div className="rounded-2xl border border-slate-200 bg-white dark:bg-slate-800 p-5">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-slate-500">Completed</p>
+          <div className="rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-600 dark:bg-slate-800 sm:rounded-2xl sm:p-5">
+            <div className="flex items-center justify-between gap-2">
+              <div className="min-w-0">
+                <p className="truncate text-xs text-slate-500 dark:text-slate-400 sm:text-sm">
+                  Completed
+                </p>
 
-                <h3 className="mt-2 text-2xl font-bold text-slate-900 dark:text-slate-200">
+                <h3 className="mt-1 text-xl font-bold text-slate-900 dark:text-slate-200 sm:mt-2 sm:text-2xl">
                   152
                 </h3>
               </div>
 
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-green-50 text-green-500">
-                <FiCheckCircle size={21} />
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-green-50 text-green-500 dark:bg-green-500/10 sm:h-11 sm:w-11 sm:rounded-xl">
+                <FiCheckCircle size={19} />
               </div>
             </div>
           </div>
         </div>
 
-        {/* ================= SEARCH + FILTER ================= */}
+        {/* =====================================================
+            SEARCH + FILTER
+        ====================================================== */}
 
-        <div className="mb-6 rounded-2xl border border-slate-200 bg-white dark:bg-slate-800 p-4">
-          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div className="mb-6 rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-600 dark:bg-slate-800 sm:rounded-2xl">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             {/* Search */}
-            <div className="relative w-full md:max-w-md">
+
+            <div className="relative w-full lg:max-w-md">
               <FiSearch
                 size={18}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
               />
 
               <input
@@ -281,18 +301,21 @@ const AllProject = () => {
                 placeholder="Search project, customer or ID..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 dark:bg-slate-700 py-3 pl-10 pr-4 text-sm outline-none transition focus:border-orange-400"
+                className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-orange-400 focus:ring-2 focus:ring-orange-100 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 dark:placeholder:text-slate-500 dark:focus:ring-orange-500/10"
               />
             </div>
 
             {/* Status */}
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-slate-500">Status:</span>
+
+            <div className="flex w-full items-center gap-2 lg:w-auto">
+              <span className="shrink-0 text-sm text-slate-500 dark:text-slate-400">
+                Status:
+              </span>
 
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="rounded-xl border border-slate-200 bg-white dark:bg-slate-800 px-4 py-3 text-sm text-slate-600 outline-none focus:border-orange-400"
+                className="h-11 min-w-0 flex-1 rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-600 outline-none focus:border-orange-400 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 sm:px-4 lg:w-40 lg:flex-none"
               >
                 <option value="All">All</option>
                 <option value="Pending">Pending</option>
@@ -303,28 +326,31 @@ const AllProject = () => {
           </div>
         </div>
 
-        {/* ================= PROJECT TABLE ================= */}
+        {/* =====================================================
+            PROJECT CONTAINER
+        ====================================================== */}
 
-        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white dark:bg-slate-800">
+        <div className="overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-600 dark:bg-slate-800 sm:rounded-2xl">
           {/* Table Header */}
-          <div className="flex flex-col justify-between gap-2 border-b border-slate-200 p-6 sm:flex-row sm:items-center">
-            <div>
-              <h3 className="font-bold text-slate-900 dark:text-white">
-                All Projects
-              </h3>
 
-              <p className="mt-1 text-xs text-slate-400">
-                {filteredProjects.length} projects found
-              </p>
-            </div>
+          <div className="border-b border-slate-200 p-4 dark:border-slate-600 sm:p-6">
+            <h3 className="font-bold text-slate-900 dark:text-white">
+              All Projects
+            </h3>
+
+            <p className="mt-1 text-xs text-slate-400">
+              {filteredProjects.length} projects found
+            </p>
           </div>
 
-          {/* ================= DESKTOP TABLE ================= */}
+          {/* =====================================================
+              DESKTOP TABLE
+          ====================================================== */}
 
           <div className="hidden overflow-x-auto md:block">
-            <table className="w-full">
+            <table className="w-full min-w-[950px]">
               <thead>
-                <tr className="border-b border-slate-100 text-left">
+                <tr className="border-b border-slate-100 text-left dark:border-slate-700">
                   <th className="px-6 py-4 text-xs font-semibold uppercase text-slate-400">
                     Project
                   </th>
@@ -359,17 +385,18 @@ const AllProject = () => {
                 {filteredProjects.map((project) => (
                   <tr
                     key={project.id}
-                    className="border-b border-slate-100 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-700"
+                    className="border-b border-slate-100 last:border-0 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-700"
                   >
                     {/* Project */}
+
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50  text-orange-500">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-orange-500 dark:bg-orange-500/10">
                           <FiFileText size={18} />
                         </div>
 
-                        <div>
-                          <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+                        <div className="min-w-0">
+                          <p className="max-w-[220px] truncate text-sm font-semibold text-slate-800 dark:text-slate-200">
                             {project.name}
                           </p>
 
@@ -381,32 +408,30 @@ const AllProject = () => {
                     </td>
 
                     {/* Customer */}
+
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-400  text-xs font-bold text-slate-600">
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-600 dark:bg-slate-600 dark:text-slate-200">
                           {project.customer.charAt(0)}
                         </div>
 
-                        <span className="text-sm text-slate-700 dark:text-slate-200">
+                        <span className="whitespace-nowrap text-sm text-slate-700 dark:text-slate-200">
                           {project.customer}
                         </span>
                       </div>
                     </td>
 
-                    {/* ================= DATE ================= */}
+                    {/* Date */}
 
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        {/* Date Text */}
-                        <span className="text-sm text-slate-500">
+                      <div className="flex items-center gap-2">
+                        <span className="whitespace-nowrap text-sm text-slate-500 dark:text-slate-400">
                           {formatDate(project.date)}
                         </span>
 
-                        {/* Calendar Icon */}
-                        <label className="relative flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-orange-500">
+                        <label className="relative flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-orange-500 dark:hover:bg-slate-700">
                           <FiCalendar size={17} />
 
-                          {/* Invisible input sitting ON TOP of icon */}
                           <input
                             type="date"
                             value={project.date}
@@ -423,20 +448,17 @@ const AllProject = () => {
                       </div>
                     </td>
 
-                    {/* ================= DUE DATE ================= */}
+                    {/* Due Date */}
 
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        {/* Due Date Text */}
-                        <span className="text-sm font-medium text-orange-600">
+                      <div className="flex items-center gap-2">
+                        <span className="whitespace-nowrap text-sm font-medium text-orange-600 dark:text-orange-400">
                           {formatDate(project.dueDate)}
                         </span>
 
-                        {/* Calendar Icon */}
-                        <label className="relative flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-orange-400 transition hover:bg-orange-50 hover:text-orange-600">
+                        <label className="relative flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-lg text-orange-400 transition hover:bg-orange-50 hover:text-orange-600 dark:hover:bg-orange-500/10">
                           <FiCalendar size={17} />
 
-                          {/* Invisible input sitting ON TOP of icon */}
                           <input
                             type="date"
                             value={project.dueDate}
@@ -454,16 +476,18 @@ const AllProject = () => {
                     </td>
 
                     {/* Amount */}
-                    <td className="px-6 py-4">
+
+                    <td className="whitespace-nowrap px-6 py-4">
                       <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">
                         {project.amount}
                       </span>
                     </td>
 
                     {/* Status */}
+
                     <td className="px-6 py-4">
                       <span
-                        className={`rounded-full px-3 py-1.5 text-xs font-semibold ${getStatusStyle(
+                        className={`whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold ${getStatusStyle(
                           project.status,
                         )}`}
                       >
@@ -472,13 +496,23 @@ const AllProject = () => {
                     </td>
 
                     {/* Action */}
+
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <button className="rounded-lg p-2 text-yellow-600 hover:bg-yellow-100 hover:text-yellow-700">
-                          <FaEdit size={18} />
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          title="Edit project"
+                          className="rounded-lg p-2 text-yellow-600 transition hover:bg-yellow-100 hover:text-yellow-700 dark:hover:bg-yellow-500/10"
+                        >
+                          <FaEdit size={17} />
                         </button>
-                        <button className="rounded-lg p-2 text-red-600 hover:bg-red-100 hover:text-red-700">
-                          <MdDelete size={18} />
+
+                        <button
+                          type="button"
+                          title="Delete project"
+                          className="rounded-lg p-2 text-red-600 transition hover:bg-red-100 hover:text-red-700 dark:hover:bg-red-500/10"
+                        >
+                          <MdDelete size={19} />
                         </button>
                       </div>
                     </td>
@@ -488,23 +522,28 @@ const AllProject = () => {
             </table>
           </div>
 
-          {/* ================= MOBILE CARDS ================= */}
+          {/* =====================================================
+              MOBILE PROJECT CARDS
+          ====================================================== */}
 
-          <div className="space-y-3 p-4 md:hidden">
+          <div className="space-y-3 p-3 sm:p-4 md:hidden">
             {filteredProjects.map((project) => (
               <div
                 key={project.id}
-                className="rounded-xl border border-slate-200 p-4"
+                className="rounded-xl border border-slate-200 bg-white p-4 transition dark:border-slate-600 dark:bg-slate-800"
               >
                 {/* Project Header */}
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-orange-500">
+
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-orange-500 dark:bg-orange-500/10">
                       <FiFileText size={18} />
                     </div>
 
-                    <div>
-                      <p className="text-sm font-semibold">{project.name}</p>
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold text-slate-800 dark:text-slate-200">
+                        {project.name}
+                      </p>
 
                       <p className="mt-1 text-xs text-orange-500">
                         {project.id}
@@ -512,32 +551,59 @@ const AllProject = () => {
                     </div>
                   </div>
 
-                  <button className="text-slate-400">
-                    <FiMoreVertical />
+                  <button
+                    type="button"
+                    aria-label="Project actions"
+                    className="shrink-0 rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
+                  >
+                    <FiMoreVertical size={18} />
                   </button>
                 </div>
 
-                <div className="mt-4 grid grid-cols-2 gap-4">
-                  {/* Customer */}
-                  <div>
-                    <p className="text-[11px] text-slate-400">Customer</p>
+                {/* Divider */}
 
-                    <p className="mt-1 text-sm font-medium">
+                <div className="my-4 border-t border-slate-100 dark:border-slate-700" />
+
+                {/* Project Information */}
+
+                <div className="grid grid-cols-2 gap-x-4 gap-y-4">
+                  {/* Customer */}
+
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+                      Customer
+                    </p>
+
+                    <p className="mt-1 truncate text-sm font-medium text-slate-700 dark:text-slate-200">
                       {project.customer}
                     </p>
                   </div>
 
-                  {/* ================= MOBILE DATE ================= */}
+                  {/* Amount */}
 
-                  <div>
-                    <p className="text-[11px] text-slate-400">Date</p>
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+                      Amount
+                    </p>
 
-                    <div className="mt-1 flex items-center gap-2">
-                      <span className="text-sm font-medium">
+                    <p className="mt-1 truncate text-sm font-bold text-slate-800 dark:text-slate-100">
+                      {project.amount}
+                    </p>
+                  </div>
+
+                  {/* Date */}
+
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+                      Date
+                    </p>
+
+                    <div className="mt-1 flex min-w-0 items-center gap-1">
+                      <span className="truncate text-sm font-medium text-slate-700 dark:text-slate-200">
                         {formatDate(project.date)}
                       </span>
 
-                      <label className="relative flex h-7 w-7 cursor-pointer items-center justify-center rounded-md text-slate-400 hover:bg-slate-100 hover:text-orange-500">
+                      <label className="relative flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-md text-slate-400 hover:bg-slate-100 hover:text-orange-500 dark:hover:bg-slate-700">
                         <FiCalendar size={16} />
 
                         <input
@@ -556,17 +622,19 @@ const AllProject = () => {
                     </div>
                   </div>
 
-                  {/* ================= MOBILE DUE DATE ================= */}
+                  {/* Due Date */}
 
-                  <div>
-                    <p className="text-[11px] text-slate-400">Due Date</p>
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+                      Due Date
+                    </p>
 
-                    <div className="mt-1 flex items-center gap-2">
-                      <span className="text-sm font-medium text-orange-600">
+                    <div className="mt-1 flex min-w-0 items-center gap-1">
+                      <span className="truncate text-sm font-medium text-orange-600 dark:text-orange-400">
                         {formatDate(project.dueDate)}
                       </span>
 
-                      <label className="relative flex h-7 w-7 cursor-pointer items-center justify-center rounded-md text-orange-400 hover:bg-orange-50 hover:text-orange-600">
+                      <label className="relative flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-md text-orange-400 hover:bg-orange-50 hover:text-orange-600 dark:hover:bg-orange-500/10">
                         <FiCalendar size={16} />
 
                         <input
@@ -584,38 +652,59 @@ const AllProject = () => {
                       </label>
                     </div>
                   </div>
+                </div>
 
-                  {/* Amount */}
-                  <div>
-                    <p className="text-[11px] text-slate-400">Amount</p>
+                {/* Status */}
 
-                    <p className="mt-1 text-sm font-bold">{project.amount}</p>
-                  </div>
+                <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-4 dark:border-slate-700">
+                  <span className="text-xs font-medium text-slate-400">
+                    Status
+                  </span>
 
-                  {/* Status */}
-                  <div>
-                    <p className="text-[11px] text-slate-400">Status</p>
+                  <span
+                    className={`rounded-full px-3 py-1.5 text-[11px] font-semibold ${getStatusStyle(
+                      project.status,
+                    )}`}
+                  >
+                    {project.status}
+                  </span>
+                </div>
 
-                    <span
-                      className={`mt-1 inline-block rounded-full px-2.5 py-1 text-[11px] font-semibold ${getStatusStyle(
-                        project.status,
-                      )}`}
-                    >
-                      {project.status}
-                    </span>
-                  </div>
+                {/* Mobile Actions */}
+
+                <div className="mt-3 flex gap-2">
+                  <button
+                    type="button"
+                    className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-slate-200 py-2 text-xs font-medium text-yellow-600 transition hover:bg-yellow-50 dark:border-slate-600 dark:hover:bg-yellow-500/10"
+                  >
+                    <FaEdit size={14} />
+                    Edit
+                  </button>
+
+                  <button
+                    type="button"
+                    className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-slate-200 py-2 text-xs font-medium text-red-600 transition hover:bg-red-50 dark:border-slate-600 dark:hover:bg-red-500/10"
+                  >
+                    <MdDelete size={17} />
+                    Delete
+                  </button>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* ================= EMPTY STATE ================= */}
+          {/* =====================================================
+              EMPTY STATE
+          ====================================================== */}
 
           {filteredProjects.length === 0 && (
-            <div className="p-12 text-center">
-              <FiFileText size={35} className="mx-auto text-slate-300" />
+            <div className="px-5 py-12 text-center sm:py-16">
+              <FiFileText
+                size={35}
+                className="mx-auto text-slate-300 dark:text-slate-600"
+              />
 
-              <h3 className="mt-3 font-semibold text-slate-700">
+              <h3 className="mt-3 font-semibold text-slate-700 dark:text-slate-200">
                 No projects found
               </h3>
 
@@ -625,7 +714,7 @@ const AllProject = () => {
             </div>
           )}
         </div>
-      </div>
+      </main>
     </div>
   );
 };

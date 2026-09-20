@@ -82,7 +82,7 @@ const initialNotifications = [
 ];
 
 // ========================================
-// DYNAMIC TIME FUNCTION
+// DYNAMIC TIME
 // ========================================
 
 const getTimeAgo = (createdAt) => {
@@ -96,11 +96,7 @@ const getTimeAgo = (createdAt) => {
   const hours = Math.floor(minutes / 60);
   const days = Math.floor(hours / 24);
 
-  if (difference < 0) {
-    return "Just now";
-  }
-
-  if (seconds < 60) {
+  if (difference < 0 || seconds < 60) {
     return "Just now";
   }
 
@@ -188,50 +184,50 @@ const Notification = () => {
   ).length;
 
   // ========================================
-  // GET NOTIFICATION ICON
+  // GET ICON
   // ========================================
 
   const getIcon = (type) => {
     switch (type) {
       case "project":
         return (
-          <div className="w-11 h-11 rounded-full bg-orange-100 dark:bg-orange-500/15 text-orange-600 dark:text-orange-400 flex items-center justify-center shrink-0">
-            <FiPackage size={20} />
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-orange-100 text-orange-600 dark:bg-orange-500/15 dark:text-orange-400 sm:h-11 sm:w-11">
+            <FiPackage size={19} />
           </div>
         );
 
       case "payment":
         return (
-          <div className="w-11 h-11 rounded-full bg-green-100 dark:bg-green-500/15 text-green-600 dark:text-green-400 flex items-center justify-center shrink-0">
-            <FiDollarSign size={20} />
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-600 dark:bg-green-500/15 dark:text-green-400 sm:h-11 sm:w-11">
+            <FiDollarSign size={19} />
           </div>
         );
 
       case "due":
         return (
-          <div className="w-11 h-11 rounded-full bg-yellow-100 dark:bg-yellow-500/15 text-yellow-600 dark:text-yellow-400 flex items-center justify-center shrink-0">
-            <FiClock size={20} />
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-yellow-100 text-yellow-600 dark:bg-yellow-500/15 dark:text-yellow-400 sm:h-11 sm:w-11">
+            <FiClock size={19} />
           </div>
         );
 
       case "completed":
         return (
-          <div className="w-11 h-11 rounded-full bg-blue-100 dark:bg-blue-500/15 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
-            <FiCheckCircle size={20} />
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400 sm:h-11 sm:w-11">
+            <FiCheckCircle size={19} />
           </div>
         );
 
       case "stock":
         return (
-          <div className="w-11 h-11 rounded-full bg-red-100 dark:bg-red-500/15 text-red-600 dark:text-red-400 flex items-center justify-center shrink-0">
-            <FiAlertCircle size={20} />
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-600 dark:bg-red-500/15 dark:text-red-400 sm:h-11 sm:w-11">
+            <FiAlertCircle size={19} />
           </div>
         );
 
       default:
         return (
-          <div className="w-11 h-11 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center shrink-0">
-            <FiBell size={20} />
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 sm:h-11 sm:w-11">
+            <FiBell size={19} />
           </div>
         );
     }
@@ -295,37 +291,59 @@ const Notification = () => {
       notification.message.toLowerCase().includes(search.toLowerCase()),
   );
 
+  // ========================================
+  // NOTIFICATION TYPE COUNTS
+  // ========================================
+
+  const projectCount = notifications.filter(
+    (item) => item.type === "project",
+  ).length;
+
+  const paymentCount = notifications.filter(
+    (item) => item.type === "payment",
+  ).length;
+
+  const dueCount = notifications.filter((item) => item.type === "due").length;
+
+  const completedCount = notifications.filter(
+    (item) => item.type === "completed",
+  ).length;
+
+  const stockCount = notifications.filter(
+    (item) => item.type === "stock",
+  ).length;
+
   return (
-    <div className="min-h-screen bg-[#f7f8fa] dark:bg-slate-900 px-4 py-5 sm:px-6 lg:px-8 transition-colors duration-200">
-      <div className="max-w-7xl mx-auto">
-        {/* ========================================
+    <div className="min-h-screen overflow-x-hidden bg-[#f7f8fa] px-4 py-5 transition-colors duration-200 dark:bg-slate-900 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl">
+        {/* =====================================================
             PAGE HEADER
-        ======================================== */}
+        ====================================================== */}
 
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-xl bg-orange-100 dark:bg-orange-500/15 text-orange-600 dark:text-orange-400 flex items-center justify-center">
-                <FiBell size={22} />
-              </div>
+          {/* TITLE */}
 
-              <div>
-                <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">
-                  Notifications
-                </h1>
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-100 text-orange-600 dark:bg-orange-500/15 dark:text-orange-400 sm:h-11 sm:w-11">
+              <FiBell size={21} />
+            </div>
 
-                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                  Stay updated with your printing press activities
-                </p>
-              </div>
+            <div className="min-w-0">
+              <h1 className="truncate text-xl font-bold text-slate-800 dark:text-slate-100 sm:text-2xl">
+                Notifications
+              </h1>
+
+              <p className="mt-1 truncate text-xs text-slate-500 dark:text-slate-400 sm:text-sm">
+                Stay updated with your printing press activities
+              </p>
             </div>
           </div>
 
           {/* TOP ACTIONS */}
 
-          <div className="flex items-center gap-3 flex-wrap">
+          <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end sm:gap-3">
             {unreadCount > 0 && (
-              <span className="px-3 py-2 bg-orange-100 dark:bg-orange-500/15 text-orange-700 dark:text-orange-400 rounded-lg text-sm font-medium">
+              <span className="rounded-lg bg-orange-100 px-3 py-2 text-xs font-medium text-orange-700 dark:bg-orange-500/15 dark:text-orange-400 sm:text-sm">
                 {unreadCount} Unread
               </span>
             )}
@@ -333,7 +351,7 @@ const Notification = () => {
             {notifications.length > 0 && (
               <button
                 onClick={markAllAsRead}
-                className="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition"
+                className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 sm:flex-none sm:px-4 sm:text-sm"
               >
                 <FiCheck size={16} />
                 Mark all as read
@@ -342,12 +360,12 @@ const Notification = () => {
           </div>
         </div>
 
-        {/* ========================================
-            SEARCH BAR
-        ======================================== */}
+        {/* =====================================================
+            SEARCH
+        ====================================================== */}
 
-        <div className="mt-6">
-          <div className="relative max-w-md">
+        <div className="mt-5 sm:mt-6">
+          <div className="relative w-full sm:max-w-md">
             <FiSearch
               size={18}
               className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
@@ -358,7 +376,7 @@ const Notification = () => {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search notifications..."
-              className="w-full h-11 pl-10 pr-10 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none text-sm text-slate-700 dark:text-slate-200 placeholder:text-slate-400 focus:border-orange-400 dark:focus:border-orange-500 transition"
+              className="h-11 w-full rounded-lg border border-slate-200 bg-white pl-10 pr-10 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-orange-400 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:focus:border-orange-500"
             />
 
             {search && (
@@ -372,25 +390,154 @@ const Notification = () => {
           </div>
         </div>
 
-        {/* ========================================
+        {/* =====================================================
+            MOBILE SUMMARY
+            Notification Types appears FIRST on mobile
+        ====================================================== */}
+
+        <div className="mt-5 space-y-3 lg:hidden">
+          {/* NOTIFICATION TYPES */}
+
+          <div className="rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-800">
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <h3 className="font-semibold text-slate-800 dark:text-slate-100">
+                  Notification Types
+                </h3>
+
+                <p className="mt-1 text-xs text-slate-400">
+                  Activity breakdown
+                </p>
+              </div>
+
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-orange-100 text-orange-600 dark:bg-orange-500/15 dark:text-orange-400">
+                <FiBell size={17} />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
+              {/* Projects */}
+
+              <div className="rounded-lg bg-orange-50 px-3 py-3 dark:bg-orange-500/10">
+                <p className="text-[11px] text-orange-600 dark:text-orange-400">
+                  Projects
+                </p>
+
+                <p className="mt-1 text-lg font-bold text-slate-800 dark:text-slate-100">
+                  {projectCount}
+                </p>
+              </div>
+
+              {/* Payments */}
+
+              <div className="rounded-lg bg-green-50 px-3 py-3 dark:bg-green-500/10">
+                <p className="text-[11px] text-green-600 dark:text-green-400">
+                  Payments
+                </p>
+
+                <p className="mt-1 text-lg font-bold text-slate-800 dark:text-slate-100">
+                  {paymentCount}
+                </p>
+              </div>
+
+              {/* Due */}
+
+              <div className="rounded-lg bg-yellow-50 px-3 py-3 dark:bg-yellow-500/10">
+                <p className="text-[11px] text-yellow-600 dark:text-yellow-400">
+                  Due
+                </p>
+
+                <p className="mt-1 text-lg font-bold text-slate-800 dark:text-slate-100">
+                  {dueCount}
+                </p>
+              </div>
+
+              {/* Completed */}
+
+              <div className="rounded-lg bg-blue-50 px-3 py-3 dark:bg-blue-500/10">
+                <p className="text-[11px] text-blue-600 dark:text-blue-400">
+                  Completed
+                </p>
+
+                <p className="mt-1 text-lg font-bold text-slate-800 dark:text-slate-100">
+                  {completedCount}
+                </p>
+              </div>
+
+              {/* Stock */}
+
+              <div className="rounded-lg bg-red-50 px-3 py-3 dark:bg-red-500/10">
+                <p className="text-[11px] text-red-600 dark:text-red-400">
+                  Stock Alerts
+                </p>
+
+                <p className="mt-1 text-lg font-bold text-red-600 dark:text-red-400">
+                  {stockCount}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* SMALL SUMMARY ROW */}
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-800">
+              <div className="flex items-center gap-3">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-orange-100 text-orange-600 dark:bg-orange-500/15 dark:text-orange-400">
+                  <FiBell size={17} />
+                </div>
+
+                <div>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    Unread
+                  </p>
+
+                  <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100">
+                    {unreadCount}
+                  </h3>
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-800">
+              <div className="flex items-center gap-3">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-100 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400">
+                  <FiPackage size={17} />
+                </div>
+
+                <div>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    Total
+                  </p>
+
+                  <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100">
+                    {notifications.length}
+                  </h3>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* =====================================================
             MAIN CONTENT
-        ======================================== */}
+        ====================================================== */}
 
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6 mt-6">
-          {/* ======================================
+        <div className="mt-5 grid grid-cols-1 gap-6 lg:mt-6 lg:grid-cols-[1fr_300px]">
+          {/* ==================================================
               NOTIFICATION LIST
-          ====================================== */}
+          ================================================== */}
 
-          <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden transition-colors duration-200">
+          <div className="min-w-0 overflow-hidden rounded-xl border border-slate-200 bg-white transition-colors duration-200 dark:border-slate-700 dark:bg-slate-800">
             {/* HEADER */}
 
-            <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
-              <div>
+            <div className="flex items-center justify-between gap-3 border-b border-slate-200 px-4 py-4 dark:border-slate-700 sm:px-5">
+              <div className="min-w-0">
                 <h2 className="font-semibold text-slate-800 dark:text-slate-100">
                   Recent Notifications
                 </h2>
 
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                   {filteredNotifications.length} notification
                   {filteredNotifications.length !== 1 ? "s" : ""}
                 </p>
@@ -399,21 +546,19 @@ const Notification = () => {
               {notifications.length > 0 && (
                 <button
                   onClick={clearAll}
-                  className="flex items-center gap-2 text-sm text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300"
+                  className="flex shrink-0 items-center gap-1.5 text-xs font-medium text-red-500 transition hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 sm:text-sm"
                 >
                   <FiTrash2 size={15} />
-                  Clear all
+                  <span className="hidden xs:inline sm:inline">Clear all</span>
                 </button>
               )}
             </div>
 
-            {/* ======================================
-                EMPTY STATE
-            ====================================== */}
+            {/* EMPTY STATE */}
 
             {filteredNotifications.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-20 px-5">
-                <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center mb-4">
+              <div className="flex flex-col items-center justify-center px-5 py-16 sm:py-20">
+                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-700">
                   <FiBell
                     size={28}
                     className="text-slate-400 dark:text-slate-500"
@@ -424,7 +569,7 @@ const Notification = () => {
                   No notifications found
                 </h3>
 
-                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 text-center">
+                <p className="mt-1 text-center text-sm text-slate-500 dark:text-slate-400">
                   You are all caught up.
                 </p>
               </div>
@@ -432,7 +577,7 @@ const Notification = () => {
               filteredNotifications.map((notification) => (
                 <div
                   key={notification.id}
-                  className={`group flex gap-4 p-5 border-b border-slate-100 dark:border-slate-700 last:border-b-0 transition ${
+                  className={`flex gap-3 border-b border-slate-100 p-4 transition last:border-b-0 dark:border-slate-700 sm:gap-4 sm:p-5 ${
                     notification.read
                       ? "bg-white dark:bg-slate-800"
                       : "bg-orange-50/50 dark:bg-orange-500/5"
@@ -444,12 +589,12 @@ const Notification = () => {
 
                   {/* DETAILS */}
 
-                  <div className="flex-1 min-w-0">
-                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
-                      <div>
-                        <div className="flex items-center gap-2">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-col gap-1.5 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
+                      <div className="min-w-0">
+                        <div className="flex items-start gap-2">
                           <h3
-                            className={`text-sm sm:text-base ${
+                            className={`min-w-0 text-sm sm:text-base ${
                               notification.read
                                 ? "font-medium text-slate-700 dark:text-slate-300"
                                 : "font-semibold text-slate-800 dark:text-slate-100"
@@ -459,29 +604,29 @@ const Notification = () => {
                           </h3>
 
                           {!notification.read && (
-                            <span className="w-2 h-2 rounded-full bg-orange-500 shrink-0" />
+                            <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-orange-500" />
                           )}
                         </div>
 
-                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 leading-6">
+                        <p className="mt-1 text-xs leading-5 text-slate-500 dark:text-slate-400 sm:text-sm sm:leading-6">
                           {notification.message}
                         </p>
                       </div>
 
                       {/* TIME */}
 
-                      <span className="text-xs text-slate-400 dark:text-slate-500 whitespace-nowrap">
+                      <span className="shrink-0 text-[11px] text-slate-400 dark:text-slate-500 sm:text-xs">
                         {getTimeAgo(notification.createdAt)}
                       </span>
                     </div>
 
                     {/* ACTIONS */}
 
-                    <div className="flex items-center gap-3 mt-3">
+                    <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
                       {!notification.read && (
                         <button
                           onClick={() => markAsRead(notification.id)}
-                          className="flex items-center gap-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
+                          className="flex items-center gap-1.5 text-xs font-medium text-blue-600 dark:text-blue-400"
                         >
                           <FiCheck size={14} />
                           Mark as read
@@ -490,7 +635,7 @@ const Notification = () => {
 
                       <button
                         onClick={() => deleteNotification(notification.id)}
-                        className="flex items-center gap-1.5 text-xs font-medium text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300"
+                        className="flex items-center gap-1.5 text-xs font-medium text-red-500 dark:text-red-400"
                       >
                         <FiTrash2 size={14} />
                         Delete
@@ -502,16 +647,16 @@ const Notification = () => {
             )}
           </div>
 
-          {/* ======================================
-              RIGHT SUMMARY
-          ====================================== */}
+          {/* ==================================================
+              DESKTOP RIGHT SUMMARY
+          ================================================== */}
 
-          <div className="space-y-4">
+          <div className="hidden space-y-4 lg:block">
             {/* UNREAD */}
 
-            <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5 transition-colors">
+            <div className="rounded-xl border border-slate-200 bg-white p-5 transition-colors dark:border-slate-700 dark:bg-slate-800">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-orange-100 dark:bg-orange-500/15 text-orange-600 dark:text-orange-400 flex items-center justify-center">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-100 text-orange-600 dark:bg-orange-500/15 dark:text-orange-400">
                   <FiBell size={18} />
                 </div>
 
@@ -529,9 +674,9 @@ const Notification = () => {
 
             {/* TOTAL */}
 
-            <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5 transition-colors">
+            <div className="rounded-xl border border-slate-200 bg-white p-5 transition-colors dark:border-slate-700 dark:bg-slate-800">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-500/15 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400">
                   <FiPackage size={18} />
                 </div>
 
@@ -549,28 +694,21 @@ const Notification = () => {
 
             {/* NOTIFICATION TYPES */}
 
-            <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5 transition-colors">
-              <h3 className="font-semibold text-slate-800 dark:text-slate-100 mb-4">
+            <div className="rounded-xl border border-slate-200 bg-white p-5 transition-colors dark:border-slate-700 dark:bg-slate-800">
+              <h3 className="mb-4 font-semibold text-slate-800 dark:text-slate-100">
                 Notification Types
               </h3>
 
               <div className="space-y-3">
-                {/* PROJECT */}
-
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-slate-600 dark:text-slate-400">
                     New Projects
                   </span>
 
                   <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-                    {
-                      notifications.filter((item) => item.type === "project")
-                        .length
-                    }
+                    {projectCount}
                   </span>
                 </div>
-
-                {/* PAYMENT */}
 
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-slate-600 dark:text-slate-400">
@@ -578,14 +716,9 @@ const Notification = () => {
                   </span>
 
                   <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-                    {
-                      notifications.filter((item) => item.type === "payment")
-                        .length
-                    }
+                    {paymentCount}
                   </span>
                 </div>
-
-                {/* DUE */}
 
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-slate-600 dark:text-slate-400">
@@ -593,11 +726,9 @@ const Notification = () => {
                   </span>
 
                   <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-                    {notifications.filter((item) => item.type === "due").length}
+                    {dueCount}
                   </span>
                 </div>
-
-                {/* COMPLETED */}
 
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-slate-600 dark:text-slate-400">
@@ -605,14 +736,9 @@ const Notification = () => {
                   </span>
 
                   <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-                    {
-                      notifications.filter((item) => item.type === "completed")
-                        .length
-                    }
+                    {completedCount}
                   </span>
                 </div>
-
-                {/* STOCK */}
 
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-slate-600 dark:text-slate-400">
@@ -620,10 +746,7 @@ const Notification = () => {
                   </span>
 
                   <span className="text-sm font-semibold text-red-600 dark:text-red-400">
-                    {
-                      notifications.filter((item) => item.type === "stock")
-                        .length
-                    }
+                    {stockCount}
                   </span>
                 </div>
               </div>

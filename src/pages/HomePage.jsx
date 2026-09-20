@@ -5,16 +5,25 @@ import {
   FiFileText,
   FiUsers,
   FiPrinter,
-  FiDollarSign,
   FiPlus,
   FiClock,
+  FiArrowRight,
+  FiCheckCircle,
+  FiCreditCard,
+  FiAlertCircle,
+  FiBriefcase,
+  FiUserPlus,
 } from "react-icons/fi";
-import { FaMoneyBillWave } from "react-icons/fa";
+
+import { FaMoneyBillWave, FaWhatsapp } from "react-icons/fa";
+import { MdPeopleOutline } from "react-icons/md";
 
 const HomePage = () => {
   const navigate = useNavigate();
 
-  // ================= STATS DATA =================
+  // =====================================================
+  // MAIN STATS
+  // =====================================================
 
   const stats = [
     {
@@ -36,6 +45,12 @@ const HomePage = () => {
       icon: FiPrinter,
     },
     {
+      title: "New Customers",
+      value: "428",
+      change: "+2.3%",
+      icon: MdPeopleOutline,
+    },
+    {
       title: "Total Revenue",
       value: "Rs. 8,42,500",
       change: "+15.8%",
@@ -43,7 +58,139 @@ const HomePage = () => {
     },
   ];
 
-  // ================= ESTIMATES DATA =================
+  // =====================================================
+  // TODAY SUMMARY
+  // =====================================================
+
+  const todaySummary = [
+    {
+      title: "Today's Sales",
+      value: "Rs. 24,500",
+      icon: FaMoneyBillWave,
+    },
+    {
+      title: "Today's Estimates",
+      value: "12",
+      icon: FiFileText,
+    },
+    {
+      title: "Payments Received",
+      value: "Rs. 18,200",
+      icon: FiCreditCard,
+    },
+    {
+      title: "Pending Amount",
+      value: "Rs. 6,300",
+      icon: FiAlertCircle,
+    },
+  ];
+
+  // =====================================================
+  // REVENUE DATA
+  // =====================================================
+
+  const revenueData = [
+    { month: "Jan", value: 45 },
+    { month: "Feb", value: 58 },
+    { month: "Mar", value: 52 },
+    { month: "Apr", value: 68 },
+    { month: "May", value: 61 },
+    { month: "Jun", value: 76 },
+    { month: "Jul", value: 70 },
+    { month: "Aug", value: 88 },
+    { month: "Sep", value: 78 },
+    { month: "Oct", value: 91 },
+    { month: "Nov", value: 82 },
+    { month: "Dec", value: 96 },
+  ];
+
+  // =====================================================
+  // ORDER STATUS
+  // =====================================================
+
+  const orderStatus = [
+    {
+      name: "Pending",
+      count: 24,
+      bar: "bg-orange-400",
+      text: "text-orange-600 dark:text-orange-400",
+    },
+    {
+      name: "In Progress",
+      count: 18,
+      bar: "bg-blue-400",
+      text: "text-blue-600 dark:text-blue-400",
+    },
+    {
+      name: "Ready",
+      count: 9,
+      bar: "bg-green-400",
+      text: "text-green-600 dark:text-green-400",
+    },
+    {
+      name: "Delivered",
+      count: 42,
+      bar: "bg-slate-500",
+      text: "text-slate-600 dark:text-slate-300",
+    },
+  ];
+
+  // =====================================================
+  // PAYMENT DATA
+  // =====================================================
+
+  const paymentData = [
+    {
+      title: "Collected",
+      value: "Rs. 8,42,500",
+      percentage: 68,
+      color: "bg-green-500",
+    },
+    {
+      title: "Pending",
+      value: "Rs. 1,24,800",
+      percentage: 22,
+      color: "bg-orange-500",
+    },
+    {
+      title: "Advance",
+      value: "Rs. 2,15,000",
+      percentage: 10,
+      color: "bg-blue-500",
+    },
+  ];
+
+  // =====================================================
+  // WORK DUE TODAY
+  // =====================================================
+
+  const dueToday = [
+    {
+      id: "EST-10248",
+      project: "Business Card",
+      customer: "Ram Sharma",
+      time: "3:00 PM",
+      status: "Printing",
+    },
+    {
+      id: "EST-10249",
+      project: "Wedding Card",
+      customer: "Sita Karki",
+      time: "4:30 PM",
+      status: "Design",
+    },
+    {
+      id: "EST-10251",
+      project: "Flex Banner",
+      customer: "Hari Thapa",
+      time: "6:00 PM",
+      status: "Ready",
+    },
+  ];
+
+  // =====================================================
+  // RECENT ESTIMATES
+  // =====================================================
 
   const estimates = [
     {
@@ -83,49 +230,71 @@ const HomePage = () => {
     },
   ];
 
-  // ================= REVENUE GRAPH DATA =================
+  // =====================================================
+  // RECENT PAYMENTS
+  // =====================================================
 
-  const revenueData = [
-    { month: "Jan", height: 45, color: "bg-orange-400" },
-    { month: "Feb", height: 65, color: "bg-blue-400" },
-    { month: "Mar", height: 52, color: "bg-green-400" },
-    { month: "Apr", height: 75, color: "bg-purple-400" },
-    { month: "May", height: 60, color: "bg-pink-400" },
-    { month: "Jun", height: 88, color: "bg-cyan-400" },
-    { month: "Jul", height: 72, color: "bg-yellow-400" },
-    { month: "Aug", height: 95, color: "bg-red-400" },
-    { month: "Sep", height: 80, color: "bg-indigo-400" },
-    { month: "Oct", height: 90, color: "bg-emerald-400" },
-    { month: "Nov", height: 70, color: "bg-violet-400" },
-    { month: "Dec", height: 100, color: "bg-orange-500" },
+  const recentPayments = [
+    {
+      customer: "Ram Sharma",
+      amount: "Rs. 5,000",
+      method: "Cash",
+      date: "Today",
+    },
+    {
+      customer: "Sita Karki",
+      amount: "Rs. 3,500",
+      method: "eSewa",
+      date: "Today",
+    },
+    {
+      customer: "Hari Thapa",
+      amount: "Rs. 8,000",
+      method: "Bank",
+      date: "Yesterday",
+    },
+    {
+      customer: "Aashish Gurung",
+      amount: "Rs. 2,000",
+      method: "Cash",
+      date: "Yesterday",
+    },
   ];
 
-  // ================= STATUS STYLE =================
+  // =====================================================
+  // STAFF ACTIVITY
+  // =====================================================
 
-  const getStatusStyle = (status) => {
-    switch (status) {
-      case "Completed":
-        return "bg-green-50 text-green-700";
+  const staffActivity = [
+    {
+      text: "Ram completed EST-10245",
+      time: "10 min ago",
+    },
+    {
+      text: "Sita added a new customer",
+      time: "25 min ago",
+    },
+    {
+      text: "Hari marked EST-10241 as Printed",
+      time: "42 min ago",
+    },
+    {
+      text: "Aashish received Rs. 5,000 payment",
+      time: "1 hour ago",
+    },
+  ];
 
-      case "Printed":
-        return "bg-blue-50 text-blue-700";
-
-      case "Pending":
-        return "bg-orange-50 text-orange-700";
-
-      default:
-        return "bg-gray-50 text-gray-700";
-    }
-  };
-
-  // ================= QUICK ACTIONS =================
+  // =====================================================
+  // QUICK ACTIONS
+  // =====================================================
 
   const quickActions = [
     {
       title: "New Project",
-      description: "Create customer estimate Bill",
+      description: "Create customer estimate",
       icon: FiPlus,
-      iconStyle: "bg-orange-100 text-orange-600",
+      iconStyle:
+        "bg-orange-100 text-orange-600 dark:bg-orange-500/10 dark:text-orange-400",
       hoverStyle:
         "hover:border-orange-200 hover:bg-orange-50 dark:hover:bg-orange-500/10",
       onClick: () => navigate("/projects/create-project"),
@@ -134,7 +303,8 @@ const HomePage = () => {
       title: "Add Customer",
       description: "Register a new customer",
       icon: FiUsers,
-      iconStyle: "bg-blue-50 text-blue-600",
+      iconStyle:
+        "bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400",
       hoverStyle:
         "hover:border-blue-200 hover:bg-blue-50 dark:hover:bg-blue-500/10",
       onClick: () => navigate("/customers/add"),
@@ -143,50 +313,150 @@ const HomePage = () => {
       title: "Print Estimate",
       description: "Print pending estimates",
       icon: FiPrinter,
-      iconStyle: "bg-green-50 text-green-600",
+      iconStyle:
+        "bg-green-50 text-green-600 dark:bg-green-500/10 dark:text-green-400",
       hoverStyle:
         "hover:border-green-200 hover:bg-green-50 dark:hover:bg-green-500/10",
-      onClick: undefined,
+      onClick: () => navigate("/projects/create-project"),
     },
   ];
 
-  return (
-    <div className="min-h-screen bg-[#f7f8fa] text-slate-800 dark:bg-slate-900 dark:text-slate-100">
-      <main>
-        <div className="p-5 md:p-8">
-          {/* ================= STATS ================= */}
+  // =====================================================
+  // STATUS STYLE
+  // =====================================================
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+  const getStatusStyle = (status) => {
+    switch (status) {
+      case "Completed":
+        return "bg-green-50 text-green-700 dark:bg-green-500/10 dark:text-green-400";
+
+      case "Printed":
+        return "bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400";
+
+      case "Pending":
+        return "bg-orange-50 text-orange-700 dark:bg-orange-500/10 dark:text-orange-400";
+
+      case "Printing":
+        return "bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400";
+
+      case "Design":
+        return "bg-purple-50 text-purple-700 dark:bg-purple-500/10 dark:text-purple-400";
+
+      case "Ready":
+        return "bg-green-50 text-green-700 dark:bg-green-500/10 dark:text-green-400";
+
+      default:
+        return "bg-slate-50 text-slate-700 dark:bg-slate-700 dark:text-slate-300";
+    }
+  };
+
+  return (
+    <div className="min-h-screen overflow-x-hidden bg-[#f7f8fa] text-slate-800 dark:bg-slate-950 dark:text-slate-100">
+      <main>
+        <div className="px-3 py-5 sm:px-5 md:p-8">
+          {/* =====================================================
+              HEADER
+          ====================================================== */}
+          <div className="mb-6 flex flex-col gap-4 sm:mb-7 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
+                Dashboard
+              </h1>
+
+              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 sm:text-sm">
+                Overview of your printing business.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => navigate("/projects/create-project")}
+              className="
+                flex
+                w-full
+                items-center
+                justify-center
+                gap-2
+                rounded-lg
+                bg-orange-500
+                px-4
+                py-2.5
+                text-sm
+                font-semibold
+                text-white
+                transition
+                hover:bg-orange-600
+                sm:w-auto
+              "
+            >
+              <FiPlus size={17} />
+              New Project
+            </button>
+          </div>
+          {/* =====================================================
+              MAIN STATS
+          ====================================================== */}
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 xl:grid-cols-5">
             {stats.map((stat, index) => {
               const Icon = stat.icon;
 
               return (
                 <div
                   key={index}
-                  className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-700 dark:bg-slate-800"
+                  className="
+                    min-w-0
+                    rounded-xl
+                    border
+                    border-slate-200
+                    bg-white
+                    p-4
+                    transition
+                    hover:border-slate-300
+                    sm:rounded-2xl
+                    sm:p-5
+                    dark:border-slate-800
+                    dark:bg-slate-900
+                    dark:hover:border-slate-700
+                  "
                 >
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="truncate text-xs font-medium text-slate-500 dark:text-slate-400 sm:text-sm">
                         {stat.title}
                       </p>
 
-                      <h3 className="mt-2 text-2xl font-bold text-slate-900 dark:text-slate-100">
+                      <h3 className="mt-2 truncate text-lg font-bold text-slate-900 dark:text-slate-100 sm:text-2xl">
                         {stat.value}
                       </h3>
                     </div>
 
-                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-orange-50 text-orange-500 dark:bg-slate-700">
-                      <Icon size={21} />
+                    <div
+                      className="
+                        flex
+                        h-9
+                        w-9
+                        shrink-0
+                        items-center
+                        justify-center
+                        rounded-lg
+                        bg-orange-50
+                        text-orange-500
+                        sm:h-11
+                        sm:w-11
+                        sm:rounded-xl
+                        dark:bg-orange-500/10
+                      "
+                    >
+                      <Icon size={18} />
                     </div>
                   </div>
 
-                  <div className="mt-4 flex items-center gap-2">
-                    <span className="text-xs font-semibold text-green-600">
+                  <div className="mt-3 flex flex-wrap items-center gap-1.5">
+                    <span className="text-[11px] font-semibold text-green-600 dark:text-green-400 sm:text-xs">
                       {stat.change}
                     </span>
 
-                    <span className="text-xs text-slate-400">
+                    <span className="text-[10px] text-slate-400 sm:text-xs">
                       vs last month
                     </span>
                   </div>
@@ -194,196 +464,381 @@ const HomePage = () => {
               );
             })}
           </div>
-
-          {/* ================= MIDDLE SECTION ================= */}
-
-          <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-3">
-            {/* ================= REVENUE OVERVIEW ================= */}
-
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-800 xl:col-span-2">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="font-bold text-slate-900 dark:text-slate-100">
-                    Revenue Overview
-                  </h3>
-
-                  <p className="mt-1 text-xs text-slate-400">
-                    Monthly revenue performance
-                  </p>
-                </div>
-
-                <select className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-600 outline-none dark:border-slate-600 dark:bg-slate-700 dark:text-slate-300">
-                  <option>Last 6 Months</option>
-                  <option>Last 12 Months</option>
-                </select>
-              </div>
-
-              {/* ================= BAR CHART ================= */}
-
-              <div className="mt-8 flex h-56 items-end gap-3">
-                {revenueData.map((item, index) => (
-                  <div
-                    key={index}
-                    className="group flex h-full flex-1 items-end"
-                  >
-                    <div
-                      style={{
-                        height: `${item.height}%`,
-                      }}
-                      className={`w-full rounded-t-lg ${item.color} transition-all duration-300 group-hover:scale-y-105 group-hover:brightness-95`}
-                    />
-                  </div>
-                ))}
-              </div>
-
-              {/* ================= MONTH LABELS ================= */}
-
-              <div className="mt-3 flex justify-between text-[11px] text-slate-400">
-                {revenueData.map((item) => (
-                  <span key={item.month}>{item.month}</span>
-                ))}
-              </div>
-            </div>
-
-            {/* ================= QUICK ACTIONS ================= */}
-
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-800">
+          {/* =====================================================
+              TODAY SUMMARY
+          ====================================================== */}
+          <div className="mt-5 rounded-xl border border-slate-200 bg-white p-4 sm:rounded-2xl sm:p-5 dark:border-slate-800 dark:bg-slate-900">
+            <div className="mb-4">
               <h3 className="font-bold text-slate-900 dark:text-white">
-                Quick Actions
+                Today's Summary
               </h3>
 
               <p className="mt-1 text-xs text-slate-400">
-                Frequently used actions
+                Your business activity for today
               </p>
+            </div>
 
-              <div className="mt-5 space-y-3">
-                {quickActions.map((action, index) => {
-                  const Icon = action.icon;
+            <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+              {todaySummary.map((item, index) => {
+                const Icon = item.icon;
 
-                  return (
-                    <button
-                      key={index}
-                      type="button"
-                      onClick={action.onClick}
-                      disabled={!action.onClick}
-                      className={`flex w-full items-center gap-4 rounded-xl border border-slate-200 p-4 text-left transition dark:border-slate-700 ${action.hoverStyle} ${
-                        !action.onClick
-                          ? "cursor-not-allowed opacity-70"
-                          : "cursor-pointer"
-                      }`}
-                    >
-                      <div
-                        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${action.iconStyle}`}
-                      >
-                        <Icon />
+                return (
+                  <div
+                    key={index}
+                    className="
+                      rounded-lg
+                      border
+                      border-slate-100
+                      bg-slate-50
+                      p-3
+                      sm:p-4
+                      dark:border-slate-800
+                      dark:bg-slate-800/50
+                    "
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-orange-50 text-orange-500 dark:bg-orange-500/10 dark:text-orange-400">
+                        <Icon size={16} />
                       </div>
 
-                      <div>
-                        <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-                          {action.title}
-                        </p>
+                      <p className="truncate text-xs font-medium text-slate-500 dark:text-slate-400">
+                        {item.title}
+                      </p>
+                    </div>
 
-                        <p className="mt-1 text-xs text-slate-400">
-                          {action.description}
-                        </p>
-                      </div>
-                    </button>
-                  );
-                })}
+                    <p className="mt-3 truncate text-base font-bold text-slate-900 dark:text-white sm:text-lg">
+                      {item.value}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          {/* ================= REVENUE OVERVIEW ================= */}
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
+            <div className="mb-6 flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+                  Revenue Overview
+                </h2>
+
+                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                  Monthly revenue performance
+                </p>
+              </div>
+
+              <span className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                2026
+              </span>
+            </div>
+
+            {/* Chart */}
+            <div className="flex h-80 items-end gap-3 overflow-x-auto px-2 sm:gap-4">
+              {[
+                { month: "Jan", value: 320, color: "bg-orange-500" },
+                { month: "Feb", value: 410, color: "bg-blue-500" },
+                { month: "Mar", value: 380, color: "bg-emerald-500" },
+                { month: "Apr", value: 520, color: "bg-purple-500" },
+                { month: "May", value: 460, color: "bg-pink-500" },
+                { month: "Jun", value: 610, color: "bg-cyan-500" },
+                { month: "Jul", value: 570, color: "bg-yellow-500" },
+                { month: "Aug", value: 680, color: "bg-indigo-500" },
+                { month: "Sep", value: 620, color: "bg-rose-500" },
+                { month: "Oct", value: 740, color: "bg-teal-500" },
+                { month: "Nov", value: 690, color: "bg-violet-500" },
+                { month: "Dec", value: 820, color: "bg-orange-600" },
+              ].map((item) => {
+                const maxValue = 820;
+
+                // Give every bar a minimum height
+                const height = Math.max((item.value / maxValue) * 100, 15);
+
+                return (
+                  <div
+                    key={item.month}
+                    className="group flex h-full min-w-[42px] flex-1 flex-col items-center justify-end"
+                  >
+                    {/* Value */}
+                    <div className="mb-2 rounded-md bg-slate-900 px-2 py-1 text-[11px] font-semibold text-white opacity-0 shadow-md transition-all duration-200 group-hover:-translate-y-1 group-hover:opacity-100 dark:bg-white dark:text-slate-900">
+                      Rs. {item.value}K
+                    </div>
+
+                    {/* Bar */}
+                    <div
+                      className={`w-full max-w-[52px] rounded-t-lg ${item.color} transition-all duration-300 group-hover:scale-x-105 group-hover:brightness-110`}
+                      style={{
+                        height: `${height}%`,
+                      }}
+                    />
+
+                    {/* Month */}
+                    <span className="mt-3 text-xs font-medium text-slate-500 dark:text-slate-400">
+                      {item.month}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Bottom Summary */}
+            <div className="mt-6 flex flex-col gap-3 border-t border-slate-100 pt-4 sm:flex-row sm:items-center sm:justify-between dark:border-slate-800">
+              <div>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Highest Revenue
+                </p>
+
+                <p className="mt-1 text-lg font-bold text-slate-900 dark:text-white">
+                  Rs. 8,20,000
+                </p>
+              </div>
+
+              <div className="text-left sm:text-right">
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Current Month
+                </p>
+
+                <p className="mt-1 text-lg font-bold text-orange-500">
+                  Rs. 6,90,000
+                </p>
               </div>
             </div>
           </div>
 
-          {/* ================= RECENT ESTIMATES ================= */}
+          {/* =====================================================
+              ORDER STATUS + PAYMENT OVERVIEW
+          ====================================================== */}
+          <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-2">
+            {/* ORDER STATUS */}
 
-          <div className="mt-6 rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800">
-            <div className="flex flex-col justify-between gap-3 border-b border-slate-200 p-6 dark:border-slate-700 sm:flex-row sm:items-center">
+            <div
+              className="
+                rounded-xl
+                border
+                border-slate-200
+                bg-white
+                p-4
+                sm:rounded-2xl
+                sm:p-6
+                dark:border-slate-800
+                dark:bg-slate-900
+              "
+            >
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="font-bold text-slate-900 dark:text-white">
+                    Order Status
+                  </h3>
+
+                  <p className="mt-1 text-xs text-slate-400">
+                    Current project workload
+                  </p>
+                </div>
+
+                <FiBriefcase className="text-slate-300 dark:text-slate-600" />
+              </div>
+
+              <div className="mt-6 space-y-5">
+                {orderStatus.map((item) => (
+                  <div key={item.name}>
+                    <div className="mb-2 flex items-center justify-between">
+                      <span className="text-xs font-medium text-slate-600 dark:text-slate-300">
+                        {item.name}
+                      </span>
+
+                      <span className={`text-xs font-bold ${item.text}`}>
+                        {item.count}
+                      </span>
+                    </div>
+
+                    <div className="h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+                      <div
+                        className={`h-full rounded-full ${item.bar}`}
+                        style={{
+                          width: `${Math.min(item.count * 2, 100)}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* PAYMENT OVERVIEW */}
+
+            <div
+              className="
+                rounded-xl
+                border
+                border-slate-200
+                bg-white
+                p-4
+                sm:rounded-2xl
+                sm:p-6
+                dark:border-slate-800
+                dark:bg-slate-900
+              "
+            >
               <div>
                 <h3 className="font-bold text-slate-900 dark:text-white">
-                  Recent Estimates
+                  Payment Overview
                 </h3>
 
                 <p className="mt-1 text-xs text-slate-400">
-                  Latest customer estimates and bills
+                  Current payment position
+                </p>
+              </div>
+
+              {/* PAYMENT BAR */}
+
+              <div className="mt-6">
+                <div className="flex h-4 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+                  {paymentData.map((item) => (
+                    <div
+                      key={item.title}
+                      className={item.color}
+                      style={{
+                        width: `${item.percentage}%`,
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-6 space-y-4">
+                {paymentData.map((item) => (
+                  <div
+                    key={item.title}
+                    className="flex items-center justify-between gap-3"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <span
+                        className={`h-2.5 w-2.5 rounded-full ${item.color}`}
+                      />
+
+                      <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                        {item.title}
+                      </span>
+                    </div>
+
+                    <div className="text-right">
+                      <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
+                        {item.value}
+                      </p>
+
+                      <p className="text-[10px] text-slate-400">
+                        {item.percentage}%
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          {/* =====================================================
+              WORK DUE TODAY
+          ====================================================== */}
+          <div
+            className="
+              mt-5
+              overflow-hidden
+              rounded-xl
+              border
+              border-slate-200
+              bg-white
+              sm:rounded-2xl
+              dark:border-slate-800
+              dark:bg-slate-900
+            "
+          >
+            <div
+              className="
+                flex
+                flex-col
+                gap-3
+                border-b
+                border-slate-200
+                p-4
+                sm:flex-row
+                sm:items-center
+                sm:justify-between
+                sm:p-6
+                dark:border-slate-800
+              "
+            >
+              <div>
+                <h3 className="font-bold text-slate-900 dark:text-white">
+                  Work Due Today
+                </h3>
+
+                <p className="mt-1 text-xs text-slate-400">
+                  Projects that need attention today
                 </p>
               </div>
 
               <button
                 type="button"
                 onClick={() => navigate("/projects")}
-                className="text-sm font-semibold text-orange-500 transition hover:text-orange-600"
+                className="self-start text-xs font-semibold text-orange-500 hover:text-orange-600 sm:self-auto"
               >
                 View All
               </button>
             </div>
 
-            {/* ================= DESKTOP TABLE ================= */}
-
-            <div className="hidden overflow-x-auto md:block">
-              <table className="w-full">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[650px]">
                 <thead>
-                  <tr className="border-b border-slate-100 text-left dark:border-slate-700">
-                    <th className="px-6 py-4 text-xs font-semibold uppercase text-slate-400">
-                      Estimate ID
+                  <tr className="border-b border-slate-100 text-left dark:border-slate-800">
+                    <th className="px-6 py-3 text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+                      Estimate
                     </th>
 
-                    <th className="px-6 py-4 text-xs font-semibold uppercase text-slate-400">
+                    <th className="px-6 py-3 text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+                      Project
+                    </th>
+
+                    <th className="px-6 py-3 text-[10px] font-semibold uppercase tracking-wide text-slate-400">
                       Customer
                     </th>
 
-                    <th className="px-6 py-4 text-xs font-semibold uppercase text-slate-400">
-                      Date
+                    <th className="px-6 py-3 text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+                      Due
                     </th>
 
-                    <th className="px-6 py-4 text-xs font-semibold uppercase text-slate-400">
-                      Amount
-                    </th>
-
-                    <th className="px-6 py-4 text-xs font-semibold uppercase text-slate-400">
+                    <th className="px-6 py-3 text-[10px] font-semibold uppercase tracking-wide text-slate-400">
                       Status
                     </th>
                   </tr>
                 </thead>
 
                 <tbody>
-                  {estimates.map((estimate) => (
+                  {dueToday.map((item) => (
                     <tr
-                      key={estimate.id}
-                      className="border-b border-slate-100 last:border-0 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-700"
+                      key={item.id}
+                      className="border-b border-slate-100 last:border-0 hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800/40"
                     >
-                      <td className="px-6 py-4">
-                        <span className="text-sm font-semibold text-orange-600">
-                          {estimate.id}
-                        </span>
+                      <td className="px-6 py-4 text-xs font-semibold text-orange-600 dark:text-orange-400">
+                        {item.id}
                       </td>
 
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-600 dark:bg-slate-700 dark:text-slate-200">
-                            {estimate.customer.charAt(0)}
-                          </div>
-
-                          <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
-                            {estimate.customer}
-                          </span>
-                        </div>
+                      <td className="px-6 py-4 text-sm font-medium text-slate-700 dark:text-slate-200">
+                        {item.project}
                       </td>
 
                       <td className="px-6 py-4 text-sm text-slate-500 dark:text-slate-400">
-                        {estimate.date}
+                        {item.customer}
                       </td>
 
-                      <td className="px-6 py-4 text-sm font-semibold text-slate-800 dark:text-slate-100">
-                        {estimate.amount}
+                      <td className="whitespace-nowrap px-6 py-4 text-sm font-semibold text-slate-700 dark:text-slate-200">
+                        {item.time}
                       </td>
 
                       <td className="px-6 py-4">
                         <span
-                          className={`rounded-full px-3 py-1.5 text-xs font-semibold ${getStatusStyle(
-                            estimate.status,
+                          className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-semibold ${getStatusStyle(
+                            item.status,
                           )}`}
                         >
-                          {estimate.status}
+                          {item.status}
                         </span>
                       </td>
                     </tr>
@@ -391,42 +846,205 @@ const HomePage = () => {
                 </tbody>
               </table>
             </div>
+          </div>
+          {/* =====================================================
+              RECENT ESTIMATES + RECENT PAYMENTS
+          ====================================================== */}
+          <div className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-2">
+            {/* RECENT ESTIMATES */}
 
-            {/* ================= MOBILE CARDS ================= */}
+            <div
+              className="
+                overflow-hidden
+                rounded-xl
+                border
+                border-slate-200
+                bg-white
+                sm:rounded-2xl
+                dark:border-slate-800
+                dark:bg-slate-900
+              "
+            >
+              <div
+                className="
+                  flex
+                  items-center
+                  justify-between
+                  border-b
+                  border-slate-200
+                  p-4
+                  sm:p-6
+                  dark:border-slate-800
+                "
+              >
+                <div>
+                  <h3 className="font-bold text-slate-900 dark:text-white">
+                    Recent Estimates
+                  </h3>
 
-            <div className="space-y-3 p-4 md:hidden">
-              {estimates.map((estimate) => (
-                <div
-                  key={estimate.id}
-                  className="rounded-xl border border-slate-200 p-4 dark:border-slate-700"
+                  <p className="mt-1 text-xs text-slate-400">
+                    Latest customer estimates
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => navigate("/projects")}
+                  className="text-xs font-semibold text-orange-500 hover:text-orange-600"
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-bold text-orange-600">
-                      {estimate.id}
-                    </span>
+                  View All
+                </button>
+              </div>
 
-                    <span
-                      className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${getStatusStyle(
-                        estimate.status,
-                      )}`}
-                    >
-                      {estimate.status}
-                    </span>
-                  </div>
+              <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                {estimates.slice(0, 5).map((estimate) => (
+                  <div
+                    key={estimate.id}
+                    className="flex items-center gap-3 p-4 transition hover:bg-slate-50 sm:px-6 dark:hover:bg-slate-800/40"
+                  >
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-orange-50 text-xs font-bold text-orange-600 dark:bg-orange-500/10 dark:text-orange-400">
+                      {estimate.customer.charAt(0)}
+                    </div>
 
-                  <div className="mt-3 flex justify-between gap-3">
-                    <div>
-                      <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-semibold text-slate-700 dark:text-slate-200">
                         {estimate.customer}
                       </p>
 
-                      <p className="mt-1 text-xs text-slate-400">
-                        {estimate.date}
+                      <p className="mt-0.5 text-[10px] text-slate-400">
+                        {estimate.id} • {estimate.date}
                       </p>
                     </div>
 
-                    <p className="text-sm font-bold text-slate-800 dark:text-slate-100">
-                      {estimate.amount}
+                    <div className="text-right">
+                      <p className="whitespace-nowrap text-xs font-bold text-slate-700 dark:text-slate-200">
+                        {estimate.amount}
+                      </p>
+
+                      <span
+                        className={`mt-1 inline-flex rounded-full px-2 py-0.5 text-[9px] font-semibold ${getStatusStyle(
+                          estimate.status,
+                        )}`}
+                      >
+                        {estimate.status}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* RECENT PAYMENTS */}
+
+            <div
+              className="
+                overflow-hidden
+                rounded-xl
+                border
+                border-slate-200
+                bg-white
+                sm:rounded-2xl
+                dark:border-slate-800
+                dark:bg-slate-900
+              "
+            >
+              <div className="flex items-center justify-between border-b border-slate-200 p-4 sm:p-6 dark:border-slate-800">
+                <div>
+                  <h3 className="font-bold text-slate-900 dark:text-white">
+                    Recent Payments
+                  </h3>
+
+                  <p className="mt-1 text-xs text-slate-400">
+                    Latest received payments
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => navigate("/reports/payments")}
+                  className="text-xs font-semibold text-orange-500 hover:text-orange-600"
+                >
+                  View All
+                </button>
+              </div>
+
+              <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                {recentPayments.map((payment, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-3 p-4 sm:px-6"
+                  >
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-green-50 text-green-600 dark:bg-green-500/10 dark:text-green-400">
+                      <FiCheckCircle size={16} />
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-semibold text-slate-700 dark:text-slate-200">
+                        {payment.customer}
+                      </p>
+
+                      <p className="mt-0.5 text-[10px] text-slate-400">
+                        {payment.method} • {payment.date}
+                      </p>
+                    </div>
+
+                    <p className="whitespace-nowrap text-sm font-bold text-green-600 dark:text-green-400">
+                      {payment.amount}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          {/* =====================================================
+              STAFF ACTIVITY
+          ====================================================== */}
+          <div
+            className="
+              mt-5
+              rounded-xl
+              border
+              border-slate-200
+              bg-white
+              p-4
+              sm:rounded-2xl
+              sm:p-6
+              dark:border-slate-800
+              dark:bg-slate-900
+            "
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-bold text-slate-900 dark:text-white">
+                  Staff Activity
+                </h3>
+
+                <p className="mt-1 text-xs text-slate-400">
+                  Recent activity from your team
+                </p>
+              </div>
+
+              <FiUsers className="text-slate-300 dark:text-slate-600" />
+            </div>
+
+            <div className="mt-5 space-y-5">
+              {staffActivity.map((activity, index) => (
+                <div key={index} className="flex gap-3">
+                  <div className="relative flex w-5 justify-center">
+                    <span className="mt-1.5 h-2 w-2 rounded-full bg-orange-500" />
+
+                    {index !== staffActivity.length - 1 && (
+                      <span className="absolute top-4 h-full w-px bg-slate-200 dark:bg-slate-800" />
+                    )}
+                  </div>
+
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                      {activity.text}
+                    </p>
+
+                    <p className="mt-1 text-[10px] text-slate-400">
+                      {activity.time}
                     </p>
                   </div>
                 </div>
@@ -435,6 +1053,74 @@ const HomePage = () => {
           </div>
         </div>
       </main>
+
+      {/* =====================================================
+          FLOATING WHATSAPP
+      ====================================================== */}
+
+      <button
+        type="button"
+        title="WhatsApp"
+        aria-label="Open WhatsApp"
+        onClick={() => window.open("https://wa.me/9779742992187", "_blank")}
+        className="
+          fixed
+          bottom-4
+          right-4
+          z-50
+          flex
+          h-12
+          w-12
+          items-center
+          justify-center
+          rounded-full
+          bg-green-500
+          text-white
+          shadow-lg
+          transition-all
+          duration-300
+          hover:scale-110
+          hover:bg-green-600
+          hover:shadow-xl
+          sm:bottom-6
+          sm:right-6
+          sm:h-14
+          sm:w-14
+          dark:bg-green-600
+          dark:hover:bg-green-500
+        "
+      >
+        <FaWhatsapp size={26} />
+
+        <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4">
+          <span
+            className="
+              absolute
+              inline-flex
+              h-full
+              w-full
+              animate-ping
+              rounded-full
+              bg-orange-400
+              opacity-75
+            "
+          />
+
+          <span
+            className="
+              relative
+              inline-flex
+              h-4
+              w-4
+              rounded-full
+              border-2
+              border-white
+              bg-orange-500
+              dark:border-slate-950
+            "
+          />
+        </span>
+      </button>
     </div>
   );
 };

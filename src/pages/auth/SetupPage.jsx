@@ -10,6 +10,7 @@ import {
   FiImage,
   FiX,
 } from "react-icons/fi";
+import Logo from "../../assets/Logo.png";
 
 const SetupPage = () => {
   const [logoPreview, setLogoPreview] = useState(null);
@@ -45,8 +46,8 @@ const SetupPage = () => {
         {/* Brand */}
         <div className="mb-7 text-center">
           <div className="inline-flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-600 shadow-lg shadow-orange-600/20">
-              <FiBriefcase size={20} className="text-white" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl  shadow-lg shadow-orange-600/20">
+              <img src={Logo} className="h-10 w-10" />
             </div>
 
             <h1 className="text-2xl font-bold tracking-tight text-slate-900">
@@ -64,7 +65,7 @@ const SetupPage = () => {
           {/* Header */}
           <div className="mb-8">
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-orange-50">
-              <FiBriefcase size={22} className="text-orange-600" />
+              <img src={Logo} className="h-10 w-10" />
             </div>
 
             <h2 className="text-2xl font-bold tracking-tight text-slate-900">

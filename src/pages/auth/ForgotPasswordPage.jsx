@@ -7,6 +7,7 @@ import {
   FiArrowLeft,
   FiPrinter,
 } from "react-icons/fi";
+import Logo from "../../assets/Logo.png";
 
 const ForgotPasswordPage = () => {
   const [method, setMethod] = useState("email");
@@ -30,8 +31,8 @@ const ForgotPasswordPage = () => {
         {/* Brand */}
         <div className="mb-7 text-center">
           <div className="mb-3 inline-flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-600 shadow-sm shadow-orange-600/20">
-              <FiPrinter size={20} className="text-white" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl shadow-sm shadow-orange-600/20">
+              <img src={Logo} className="h-10 w-10" />
             </div>
 
             <h1 className="text-2xl font-bold tracking-tight text-slate-900">

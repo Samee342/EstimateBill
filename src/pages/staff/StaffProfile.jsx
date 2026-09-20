@@ -1,518 +1,599 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
-  FiBriefcase,
-  FiCheckCircle,
-  FiClock,
-  FiMail,
-  FiMapPin,
-  FiPhone,
-  FiShield,
   FiUser,
-  FiCalendar,
-  FiActivity,
+  FiMoon,
+  FiSun,
+  FiSave,
+  FiLock,
+  FiEye,
+  FiEyeOff,
+  FiCheck,
 } from "react-icons/fi";
-
-import { getCurrentUser } from "../../utils/auth";
+import { useDispatch, useSelector } from "react-redux";
+import { setTheme } from "../../redux/slices/themeSlice";
 
 const StaffProfile = () => {
-  const user = getCurrentUser();
+  const dispatch = useDispatch();
+  const theme = useSelector((state) => state.theme.theme);
 
-  const userName = user?.name || "Staff Member";
-  const userEmail = user?.email || "Not available";
-  const userRole = user?.role || "staff";
+  // ========================================
+  // STATE
+  // ========================================
 
-  const userInitial = userName.charAt(0).toUpperCase();
+  const [activeSection, setActiveSection] = useState("profile");
+
+  const [profile, setProfile] = useState({
+    name: "printtech staff",
+    email: "staff@printtech.com",
+  });
+
+  const [passwords, setPasswords] = useState({
+    current: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+
+  const [showPasswords, setShowPasswords] = useState({
+    current: false,
+    newPassword: false,
+    confirmPassword: false,
+  });
+
+  const [saved, setSaved] = useState(false);
+
+  // ========================================
+  // LOAD PROFILE
+  // ========================================
+
+  useEffect(() => {
+    const storedProfile = localStorage.getItem("printtech_profile");
+
+    if (storedProfile) {
+      try {
+        setProfile(JSON.parse(storedProfile));
+      } catch (error) {
+        console.error("Failed to load profile:", error);
+      }
+    }
+  }, []);
+
+  // ========================================
+  // PROFILE CHANGE
+  // ========================================
+
+  const handleProfileChange = (e) => {
+    const { name, value } = e.target;
+
+    setProfile((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  // ========================================
+  // PASSWORD CHANGE
+  // ========================================
+
+  const handlePasswordChange = (e) => {
+    const { name, value } = e.target;
+
+    setPasswords((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  // ========================================
+  // SAVE PROFILE
+  // ========================================
+
+  const saveProfile = () => {
+    localStorage.setItem("printtech_profile", JSON.stringify(profile));
+
+    showSavedMessage();
+  };
+
+  // ========================================
+  // SAVED MESSAGE
+  // ========================================
+
+  const showSavedMessage = () => {
+    setSaved(true);
+
+    setTimeout(() => {
+      setSaved(false);
+    }, 2500);
+  };
+
+  // ========================================
+  // UPDATE PASSWORD
+  // ========================================
+
+  const updatePassword = () => {
+    if (
+      !passwords.current ||
+      !passwords.newPassword ||
+      !passwords.confirmPassword
+    ) {
+      alert("Please fill in all password fields.");
+      return;
+    }
+
+    if (passwords.newPassword.length < 6) {
+      alert("New password must be at least 6 characters.");
+      return;
+    }
+
+    if (passwords.newPassword !== passwords.confirmPassword) {
+      alert("New password and confirm password do not match.");
+      return;
+    }
+
+    // Frontend-only for now
+    alert("Password updated successfully.");
+
+    setPasswords({
+      current: "",
+      newPassword: "",
+      confirmPassword: "",
+    });
+
+    showSavedMessage();
+  };
+
+  // ========================================
+  // PASSWORD VISIBILITY
+  // ========================================
+
+  const togglePassword = (field) => {
+    setShowPasswords((prev) => ({
+      ...prev,
+      [field]: !prev[field],
+    }));
+  };
+
+  // ========================================
+  // SETTINGS NAVIGATION
+  // ========================================
+
+  const sections = [
+    {
+      id: "profile",
+      label: "My Profile",
+      description: "Your account",
+      icon: FiUser,
+    },
+    {
+      id: "appearance",
+      label: "Appearance",
+      description: "Theme preferences",
+      icon: theme === "dark" ? FiMoon : FiSun,
+    },
+  ];
+
+  // ========================================
+  // UI
+  // ========================================
 
   return (
-    <div className="space-y-6">
-      {/* =====================================================
-          PAGE HEADER
-      ====================================================== */}
-      <div>
-        <p className="text-xs font-bold uppercase tracking-[0.18em] text-orange-500">
-          Account
-        </p>
+    <div className="min-h-screen bg-slate-50 px-4 py-6 transition-colors dark:bg-slate-950 md:px-6">
+      <div className="mx-auto max-w-7xl">
+        {/* ========================================
+            HEADER
+        ======================================== */}
 
-        <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-          My Profile
-        </h1>
+        <div className="mb-7">
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+            Settings
+          </h1>
 
-        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-          Manage and view your PrintTech staff account information.
-        </p>
-      </div>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+            Manage your PrintTech account and preferences.
+          </p>
+        </div>
 
-      {/* =====================================================
-          PROFILE HERO
-      ====================================================== */}
-      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
-        <div className="flex flex-col lg:flex-row">
-          {/* =====================================================
-        LEFT IDENTITY PANEL
-    ====================================================== */}
-          <div className="relative overflow-hidden bg-orange-500 px-6 py-7 lg:w-[280px] lg:shrink-0">
-            {/* Subtle decorative elements */}
-            <div className="absolute -right-14 -top-14 h-32 w-32 rounded-full border-[18px] border-white/10" />
+        {/* ========================================
+            SAVED MESSAGE
+        ======================================== */}
 
-            <div className="absolute -bottom-16 -left-10 h-32 w-32 rounded-full border-[16px] border-white/10" />
+        {saved && (
+          <div className="mb-5 flex items-center gap-2 border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-700 dark:border-green-900 dark:bg-green-950/40 dark:text-green-400">
+            <FiCheck size={18} />
 
-            <div className="relative flex items-center gap-4 lg:block">
-              {/* Avatar */}
-              <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl border-4 border-white/20 bg-white text-2xl font-bold text-orange-600 shadow-lg">
-                {userInitial}
-              </div>
-
-              <div className="mt-0 lg:mt-5">
-                <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-orange-100">
-                  PrintTech Staff
-                </p>
-
-                <h2 className="mt-1 text-xl font-bold text-white">
-                  {userName}
-                </h2>
-
-                <div className="mt-2 flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-green-300" />
-
-                  <span className="text-xs font-medium text-orange-50">
-                    Currently active
-                  </span>
-                </div>
-              </div>
-            </div>
+            <span>Changes saved successfully.</span>
           </div>
+        )}
 
-          {/* =====================================================
-        CENTER USER INFORMATION
-    ====================================================== */}
-          <div className="flex-1 px-6 py-6">
-            <div className="mb-5">
-              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">
-                Account Information
+        {/* ========================================
+            MAIN LAYOUT
+        ======================================== */}
+
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[250px_1fr]">
+          {/* ========================================
+              SIDEBAR
+          ======================================== */}
+
+          <aside className="h-fit border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+            {/* SIDEBAR HEADER */}
+
+            <div className="border-b border-slate-200 px-5 py-5 dark:border-slate-800">
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                Settings
               </p>
 
-              <h3 className="mt-1 text-lg font-bold text-slate-900 dark:text-white">
-                Staff Account
-              </h3>
+              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                Account preferences
+              </p>
             </div>
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              {/* Email */}
+            {/* NAVIGATION */}
+
+            <div className="p-2">
+              {sections.map((section) => {
+                const Icon = section.icon;
+                const active = activeSection === section.id;
+
+                return (
+                  <button
+                    key={section.id}
+                    type="button"
+                    onClick={() => setActiveSection(section.id)}
+                    className={`mb-1 flex w-full items-center gap-3 px-3 py-3 text-left transition ${
+                      active
+                        ? "bg-orange-500 text-white"
+                        : "text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
+                    }`}
+                  >
+                    <Icon size={18} />
+
+                    <div>
+                      <p className="text-sm font-semibold">{section.label}</p>
+
+                      <p
+                        className={`text-xs ${
+                          active
+                            ? "text-orange-100"
+                            : "text-slate-400 dark:text-slate-500"
+                        }`}
+                      >
+                        {section.description}
+                      </p>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* ACCOUNT TYPE */}
+
+            <div className="border-t border-slate-200 p-4 dark:border-slate-800">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-orange-600 dark:bg-orange-500/10 dark:text-orange-400">
-                  <FiMail size={17} />
+                <div className="flex h-9 w-9 items-center justify-center bg-orange-100 text-sm font-bold text-orange-600 dark:bg-orange-950/50 dark:text-orange-400">
+                  PS
                 </div>
 
                 <div className="min-w-0">
-                  <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
-                    Email
+                  <p className="truncate text-sm font-semibold text-slate-800 dark:text-slate-200">
+                    PrintTech Staff
                   </p>
 
-                  <p className="mt-0.5 truncate text-sm font-semibold text-slate-800 dark:text-slate-200">
-                    {userEmail}
-                  </p>
-                </div>
-              </div>
-
-              {/* Role */}
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                  <FiBriefcase size={17} />
-                </div>
-
-                <div>
-                  <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
-                    Role
-                  </p>
-
-                  <p className="mt-0.5 text-sm font-semibold capitalize text-slate-800 dark:text-slate-200">
-                    {userRole}
-                  </p>
-                </div>
-              </div>
-
-              {/* Department */}
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                  <FiActivity size={17} />
-                </div>
-
-                <div>
-                  <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
-                    Department
-                  </p>
-
-                  <p className="mt-0.5 text-sm font-semibold text-slate-800 dark:text-slate-200">
-                    Production
-                  </p>
-                </div>
-              </div>
-
-              {/* Workspace */}
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                  <FiShield size={17} />
-                </div>
-
-                <div>
-                  <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
-                    Access
-                  </p>
-
-                  <p className="mt-0.5 text-sm font-semibold text-slate-800 dark:text-slate-200">
-                    Staff Workspace
-                  </p>
+                  <p className="text-xs text-slate-400">Staff Account</p>
                 </div>
               </div>
             </div>
-          </div>
+          </aside>
 
-          {/* =====================================================
-        RIGHT STATUS PANEL
-    ====================================================== */}
-          <div className="border-t border-slate-100 px-6 py-6 lg:w-[190px] lg:shrink-0 lg:border-l lg:border-t-0 dark:border-slate-800">
-            <div className="flex h-full flex-col justify-between">
-              <div>
-                <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">
-                  Status
-                </p>
+          {/* ========================================
+              CONTENT
+          ======================================== */}
 
-                <div className="mt-3 flex items-center gap-2">
-                  <span className="relative flex h-3 w-3">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-50" />
+          <main className="min-w-0">
+            {/* ========================================
+                PROFILE
+            ======================================== */}
 
-                    <span className="relative inline-flex h-3 w-3 rounded-full bg-green-500" />
-                  </span>
+            {activeSection === "profile" && (
+              <section className="space-y-6">
+                {/* PERSONAL INFORMATION */}
 
-                  <span className="text-sm font-bold text-green-600 dark:text-green-400">
-                    Active
-                  </span>
-                </div>
-              </div>
+                <div className="border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+                  {/* HEADER */}
 
-              <div className="mt-6 lg:mt-0">
-                <div className="rounded-xl bg-slate-50 px-3 py-3 dark:bg-slate-800/60">
-                  <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
-                    Workspace
-                  </p>
+                  <div className="border-b border-slate-200 px-6 py-5 dark:border-slate-800">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center bg-orange-100 text-orange-600 dark:bg-orange-950/50 dark:text-orange-400">
+                        <FiUser size={20} />
+                      </div>
 
-                  <p className="mt-1 text-xs font-semibold text-slate-700 dark:text-slate-300">
-                    Production Panel
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+                      <div>
+                        <h2 className="font-bold text-slate-900 dark:text-white">
+                          My Profile
+                        </h2>
 
-      {/* =====================================================
-          MAIN CONTENT
-      ====================================================== */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* =================================================
-            PERSONAL INFORMATION
-        ================================================== */}
-        <div className="lg:col-span-2">
-          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
-            {/* Header */}
-            <div className="border-b border-slate-100 px-5 py-4 dark:border-slate-800">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-orange-600 dark:bg-orange-500/10 dark:text-orange-400">
-                  <FiUser size={18} />
-                </div>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">
+                          Manage your personal account information.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
 
-                <div>
-                  <h2 className="font-bold text-slate-900 dark:text-white">
-                    Personal Information
-                  </h2>
+                  {/* FORM */}
 
-                  <p className="mt-0.5 text-xs text-slate-400">
-                    Your basic account details
-                  </p>
-                </div>
-              </div>
-            </div>
+                  <div className="space-y-5 p-6">
+                    <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                      <Input
+                        label="Full Name"
+                        name="name"
+                        value={profile.name}
+                        onChange={handleProfileChange}
+                      />
 
-            {/* Details */}
-            <div className="grid grid-cols-1 gap-1 p-4 sm:grid-cols-2">
-              <ProfileItem icon={FiUser} label="Full Name" value={userName} />
+                      <Input
+                        label="Email Address"
+                        name="email"
+                        type="email"
+                        value={profile.email}
+                        onChange={handleProfileChange}
+                      />
+                    </div>
 
-              <ProfileItem
-                icon={FiMail}
-                label="Email Address"
-                value={userEmail}
-              />
-
-              <ProfileItem
-                icon={FiPhone}
-                label="Phone Number"
-                value={user?.phone || "Not added"}
-              />
-
-              <ProfileItem
-                icon={FiMapPin}
-                label="Location"
-                value={user?.address || "Not added"}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* =================================================
-            WORK INFORMATION
-        ================================================== */}
-        <div>
-          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
-            {/* Header */}
-            <div className="border-b border-slate-100 px-5 py-4 dark:border-slate-800">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400">
-                  <FiBriefcase size={18} />
+                    <div className="flex justify-end border-t border-slate-100 pt-5 dark:border-slate-800">
+                      <SaveButton onClick={saveProfile} />
+                    </div>
+                  </div>
                 </div>
 
-                <div>
-                  <h2 className="font-bold text-slate-900 dark:text-white">
-                    Work Information
-                  </h2>
+                {/* ========================================
+                    CHANGE PASSWORD
+                ======================================== */}
 
-                  <p className="mt-0.5 text-xs text-slate-400">
-                    Your workspace role
-                  </p>
+                <div className="border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+                  {/* HEADER */}
+
+                  <div className="border-b border-slate-200 px-6 py-5 dark:border-slate-800">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                        <FiLock size={19} />
+                      </div>
+
+                      <div>
+                        <h2 className="font-bold text-slate-900 dark:text-white">
+                          Change Password
+                        </h2>
+
+                        <p className="text-sm text-slate-500 dark:text-slate-400">
+                          Update your account password.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* PASSWORD FORM */}
+
+                  <div className="space-y-5 p-6">
+                    <PasswordInput
+                      label="Current Password"
+                      name="current"
+                      value={passwords.current}
+                      show={showPasswords.current}
+                      onChange={handlePasswordChange}
+                      onToggle={() => togglePassword("current")}
+                    />
+
+                    <PasswordInput
+                      label="New Password"
+                      name="newPassword"
+                      value={passwords.newPassword}
+                      show={showPasswords.newPassword}
+                      onChange={handlePasswordChange}
+                      onToggle={() => togglePassword("newPassword")}
+                    />
+
+                    <PasswordInput
+                      label="Confirm New Password"
+                      name="confirmPassword"
+                      value={passwords.confirmPassword}
+                      show={showPasswords.confirmPassword}
+                      onChange={handlePasswordChange}
+                      onToggle={() => togglePassword("confirmPassword")}
+                    />
+
+                    <div className="flex justify-end border-t border-slate-100 pt-5 dark:border-slate-800">
+                      <button
+                        type="button"
+                        onClick={updatePassword}
+                        className="flex items-center gap-2 bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-orange-600"
+                      >
+                        <FiLock size={16} />
+                        Update Password
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
+              </section>
+            )}
 
-            <div className="space-y-1 p-4">
-              <InfoRow icon={FiShield} label="Role" value="Staff" />
+            {/* ========================================
+                APPEARANCE
+            ======================================== */}
 
-              <InfoRow
-                icon={FiBriefcase}
-                label="Department"
-                value="Production"
-              />
+            {activeSection === "appearance" && (
+              <section className="border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+                {/* HEADER */}
 
-              <InfoRow
-                icon={FiCheckCircle}
-                label="Status"
-                value="Active"
-                valueClass="text-green-600 dark:text-green-400"
-              />
+                <div className="border-b border-slate-200 px-6 py-5 dark:border-slate-800">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center bg-orange-100 text-orange-600 dark:bg-orange-950/50 dark:text-orange-400">
+                      {theme === "dark" ? (
+                        <FiMoon size={20} />
+                      ) : (
+                        <FiSun size={20} />
+                      )}
+                    </div>
 
-              <InfoRow
-                icon={FiCalendar}
-                label="Access"
-                value="Staff Workspace"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
+                    <div>
+                      <h2 className="font-bold text-slate-900 dark:text-white">
+                        Appearance
+                      </h2>
 
-      {/* =====================================================
-          WORKSPACE PERMISSIONS
-      ====================================================== */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {/* What Staff Can Do */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-          <div className="flex items-start gap-4">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-orange-600 dark:bg-orange-500/10 dark:text-orange-400">
-              <FiCheckCircle size={19} />
-            </div>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">
+                        Choose how PrintTech looks on your device.
+                      </p>
+                    </div>
+                  </div>
+                </div>
 
-            <div>
-              <h3 className="font-bold text-slate-900 dark:text-white">
-                Your Workspace Access
-              </h3>
+                {/* THEME OPTIONS */}
 
-              <p className="mt-1 text-sm leading-6 text-slate-500 dark:text-slate-400">
-                Your staff account is designed to help you focus on production
-                work assigned to you.
-              </p>
-            </div>
-          </div>
+                <div className="p-6">
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <ThemeOption
+                      active={theme === "light"}
+                      icon={FiSun}
+                      title="Light"
+                      description="Use the standard light interface."
+                      onClick={() => dispatch(setTheme("light"))}
+                    />
 
-          <div className="mt-5 grid grid-cols-1 gap-2 sm:grid-cols-2">
-            <PermissionItem text="View assigned tasks" />
-            <PermissionItem text="Update task status" />
-            <PermissionItem text="Update progress" />
-            <PermissionItem text="View assigned orders" />
-            <PermissionItem text="View customer details" />
-            <PermissionItem text="Track production work" />
-          </div>
-        </div>
-
-        {/* Account Security */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-          <div className="flex items-start gap-4">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400">
-              <FiShield size={19} />
-            </div>
-
-            <div>
-              <h3 className="font-bold text-slate-900 dark:text-white">
-                Account Security
-              </h3>
-
-              <p className="mt-1 text-sm leading-6 text-slate-500 dark:text-slate-400">
-                Your account access is controlled by your PrintTech workspace
-                role.
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-5 space-y-3">
-            <SecurityRow label="Authentication" value="Email & Password" />
-
-            <SecurityRow label="Account Type" value="Staff Account" />
-
-            <SecurityRow label="Access Level" value="Production" />
-          </div>
-        </div>
-      </div>
-
-      {/* =====================================================
-          INFO BANNER
-      ====================================================== */}
-      <div className="overflow-hidden rounded-2xl border border-orange-100 bg-orange-50 dark:border-orange-500/10 dark:bg-orange-500/5">
-        <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-orange-500 text-white shadow-sm">
-            <FiBriefcase size={19} />
-          </div>
-
-          <div className="flex-1">
-            <h3 className="font-bold text-orange-800 dark:text-orange-300">
-              Keep your production work updated
-            </h3>
-
-            <p className="mt-1 text-sm leading-6 text-orange-700/80 dark:text-orange-300/70">
-              Update your assigned task status and progress regularly so the
-              admin can track the complete production workflow.
-            </p>
-          </div>
-
-          <div className="hidden shrink-0 rounded-xl border border-orange-200 bg-white/60 px-4 py-2 text-xs font-semibold text-orange-700 sm:block dark:border-orange-500/20 dark:bg-orange-500/10 dark:text-orange-300">
-            PrintTech Staff
-          </div>
+                    <ThemeOption
+                      active={theme === "dark"}
+                      icon={FiMoon}
+                      title="Dark"
+                      description="Use a darker interface for low-light environments."
+                      onClick={() => dispatch(setTheme("dark"))}
+                    />
+                  </div>
+                </div>
+              </section>
+            )}
+          </main>
         </div>
       </div>
     </div>
   );
 };
 
-/* =========================================================
-   STAT CARD
-========================================================= */
+/* ========================================
+   INPUT COMPONENT
+======================================== */
 
-const StatCard = ({
-  icon: Icon,
+const Input = ({
   label,
+  name,
+  type = "text",
   value,
-  iconBg,
-  iconColor,
-  valueColor = "text-slate-900 dark:text-white",
+  onChange,
+  placeholder,
 }) => {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-slate-800 dark:bg-slate-900">
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <p className="text-xs font-medium text-slate-400">{label}</p>
+    <div>
+      <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+        {label}
+      </label>
 
-          <p className={`mt-2 text-lg font-bold ${valueColor}`}>{value}</p>
-        </div>
+      <input
+        type={type}
+        name={name}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        className="h-11 w-full border border-slate-300 bg-white px-3 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-orange-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:placeholder:text-slate-600"
+      />
+    </div>
+  );
+};
 
+/* ========================================
+   PASSWORD INPUT
+======================================== */
+
+const PasswordInput = ({ label, name, value, show, onChange, onToggle }) => {
+  return (
+    <div>
+      <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+        {label}
+      </label>
+
+      <div className="relative">
+        <input
+          type={show ? "text" : "password"}
+          name={name}
+          value={value}
+          onChange={onChange}
+          className="h-11 w-full border border-slate-300 bg-white px-3 pr-11 text-sm text-slate-700 outline-none transition focus:border-orange-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200"
+        />
+
+        <button
+          type="button"
+          onClick={onToggle}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-600 dark:hover:text-slate-200"
+          aria-label={show ? "Hide password" : "Show password"}
+        >
+          {show ? <FiEyeOff size={17} /> : <FiEye size={17} />}
+        </button>
+      </div>
+    </div>
+  );
+};
+
+/* ========================================
+   SAVE BUTTON
+======================================== */
+
+const SaveButton = ({ onClick }) => {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex items-center gap-2 bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-orange-600"
+    >
+      <FiSave size={16} />
+      Save Changes
+    </button>
+  );
+};
+
+/* ========================================
+   THEME OPTION
+======================================== */
+
+const ThemeOption = ({ active, icon: Icon, title, description, onClick }) => {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`border p-5 text-left transition ${
+        active
+          ? "border-orange-500 bg-orange-50 dark:border-orange-500 dark:bg-orange-950/20"
+          : "border-slate-200 hover:border-slate-300 dark:border-slate-800 dark:hover:border-slate-700"
+      }`}
+    >
+      <div className="flex items-start justify-between">
         <div
-          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${iconBg} ${iconColor}`}
+          className={`flex h-10 w-10 items-center justify-center ${
+            active
+              ? "bg-orange-500 text-white"
+              : "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400"
+          }`}
         >
           <Icon size={19} />
         </div>
-      </div>
-    </div>
-  );
-};
 
-/* =========================================================
-   PROFILE ITEM
-========================================================= */
-
-const ProfileItem = ({ icon: Icon, label, value }) => {
-  return (
-    <div className="group rounded-xl p-4 transition hover:bg-slate-50 dark:hover:bg-slate-800/60">
-      <div className="flex items-start gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-500 transition group-hover:bg-orange-50 group-hover:text-orange-500 dark:bg-slate-800 dark:text-slate-400 dark:group-hover:bg-orange-500/10 dark:group-hover:text-orange-400">
-          <Icon size={17} />
-        </div>
-
-        <div className="min-w-0">
-          <p className="text-xs font-medium text-slate-400">{label}</p>
-
-          <p className="mt-1 break-words text-sm font-semibold text-slate-800 dark:text-slate-200">
-            {value}
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-/* =========================================================
-   INFO ROW
-========================================================= */
-
-const InfoRow = ({
-  icon: Icon,
-  label,
-  value,
-  valueClass = "text-slate-800 dark:text-slate-200",
-}) => {
-  return (
-    <div className="flex items-center justify-between gap-3 rounded-xl px-3 py-3 transition hover:bg-slate-50 dark:hover:bg-slate-800/60">
-      <div className="flex min-w-0 items-center gap-3">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400">
-          <Icon size={15} />
-        </div>
-
-        <span className="text-sm text-slate-500 dark:text-slate-400">
-          {label}
-        </span>
+        {active && (
+          <div className="flex h-5 w-5 items-center justify-center rounded-full bg-orange-500 text-white">
+            <FiCheck size={13} />
+          </div>
+        )}
       </div>
 
-      <span className={`text-sm font-semibold ${valueClass}`}>{value}</span>
-    </div>
-  );
-};
+      <h3 className="mt-4 text-sm font-bold text-slate-900 dark:text-white">
+        {title}
+      </h3>
 
-/* =========================================================
-   PERMISSION ITEM
-========================================================= */
-
-const PermissionItem = ({ text }) => {
-  return (
-    <div className="flex items-center gap-2 rounded-xl border border-slate-100 bg-slate-50 px-3 py-2.5 dark:border-slate-800 dark:bg-slate-800/50">
-      <FiCheckCircle size={15} className="shrink-0 text-green-500" />
-
-      <span className="text-xs font-medium text-slate-600 dark:text-slate-300">
-        {text}
-      </span>
-    </div>
-  );
-};
-
-/* =========================================================
-   SECURITY ROW
-========================================================= */
-
-const SecurityRow = ({ label, value }) => {
-  return (
-    <div className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3 dark:bg-slate-800/60">
-      <span className="text-sm text-slate-500 dark:text-slate-400">
-        {label}
-      </span>
-
-      <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-        {value}
-      </span>
-    </div>
+      <p className="mt-1 text-xs leading-5 text-slate-500 dark:text-slate-400">
+        {description}
+      </p>
+    </button>
   );
 };
 

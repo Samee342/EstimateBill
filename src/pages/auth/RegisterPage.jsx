@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaEye, FaEyeSlash, FaFacebookF, FaGoogle } from "react-icons/fa";
 import svgImage from "../../assets/svgImage.jpg";
+import Logo from "../../assets/Logo.png";
 
 const RegisterPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -33,6 +34,7 @@ const RegisterPage = () => {
           {/* Top Brand Logo */}
           <div className="w-full flex justify-start">
             <div className="flex items-center gap-2">
+              <img src={Logo} className="h-7 w-7" />
               <span className="text-lg font-bold text-slate-800">
                 Print<span className="text-[#FF7A00]">Tech</span>
               </span>
