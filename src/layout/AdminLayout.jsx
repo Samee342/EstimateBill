@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 
 import Sidebar from "../components/SideBar";
-import { getCurrentUser, logoutUser } from "../utils/auth";
+import { getCurrentUser } from "../utils/auth";
 
 import {
   FiMoon,
@@ -11,7 +11,6 @@ import {
   FiChevronDown,
   FiMenu,
   FiSun,
-  FiLogOut,
 } from "react-icons/fi";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -36,8 +35,12 @@ const AdminLayout = () => {
   const [sideBarOpen, setSideBarOpen] = useState(true);
 
   // =========================
-  // LOGOUT
+  // NOTIFICATION
   // =========================
+
+  const handleNotificationClick = () => {
+    navigate("/notifications");
+  };
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
@@ -146,7 +149,11 @@ const AdminLayout = () => {
             "
             aria-label="Toggle theme"
           >
-            {theme === "dark" ? <FiSun size={19} /> : <FiMoon size={19} />}
+            {theme === "dark" ? (
+              <FiSun size={19} />
+            ) : (
+              <FiMoon size={19} />
+            )}
           </button>
 
           {/* =====================================================
@@ -155,19 +162,25 @@ const AdminLayout = () => {
 
           <button
             type="button"
+            onClick={handleNotificationClick}
             className="
               relative rounded-xl
               border border-slate-200
               p-2.5 text-slate-500
               transition
               hover:bg-slate-50
+              hover:text-orange-500
               dark:border-slate-700
               dark:text-slate-300
               dark:hover:bg-slate-800
+              dark:hover:text-orange-400
             "
             aria-label="Notifications"
+            title="Notifications"
           >
             <FiBell size={19} />
+
+            {/* Notification dot */}
 
             <span
               className="
@@ -251,7 +264,10 @@ const AdminLayout = () => {
       ====================================================== */}
 
       <div className="no-print">
-        <Sidebar sideBarOpen={sideBarOpen} setSideBarOpen={setSideBarOpen} />
+        <Sidebar
+          sideBarOpen={sideBarOpen}
+          setSideBarOpen={setSideBarOpen}
+        />
       </div>
 
       {/* =====================================================

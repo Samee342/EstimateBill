@@ -1,4 +1,3 @@
-
 import {
   BrowserRouter,
   Navigate,
@@ -18,82 +17,137 @@ import { getCurrentUser } from "./utils/auth";
 ====================================================== */
 
 const Login = lazy(() => import("./pages/auth/LoginPage"));
-const Register = lazy(() => import("./pages/auth/RegisterPage"));
+
+const Register = lazy(() =>
+  import("./pages/auth/RegisterPage")
+);
+
 const ForgotPassword = lazy(() =>
   import("./pages/auth/ForgotPasswordPage")
 );
-const SetupPage = lazy(() => import("./pages/auth/SetupPage"));
+
+const SetupPage = lazy(() =>
+  import("./pages/auth/SetupPage")
+);
 
 /* ======================================================
    LAYOUTS
 ====================================================== */
 
-const AdminLayout = lazy(() => import("./layout/AdminLayout"));
-const StaffLayout = lazy(() => import("./layout/StaffLayout"));
+const AdminLayout = lazy(() =>
+  import("./layout/AdminLayout")
+);
+
+const StaffLayout = lazy(() =>
+  import("./layout/StaffLayout")
+);
 
 /* ======================================================
    ADMIN PAGES
 ====================================================== */
 
-/* Dashboard */
-const Home = lazy(() => import("./pages/HomePage"));
+/* ================= DASHBOARD ================= */
 
-/* Projects */
-const ProjectPage = lazy(() => import("./pages/project/AllProject"));
+const Home = lazy(() =>
+  import("./pages/HomePage")
+);
+
+/* ================= PROJECTS ================= */
+
+const ProjectPage = lazy(() =>
+  import("./pages/project/AllProject")
+);
+
 const CreateProject = lazy(() =>
   import("./pages/project/CreateProject")
 );
 
-/* Customers */
+/* ================= CUSTOMERS ================= */
+
 const AllCustomers = lazy(() =>
   import("./pages/customers/AllCustomersPage")
 );
+
 const AddCustomer = lazy(() =>
   import("./pages/customers/AddCustomer")
 );
 
-/* Reports */
+/* ================= TEAM ================= */
+
+/*
+  Team is Admin-side staff management.
+
+  Existing:
+  src/pages/staff/
+  is used for Staff-side pages.
+
+  New:
+  src/pages/team/
+  is used for Admin-side team management.
+*/
+
+const AllTeam = lazy(() =>
+  import("./pages/team/AllTeam")
+);
+
+const AddTeamMember = lazy(() =>
+  import("./pages/team/AddTeamMember")
+);
+
+/* ================= REPORTS ================= */
+
 const SalesReport = lazy(() =>
   import("./pages/Reports/SalesReport")
 );
+
 const CustomerReport = lazy(() =>
   import("./pages/Reports/CustomerReport")
 );
+
 const PaymentReport = lazy(() =>
   import("./pages/Reports/PaymentReport")
 );
 
-/* Notifications */
+/* ================= NOTIFICATIONS ================= */
+
 const Notification = lazy(() =>
   import("./pages/Notification/Notification")
 );
 
-/* Settings */
+/* ================= SETTINGS ================= */
+
 const ResetCleanup = lazy(() =>
   import("./pages/settings/ResetCleanup")
 );
+
 const StudioSettings = lazy(() =>
   import("./pages/settings/StudioSettings")
 );
 
-/* Trash */
-const Trash = lazy(() => import("./pages/Trash/trash"));
+/* ================= TRASH ================= */
+
+const Trash = lazy(() =>
+  import("./pages/Trash/trash")
+);
 
 /* ======================================================
    STAFF PAGES
 ====================================================== */
 
-/* Dashboard */
+/* ================= DASHBOARD ================= */
+
 const StaffDashboard = lazy(() =>
   import("./pages/staff/StaffDashboard")
 );
 
-/* Tasks */
+/* ================= TASKS ================= */
+
 const StaffTasks = lazy(() =>
   import("./pages/staff/StaffTasks")
 );
 
-/* Orders */
+/* ================= ORDERS ================= */
+
 const StaffOrders = lazy(() =>
   import("./pages/staff/StaffOrders")
 );
@@ -102,12 +156,14 @@ const StaffOrderDetails = lazy(() =>
   import("./pages/staff/StaffOrderDetails")
 );
 
-/* Customers */
+/* ================= CUSTOMERS ================= */
+
 const StaffCustomers = lazy(() =>
   import("./pages/staff/StaffCustomers")
 );
 
-/* Profile */
+/* ================= PROFILE ================= */
+
 const StaffProfile = lazy(() =>
   import("./pages/staff/StaffProfile")
 );
@@ -120,11 +176,13 @@ const LoadingScreen = () => {
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-950">
       <div className="text-center">
+
         <div className="mx-auto mb-3 h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-orange-600 dark:border-slate-700 dark:border-t-orange-500" />
 
         <p className="text-sm text-slate-500">
           Loading...
         </p>
+
       </div>
     </div>
   );
@@ -138,6 +196,7 @@ const AdminRoute = ({ children }) => {
   const user = getCurrentUser();
 
   /* User not logged in */
+
   if (!user) {
     return (
       <Navigate
@@ -148,6 +207,7 @@ const AdminRoute = ({ children }) => {
   }
 
   /* Logged in but not admin */
+
   if (user.role !== "admin") {
     return (
       <Navigate
@@ -168,6 +228,7 @@ const StaffRoute = ({ children }) => {
   const user = getCurrentUser();
 
   /* User not logged in */
+
   if (!user) {
     return (
       <Navigate
@@ -178,6 +239,7 @@ const StaffRoute = ({ children }) => {
   }
 
   /* Logged in but not staff */
+
   if (user.role !== "staff") {
     return (
       <Navigate
@@ -198,6 +260,7 @@ const RootRedirect = () => {
   const user = getCurrentUser();
 
   /* No user */
+
   if (!user) {
     return (
       <Navigate
@@ -208,6 +271,7 @@ const RootRedirect = () => {
   }
 
   /* Admin */
+
   if (user.role === "admin") {
     return (
       <Navigate
@@ -218,6 +282,7 @@ const RootRedirect = () => {
   }
 
   /* Staff */
+
   if (user.role === "staff") {
     return (
       <Navigate
@@ -228,6 +293,7 @@ const RootRedirect = () => {
   }
 
   /* Unknown role */
+
   return (
     <Navigate
       to="/login"
@@ -243,6 +309,7 @@ const RootRedirect = () => {
 const NotFound = () => {
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-50 p-6 dark:bg-slate-950">
+
       <div className="text-center">
 
         <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-slate-100 dark:bg-slate-800">
@@ -270,6 +337,7 @@ const NotFound = () => {
         </button>
 
       </div>
+
     </div>
   );
 };
@@ -279,6 +347,7 @@ const NotFound = () => {
 ====================================================== */
 
 function App() {
+
   /* ====================================================
      REDUX THEME
   ==================================================== */
@@ -306,6 +375,7 @@ function App() {
     <BrowserRouter>
 
       {/* Route Meta */}
+
       <RouteMeta />
 
       <Suspense fallback={<LoadingScreen />}>
@@ -357,14 +427,14 @@ function App() {
             }
           >
 
-            {/* Dashboard */}
+            {/* ================= DASHBOARD ================= */}
 
             <Route
               path="/dashboard"
               element={<Home />}
             />
 
-            {/* Projects */}
+            {/* ================= PROJECTS ================= */}
 
             <Route
               path="/projects"
@@ -376,7 +446,7 @@ function App() {
               element={<CreateProject />}
             />
 
-            {/* Customers */}
+            {/* ================= CUSTOMERS ================= */}
 
             <Route
               path="/customers"
@@ -388,7 +458,21 @@ function App() {
               element={<AddCustomer />}
             />
 
-            {/* Reports */}
+            {/* ==================================================
+                TEAM
+            ================================================== */}
+
+            <Route
+              path="/team"
+              element={<AllTeam />}
+            />
+
+            <Route
+              path="/team/add"
+              element={<AddTeamMember />}
+            />
+
+            {/* ================= REPORTS ================= */}
 
             <Route
               path="/reports/sales"
@@ -405,14 +489,14 @@ function App() {
               element={<PaymentReport />}
             />
 
-            {/* Notifications */}
+            {/* ================= NOTIFICATIONS ================= */}
 
             <Route
               path="/notifications"
               element={<Notification />}
             />
 
-            {/* Settings */}
+            {/* ================= SETTINGS ================= */}
 
             <Route
               path="/settings/studio"
@@ -424,7 +508,7 @@ function App() {
               element={<ResetCleanup />}
             />
 
-            {/* Trash */}
+            {/* ================= TRASH ================= */}
 
             <Route
               path="/trash"
@@ -445,21 +529,21 @@ function App() {
             }
           >
 
-            {/* Staff Dashboard */}
+            {/* ================= STAFF DASHBOARD ================= */}
 
             <Route
               path="/staff"
               element={<StaffDashboard />}
             />
 
-            {/* My Tasks */}
+            {/* ================= MY TASKS ================= */}
 
             <Route
               path="/staff/tasks"
               element={<StaffTasks />}
             />
 
-            {/* My Orders */}
+            {/* ================= MY ORDERS ================= */}
 
             <Route
               path="/staff/orders"
@@ -471,14 +555,14 @@ function App() {
               element={<StaffOrderDetails />}
             />
 
-            {/* Staff Customers */}
+            {/* ================= STAFF CUSTOMERS ================= */}
 
             <Route
               path="/staff/customers"
               element={<StaffCustomers />}
             />
 
-            {/* Staff Profile */}
+            {/* ================= STAFF PROFILE ================= */}
 
             <Route
               path="/staff/profile"
@@ -505,4 +589,3 @@ function App() {
 }
 
 export default App;
-

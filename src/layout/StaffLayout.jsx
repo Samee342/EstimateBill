@@ -1,4 +1,7 @@
+
+import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
+
 import {
   FiBarChart2,
   FiBriefcase,
@@ -8,20 +11,39 @@ import {
   FiLogOut,
   FiUsers,
   FiUser,
+  FiMoon,
+  FiSun,
+  FiBell,
 } from "react-icons/fi";
-import { useState } from "react";
+
+import { useDispatch, useSelector } from "react-redux";
+import { toggleTheme } from "../redux/slices/themeSlice";
+
 import { getCurrentUser, logoutUser } from "../utils/auth";
 import Logo from "../assets/Logo.png";
 
 const StaffLayout = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  // Current logged-in user
+  // =========================
+  // CURRENT USER
+  // =========================
+
   const user = getCurrentUser();
 
-  // Logout
+  // =========================
+  // THEME
+  // =========================
+
+  const theme = useSelector((state) => state.theme.theme);
+
+  // =========================
+  // LOGOUT
+  // =========================
+
   const handleLogout = () => {
     logoutUser();
 
@@ -30,7 +52,18 @@ const StaffLayout = () => {
     });
   };
 
-  // Navigation items
+  // =========================
+  // NOTIFICATION
+  // =========================
+
+  const handleNotificationClick = () => {
+    navigate("/notifications");
+  };
+
+  // =========================
+  // NAVIGATION ITEMS
+  // =========================
+
   const navigation = [
     {
       name: "Dashboard",
@@ -60,7 +93,10 @@ const StaffLayout = () => {
     },
   ];
 
-  // Sidebar navigation class
+  // =========================
+  // SIDEBAR NAVIGATION CLASS
+  // =========================
+
   const navClass = ({ isActive }) =>
     `group flex items-center rounded-xl transition-all duration-200 ${
       sidebarOpen ? "gap-3 px-3 py-3" : "justify-center px-2 py-3"
@@ -70,66 +106,84 @@ const StaffLayout = () => {
         : "text-slate-600 hover:bg-orange-50 hover:text-orange-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-orange-400"
     }`;
 
-  // User initial
-  const userInitial = user?.name?.charAt(0)?.toUpperCase() || "S";
+  // =========================
+  // USER INITIAL
+  // =========================
+
+  const userInitial =
+    user?.name?.charAt(0)?.toUpperCase() || "S";
 
   return (
     <div className="flex min-h-screen bg-[#f7f8fa] text-slate-800 dark:bg-slate-950 dark:text-slate-100">
+
       {/* =====================================================
           SIDEBAR
       ====================================================== */}
+
       <aside
         className={`fixed left-0 top-0 z-40 flex h-screen flex-col border-r border-slate-200 bg-white transition-all duration-300 dark:border-slate-800 dark:bg-slate-900 ${
           sidebarOpen ? "w-64" : "w-20"
         }`}
       >
-        {/* =================================================
-            LOGO
-        ================================================== */}
+
+        {/* ================= LOGO ================= */}
 
         <div
           className={`flex h-20 shrink-0 items-center border-b border-slate-100 dark:border-slate-800 ${
-            sidebarOpen ? "justify-between px-4" : "justify-center px-3"
+            sidebarOpen
+              ? "justify-between px-4"
+              : "justify-center px-3"
           }`}
         >
-          {sidebarOpen ? (
-            <div className="flex min-w-0 items-center gap-3">
-              {/* Logo */}
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-orange-50 dark:bg-orange-500/10">
-                <img
-                  src={Logo}
-                  alt="PrintTech"
-                  className="h-9 w-9 object-contain"
-                />
-              </div>
 
-              {/* Brand */}
+          {/* Logo + Brand */}
+
+          <NavLink
+            to="/staff"
+            end
+            title="Go to Staff Dashboard"
+            className={`flex min-w-0 items-center ${
+              sidebarOpen ? "gap-3" : "justify-center"
+            }`}
+          >
+
+            {/* Logo */}
+
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-orange-50 dark:bg-orange-500/10">
+              <img
+                src={Logo}
+                alt="PrintTech"
+                className="h-9 w-9 object-contain"
+              />
+            </div>
+
+            {/* Brand */}
+
+            {sidebarOpen && (
               <div className="min-w-0">
+
                 <h1 className="text-[18px] font-bold leading-none tracking-tight text-slate-900 dark:text-white">
-                  Print<span className="text-orange-500">Tech</span>
+                  Print
+                  <span className="text-orange-500">
+                    Tech
+                  </span>
                 </h1>
 
                 <div className="mt-1.5 flex items-center gap-1.5">
+
                   <span className="h-1.5 w-1.5 rounded-full bg-orange-500" />
 
                   <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
                     Staff Panel
                   </p>
+
                 </div>
               </div>
-            </div>
-          ) : (
-            /* Collapsed */
-            <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl  shadow-sm">
-              <img
-                src={Logo}
-                alt="PrintTech"
-                className="h-8 w-8 object-contain"
-              />
-            </div>
-          )}
+            )}
+          </NavLink>
 
-          {/* Sidebar Toggle */}
+          {/* Collapse */}
+
           {sidebarOpen && (
             <button
               type="button"
@@ -142,11 +196,11 @@ const StaffLayout = () => {
           )}
         </div>
 
-        {/* =================================================
-            OPEN SIDEBAR BUTTON
-        ================================================== */}
+        {/* ================= OPEN SIDEBAR ================= */}
+
         {!sidebarOpen && (
           <div className="flex justify-center border-b border-slate-100 py-3 dark:border-slate-800">
+
             <button
               type="button"
               onClick={() => setSidebarOpen(true)}
@@ -155,12 +209,14 @@ const StaffLayout = () => {
             >
               <FiChevronRight size={18} />
             </button>
+
           </div>
         )}
-        {/* =================================================
-            NAVIGATION
-        ================================================== */}
+
+        {/* ================= NAVIGATION ================= */}
+
         <nav className="flex-1 overflow-y-auto overflow-x-hidden px-3 py-5">
+
           {sidebarOpen && (
             <p className="mb-3 px-3 text-[10px] font-bold uppercase tracking-widest text-slate-400">
               Workspace
@@ -168,6 +224,7 @@ const StaffLayout = () => {
           )}
 
           <div className="space-y-1.5">
+
             {navigation.map((item) => {
               const Icon = item.icon;
 
@@ -179,81 +236,209 @@ const StaffLayout = () => {
                   className={navClass}
                   title={!sidebarOpen ? item.name : ""}
                 >
-                  <Icon className="shrink-0" size={18} />
+                  <Icon
+                    className="shrink-0"
+                    size={18}
+                  />
 
                   {sidebarOpen && (
-                    <span className="text-sm font-medium">{item.name}</span>
+                    <span className="text-sm font-medium">
+                      {item.name}
+                    </span>
                   )}
                 </NavLink>
               );
             })}
+
           </div>
         </nav>
-        {/* =================================================
-            USER + LOGOUT
-        ================================================== */}
+
+        {/* ================= LOGOUT ================= */}
+
         <div className="shrink-0 border-t border-slate-100 p-3 dark:border-slate-800">
-          {/* Logout */}
+
           <button
             type="button"
             onClick={handleLogout}
             title={!sidebarOpen ? "Logout" : ""}
             className={`group flex w-full items-center rounded-xl text-red-500 transition-all duration-200 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/30 ${
-              sidebarOpen ? "gap-3 px-3 py-3" : "justify-center px-2 py-3"
+              sidebarOpen
+                ? "gap-3 px-3 py-3"
+                : "justify-center px-2 py-3"
             }`}
           >
-            <FiLogOut className="shrink-0" size={18} />
 
-            {sidebarOpen && <span className="text-sm font-medium">Logout</span>}
+            <FiLogOut
+              className="shrink-0"
+              size={18}
+            />
+
+            {sidebarOpen && (
+              <span className="text-sm font-medium">
+                Logout
+              </span>
+            )}
+
           </button>
+
         </div>
       </aside>
 
       {/* =====================================================
           MAIN AREA
       ====================================================== */}
+
       <div
         className={`flex min-h-screen min-w-0 flex-1 flex-col transition-all duration-300 ${
           sidebarOpen ? "ml-64" : "ml-20"
         }`}
       >
-        {/* =================================================
+
+        {/* =====================================================
             TOP HEADER
-        ================================================== */}
-        <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-slate-200 bg-white/95 px-5 backdrop-blur md:px-8 dark:border-slate-800 dark:bg-slate-900/95">
-          {/* Left */}
+        ====================================================== */}
+
+        <header
+          className="
+            sticky top-0 z-30
+            flex h-20
+            items-center justify-between
+            border-b border-slate-200
+            bg-white/95
+            px-5
+            backdrop-blur
+            md:px-8
+            dark:border-slate-800
+            dark:bg-slate-900/95
+          "
+        >
+
+          {/* ================= LEFT ================= */}
+
           <div>
+
             <p className="text-xs font-medium uppercase tracking-wider text-orange-500">
               Staff Workspace
             </p>
+
           </div>
 
-          {/* Right User */}
+          {/* ================= RIGHT ================= */}
+
           <div className="flex items-center gap-3">
-            {/* User details */}
+
+            {/* =================================================
+                THEME TOGGLE
+            ================================================== */}
+
+            <button
+              type="button"
+              onClick={() => dispatch(toggleTheme())}
+              className="
+                rounded-xl
+                border border-slate-200
+                p-2.5
+                text-slate-500
+                transition
+                hover:bg-slate-50
+                hover:text-orange-500
+                dark:border-slate-700
+                dark:text-slate-300
+                dark:hover:bg-slate-800
+                dark:hover:text-orange-400
+              "
+              aria-label="Toggle theme"
+              title={
+                theme === "dark"
+                  ? "Switch to light mode"
+                  : "Switch to dark mode"
+              }
+            >
+              {theme === "dark" ? (
+                <FiSun size={19} />
+              ) : (
+                <FiMoon size={19} />
+              )}
+            </button>
+
+            {/* =================================================
+                NOTIFICATION
+            ================================================== */}
+
+            <button
+              type="button"
+              onClick={handleNotificationClick}
+              className="
+                relative
+                rounded-xl
+                border border-slate-200
+                p-2.5
+                text-slate-500
+                transition
+                hover:bg-slate-50
+                hover:text-orange-500
+                dark:border-slate-700
+                dark:text-slate-300
+                dark:hover:bg-slate-800
+                dark:hover:text-orange-400
+              "
+              aria-label="Notifications"
+              title="Notifications"
+            >
+
+              <FiBell size={19} />
+
+              {/* Notification Dot */}
+
+              <span
+                className="
+                  absolute
+                  right-2
+                  top-2
+                  h-2
+                  w-2
+                  rounded-full
+                  bg-orange-500
+                "
+              />
+
+            </button>
+
+            {/* =================================================
+                USER DETAILS
+            ================================================== */}
+
             <div className="hidden text-right sm:block">
+
               <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
                 {user?.name || "Staff"}
               </p>
 
-              <p className="text-xs capitalize text-slate-400">
+              <p className="text-xs capitalize text-slate-400 dark:text-slate-500">
                 {user?.role || "staff"}
               </p>
+
             </div>
 
-            {/* Avatar */}
+            {/* =================================================
+                AVATAR
+            ================================================== */}
+
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-100 text-sm font-bold text-orange-600 ring-4 ring-orange-50 dark:bg-orange-500/10 dark:text-orange-400 dark:ring-orange-500/5">
               {userInitial}
             </div>
+
           </div>
         </header>
 
-        {/* =================================================
+        {/* =====================================================
             PAGE CONTENT
-        ================================================== */}
-        <main className="min-w-0 flex-1 p-4 ">
+        ====================================================== */}
+
+        <main className="min-w-0 flex-1 p-4">
           <Outlet />
         </main>
+
       </div>
     </div>
   );
