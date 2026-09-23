@@ -9,9 +9,12 @@ import {
   FiFileText,
 } from "react-icons/fi";
 import { FaMoneyBillWave } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const CustomerReport = () => {
   const [search, setSearch] = useState("");
+
+  const navigate = useNavigate();
 
   const customers = [
     {
@@ -314,15 +317,18 @@ const CustomerReport = () => {
                           {customer.name.charAt(0)}
                         </div>
 
-                        <div>
-                          <p className="text-sm font-semibold dark:text-slate-300">
+                        <td
+                          className="cursor-pointer px-6 py-4 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                          onClick={() => navigate(`/customers/${customer.id}`)}
+                        >
+                          <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 hover:text-orange-500">
                             {customer.name}
                           </p>
 
-                          <p className="mt-1 text-xs text-slate-400">
+                          <p className="mt-1 text-xs text-orange-500">
                             {customer.id}
                           </p>
-                        </div>
+                        </td>
                       </div>
                     </td>
 

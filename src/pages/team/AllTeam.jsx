@@ -226,13 +226,17 @@ const AllTeam = () => {
                     className="border-b border-slate-100 hover:bg-slate-50 dark:hover:bg-slate-700"
                   >
                     <td className="px-5 py-4">
-                      <div>
-                        <p className="font-semibold text-slate-800 dark:text-slate-300">
+                      <button
+                        type="button"
+                        onClick={() => navigate(`/team/${member.id}`)}
+                        className="group text-left"
+                      >
+                        <p className="font-semibold text-slate-800 transition group-hover:text-orange-500 dark:text-slate-300">
                           {member.name}
                         </p>
 
                         <p className="text-xs text-slate-500">{member.id}</p>
-                      </div>
+                      </button>
                     </td>
 
                     <td className="px-5 py-4 text-sm text-slate-600 dark:text-slate-300">

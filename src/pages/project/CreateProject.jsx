@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
@@ -105,10 +104,7 @@ const CreateProject = () => {
 
   const advance = Number(formData.advance) || 0;
 
-  const remainingAmount = Math.max(
-    totalAmount - advance,
-    0
-  );
+  const remainingAmount = Math.max(totalAmount - advance, 0);
 
   // ========================================
   // CREATE PROJECT
@@ -171,14 +167,12 @@ const CreateProject = () => {
       ====================================================== */}
 
       <div className="no-print min-h-screen bg-slate-50 px-4 py-6 dark:bg-slate-700 sm:px-6 lg:px-8">
-
         {/* =====================================================
             PAGE HEADER
         ====================================================== */}
 
         <div className="mx-auto mb-6 max-w-7xl">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-
             <div>
               <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-200">
                 Create Project
@@ -199,30 +193,19 @@ const CreateProject = () => {
               <FiPrinter size={17} />
               Print Estimate
             </button>
-
           </div>
         </div>
 
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="mx-auto max-w-7xl"
-        >
-
+        <form onSubmit={handleSubmit(onSubmit)} className="mx-auto max-w-7xl">
           {/* =====================================================
               01. CUSTOMER INFORMATION
           ====================================================== */}
 
           <div className="mb-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800">
-
             <div className="border-b border-slate-100 px-6 py-5 dark:border-slate-700">
-
               <div className="flex items-center gap-3">
-
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50">
-                  <FiUser
-                    className="text-orange-600"
-                    size={18}
-                  />
+                  <FiUser className="text-orange-600" size={18} />
                 </div>
 
                 <div>
@@ -234,9 +217,7 @@ const CreateProject = () => {
                     Enter customer and estimate details.
                   </p>
                 </div>
-
               </div>
-
             </div>
 
             <EstimateHeader
@@ -244,7 +225,6 @@ const CreateProject = () => {
               errors={errors}
               setValue={setValue}
             />
-
           </div>
 
           {/* =====================================================
@@ -252,16 +232,10 @@ const CreateProject = () => {
           ====================================================== */}
 
           <div className="mb-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800">
-
             <div className="border-b border-slate-100 px-6 py-5 dark:border-slate-700">
-
               <div className="flex items-center gap-3">
-
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50">
-                  <FiBriefcase
-                    className="text-orange-600"
-                    size={18}
-                  />
+                  <FiBriefcase className="text-orange-600" size={18} />
                 </div>
 
                 <div>
@@ -273,13 +247,10 @@ const CreateProject = () => {
                     Enter the main details of this customer order.
                   </p>
                 </div>
-
               </div>
-
             </div>
 
             <div className="grid grid-cols-1 gap-5 p-6 md:grid-cols-2">
-
               {/* PROJECT NAME */}
 
               <div>
@@ -346,7 +317,6 @@ const CreateProject = () => {
               {/* DESCRIPTION */}
 
               <div className="md:col-span-2">
-
                 <label className="mb-2 flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
                   <FiFileText size={15} />
                   Order Description
@@ -358,11 +328,8 @@ const CreateProject = () => {
                   {...register("description")}
                   className="w-full resize-none rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
                 />
-
               </div>
-
             </div>
-
           </div>
 
           {/* =====================================================
@@ -370,11 +337,8 @@ const CreateProject = () => {
           ====================================================== */}
 
           <div className="mb-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800">
-
             <div className="border-b border-slate-100 px-6 py-5 dark:border-slate-700">
-
               <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-
                 <div>
                   <h2 className="font-semibold text-slate-900 dark:text-slate-200">
                     03. Printing Items
@@ -386,23 +350,14 @@ const CreateProject = () => {
                 </div>
 
                 <div className="rounded-lg bg-orange-50 px-3 py-1.5 text-xs font-medium text-orange-600">
-                  {items?.length || 0}{" "}
-                  {items?.length === 1 ? "Item" : "Items"}
+                  {items?.length || 0} {items?.length === 1 ? "Item" : "Items"}
                 </div>
-
               </div>
-
             </div>
 
             <div className="p-4 sm:p-6">
-
-              <EstimateItems
-                control={control}
-                register={register}
-              />
-
+              <EstimateItems control={control} register={register} />
             </div>
-
           </div>
 
           {/* =====================================================
@@ -410,12 +365,7 @@ const CreateProject = () => {
           ====================================================== */}
 
           <div className="mb-6">
-
-            <EstimateSummary
-              control={control}
-              register={register}
-            />
-
+            <EstimateSummary control={control} register={register} />
           </div>
 
           {/* =====================================================
@@ -423,16 +373,10 @@ const CreateProject = () => {
           ====================================================== */}
 
           <div className="mb-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800">
-
             <div className="border-b border-slate-100 px-6 py-5 dark:border-slate-700">
-
               <div className="flex items-center gap-3">
-
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50">
-                  <FiCreditCard
-                    className="text-orange-600"
-                    size={18}
-                  />
+                  <FiCreditCard className="text-orange-600" size={18} />
                 </div>
 
                 <div>
@@ -444,17 +388,13 @@ const CreateProject = () => {
                     Record advance payment and payment status.
                   </p>
                 </div>
-
               </div>
-
             </div>
 
             <div className="grid grid-cols-1 gap-5 p-6 md:grid-cols-3">
-
               {/* TOTAL */}
 
               <div className="rounded-xl bg-slate-50 p-4 dark:bg-slate-700">
-
                 <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
                   Total Amount
                 </p>
@@ -462,13 +402,11 @@ const CreateProject = () => {
                 <p className="mt-2 text-xl font-bold text-slate-800 dark:text-white">
                   Rs. {totalAmount.toLocaleString("en-IN")}
                 </p>
-
               </div>
 
               {/* ADVANCE */}
 
               <div>
-
                 <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
                   Advance Payment
                 </label>
@@ -481,13 +419,11 @@ const CreateProject = () => {
                   {...register("advance")}
                   className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
                 />
-
               </div>
 
               {/* REMAINING */}
 
               <div className="rounded-xl bg-orange-50 p-4 dark:bg-orange-900/20">
-
                 <p className="text-xs font-medium uppercase tracking-wide text-orange-500">
                   Remaining
                 </p>
@@ -495,13 +431,11 @@ const CreateProject = () => {
                 <p className="mt-2 text-xl font-bold text-orange-600">
                   Rs. {remainingAmount.toLocaleString("en-IN")}
                 </p>
-
               </div>
 
               {/* PAYMENT METHOD */}
 
               <div>
-
                 <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
                   Payment Method
                 </label>
@@ -511,20 +445,16 @@ const CreateProject = () => {
                   className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
                 >
                   <option value="Cash">Cash</option>
-                  <option value="Bank Transfer">
-                    Bank Transfer
-                  </option>
+                  <option value="Bank Transfer">Bank Transfer</option>
                   <option value="Card">Card</option>
                   <option value="eSewa">eSewa</option>
                   <option value="Khalti">Khalti</option>
                 </select>
-
               </div>
 
               {/* PAYMENT STATUS */}
 
               <div>
-
                 <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
                   Payment Status
                 </label>
@@ -537,13 +467,11 @@ const CreateProject = () => {
                   <option value="Partial">Partial</option>
                   <option value="Paid">Paid</option>
                 </select>
-
               </div>
 
               {/* PAYMENT DATE */}
 
               <div>
-
                 <label className="mb-2 flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
                   <FiCalendar size={15} />
                   Payment Date
@@ -554,11 +482,8 @@ const CreateProject = () => {
                   {...register("paymentDate")}
                   className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
                 />
-
               </div>
-
             </div>
-
           </div>
 
           {/* =====================================================
@@ -566,11 +491,7 @@ const CreateProject = () => {
           ====================================================== */}
 
           <div className="mb-6">
-
-            <EstimateFooter
-              register={register}
-            />
-
+            <EstimateFooter register={register} />
           </div>
 
           {/* =====================================================
@@ -578,19 +499,14 @@ const CreateProject = () => {
           ====================================================== */}
 
           <div className="mb-6 flex justify-end">
-
             <div className="w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800 sm:w-96">
-
               <div className="border-b border-slate-100 px-5 py-4 dark:border-slate-700">
-
                 <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                   Estimate Summary
                 </p>
-
               </div>
 
               <div className="space-y-3 px-5 py-5">
-
                 <div className="flex justify-between">
                   <span className="text-sm text-slate-500 dark:text-slate-400">
                     Total
@@ -612,9 +528,7 @@ const CreateProject = () => {
                 </div>
 
                 <div className="border-t border-slate-100 pt-3 dark:border-slate-700">
-
                   <div className="flex justify-between">
-
                     <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
                       Remaining
                     </span>
@@ -622,15 +536,10 @@ const CreateProject = () => {
                     <span className="text-xl font-bold text-orange-600">
                       Rs. {remainingAmount.toLocaleString("en-IN")}
                     </span>
-
                   </div>
-
                 </div>
-
               </div>
-
             </div>
-
           </div>
 
           {/* =====================================================
@@ -638,7 +547,6 @@ const CreateProject = () => {
           ====================================================== */}
 
           <div className="mb-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-
             <button
               type="button"
               onClick={() => navigate("/projects")}
@@ -662,9 +570,7 @@ const CreateProject = () => {
             >
               Create Project
             </button>
-
           </div>
-
         </form>
       </div>
 
@@ -673,41 +579,20 @@ const CreateProject = () => {
       =========================================================== */}
 
       <div className="print-estimate">
-
         {/* PRINT HEADER */}
 
         <div className="print-header">
-
-          <div className="print-logo-section">
-
-            <img
-              src={Logo}
-              alt="PrintTech"
-              className="print-logo"
-            />
-
-          </div>
-
           <div className="print-title-section">
-
-            <h1>ESTIMATE SLIP</h1>
+            <h1 className="text-center">ESTIMATE SLIP</h1>
 
             <p>
-              PPP No:{" "}
-              <strong>
-                {formData.slipNumber || "-"}
-              </strong>
+              PPP No: <strong>{formData.slipNumber || "-"}</strong>
             </p>
 
             <p>
-              मिति:{" "}
-              <strong>
-                {formData.date || "-"}
-              </strong>
+              मिति: <strong>{formData.date || "-"}</strong>
             </p>
-
           </div>
-
         </div>
 
         {/* =====================================================
@@ -715,38 +600,29 @@ const CreateProject = () => {
         ====================================================== */}
 
         <div className="print-section">
-
           <h2>CUSTOMER INFORMATION</h2>
 
           <div className="customer-grid">
-
             <div>
-              <strong>Customer Name:</strong>{" "}
-              {formData.customerName || "-"}
+              <strong>Customer Name:</strong> {formData.customerName || "-"}
             </div>
 
             <div>
-              <strong>Contact:</strong>{" "}
-              {formData.contactNumber || "-"}
+              <strong>Contact:</strong> {formData.contactNumber || "-"}
             </div>
 
             <div>
-              <strong>PAN/VAT No:</strong>{" "}
-              {formData.panNumber || "-"}
+              <strong>PAN/VAT No:</strong> {formData.panNumber || "-"}
             </div>
 
             <div>
-              <strong>Project:</strong>{" "}
-              {formData.projectName || "-"}
+              <strong>Project:</strong> {formData.projectName || "-"}
             </div>
 
             <div className="full-width">
-              <strong>Address:</strong>{" "}
-              {formData.address || "-"}
+              <strong>Address:</strong> {formData.address || "-"}
             </div>
-
           </div>
-
         </div>
 
         {/* =====================================================
@@ -754,38 +630,29 @@ const CreateProject = () => {
         ====================================================== */}
 
         <div className="print-section">
-
           <h2>PROJECT INFORMATION</h2>
 
           <div className="customer-grid">
-
             <div>
-              <strong>Project Name:</strong>{" "}
-              {formData.projectName || "-"}
+              <strong>Project Name:</strong> {formData.projectName || "-"}
             </div>
 
             <div>
-              <strong>Priority:</strong>{" "}
-              {formData.priority || "-"}
+              <strong>Priority:</strong> {formData.priority || "-"}
             </div>
 
             <div>
-              <strong>Due Date:</strong>{" "}
-              {formData.dueDate || "-"}
+              <strong>Due Date:</strong> {formData.dueDate || "-"}
             </div>
 
             <div>
-              <strong>Customer:</strong>{" "}
-              {formData.customer || "-"}
+              <strong>Customer:</strong> {formData.customer || "-"}
             </div>
 
             <div className="full-width">
-              <strong>Description:</strong>{" "}
-              {formData.description || "-"}
+              <strong>Description:</strong> {formData.description || "-"}
             </div>
-
           </div>
-
         </div>
 
         {/* =====================================================
@@ -793,13 +660,10 @@ const CreateProject = () => {
         ====================================================== */}
 
         <div className="print-section">
-
           <h2>PRINTING DETAILS</h2>
 
           <table className="print-table">
-
             <thead>
-
               <tr>
                 <th>S.N.</th>
                 <th>Description</th>
@@ -812,76 +676,42 @@ const CreateProject = () => {
                 <th>Work Type</th>
                 <th>Amount</th>
               </tr>
-
             </thead>
 
             <tbody>
-
               {formData.items?.map((item, index) => {
+                const quantity = Number(item.quantity) || 0;
 
-                const quantity =
-                  Number(item.quantity) || 0;
+                const rate = Number(item.rate) || 0;
 
-                const rate =
-                  Number(item.rate) || 0;
-
-                const amount =
-                  quantity * rate;
+                const amount = quantity * rate;
 
                 return (
                   <tr key={index}>
+                    <td>{index + 1}</td>
 
-                    <td>
-                      {index + 1}
-                    </td>
+                    <td>{item.description || "-"}</td>
 
-                    <td>
-                      {item.description || "-"}
-                    </td>
+                    <td>{item.size || "-"}</td>
 
-                    <td>
-                      {item.size || "-"}
-                    </td>
+                    <td>{quantity}</td>
 
-                    <td>
-                      {quantity}
-                    </td>
+                    <td>Rs. {rate.toLocaleString("en-IN")}</td>
 
-                    <td>
-                      Rs.{" "}
-                      {rate.toLocaleString("en-IN")}
-                    </td>
+                    <td>{item.ink || "-"}</td>
 
-                    <td>
-                      {item.ink || "-"}
-                    </td>
+                    <td>{item.paperType || "-"}</td>
 
-                    <td>
-                      {item.paperType || "-"}
-                    </td>
+                    <td>{item.bindingType || "-"}</td>
 
-                    <td>
-                      {item.bindingType || "-"}
-                    </td>
+                    <td>{item.workType || "-"}</td>
 
-                    <td>
-                      {item.workType || "-"}
-                    </td>
-
-                    <td>
-                      Rs.{" "}
-                      {amount.toLocaleString("en-IN")}
-                    </td>
-
+                    <td>Rs. {amount.toLocaleString("en-IN")}</td>
                   </tr>
                 );
-
               })}
-
             </tbody>
-
           </table>
-
         </div>
 
         {/* =====================================================
@@ -889,15 +719,11 @@ const CreateProject = () => {
         ====================================================== */}
 
         <div className="print-section">
-
           <h2>छपाइको पुर्ण बीवरण :</h2>
 
           <div className="printing-description">
-            {formData.printingDetails ||
-              formData.description ||
-              "-"}
+            {formData.printingDetails || formData.description || "-"}
           </div>
-
         </div>
 
         {/* =====================================================
@@ -905,33 +731,25 @@ const CreateProject = () => {
         ====================================================== */}
 
         <div className="print-section">
-
           <h2>PAYMENT INFORMATION</h2>
 
           <div className="customer-grid">
-
             <div>
-              <strong>Payment Method:</strong>{" "}
-              {formData.paymentMethod || "-"}
+              <strong>Payment Method:</strong> {formData.paymentMethod || "-"}
             </div>
 
             <div>
-              <strong>Payment Status:</strong>{" "}
-              {formData.paymentStatus || "-"}
+              <strong>Payment Status:</strong> {formData.paymentStatus || "-"}
             </div>
 
             <div>
-              <strong>Payment Date:</strong>{" "}
-              {formData.paymentDate || "-"}
+              <strong>Payment Date:</strong> {formData.paymentDate || "-"}
             </div>
 
             <div>
-              <strong>Due Date:</strong>{" "}
-              {formData.dueDate || "-"}
+              <strong>Due Date:</strong> {formData.dueDate || "-"}
             </div>
-
           </div>
-
         </div>
 
         {/* =====================================================
@@ -939,118 +757,45 @@ const CreateProject = () => {
         ====================================================== */}
 
         <div className="print-summary-wrapper">
-
           <table className="print-summary">
-
             <tbody>
-
               <tr>
+                <td>जम्मा रकम</td>
 
-                <td>
-                  जम्मा रकम
-                </td>
-
-                <td>
-                  Rs.{" "}
-                  {totalAmount.toLocaleString("en-IN")}
-                </td>
-
+                <td>Rs. {totalAmount.toLocaleString("en-IN")}</td>
               </tr>
 
               <tr>
+                <td>पेस्की</td>
 
-                <td>
-                  पेस्की
-                </td>
-
-                <td>
-                  Rs.{" "}
-                  {advance.toLocaleString("en-IN")}
-                </td>
-
+                <td>Rs. {advance.toLocaleString("en-IN")}</td>
               </tr>
 
               <tr>
+                <td>बाँकी</td>
 
-                <td>
-                  बाँकी
-                </td>
-
-                <td>
-                  Rs.{" "}
-                  {remainingAmount.toLocaleString("en-IN")}
-                </td>
-
+                <td>Rs. {remainingAmount.toLocaleString("en-IN")}</td>
               </tr>
 
               <tr>
+                <td>Payment Method</td>
 
-                <td>
-                  Payment Method
-                </td>
-
-                <td>
-                  {formData.paymentMethod || "-"}
-                </td>
-
+                <td>{formData.paymentMethod || "-"}</td>
               </tr>
 
               <tr>
+                <td>Payment Status</td>
 
-                <td>
-                  Payment Status
-                </td>
-
-                <td>
-                  {formData.paymentStatus || "-"}
-                </td>
-
+                <td>{formData.paymentStatus || "-"}</td>
               </tr>
 
               <tr>
+                <td>सामान दिने मिति</td>
 
-                <td>
-                  सामान दिने मिति
-                </td>
-
-                <td>
-                  {formData.dueDate || "-"}
-                </td>
-
+                <td>{formData.dueDate || "-"}</td>
               </tr>
-
             </tbody>
-
           </table>
-
-        </div>
-
-        {/* =====================================================
-            SIGNATURE
-        ====================================================== */}
-
-        <div className="print-signatures">
-
-          <div>
-
-            <div className="signature-line"></div>
-
-            <p>
-              Customer Signature
-            </p>
-
-          </div>
-
-          <div>
-
-            <div className="signature-line"></div>
-
-            <p>
-              Authorized Signature
-            </p>
-
-          </div>
-
         </div>
 
         {/* =====================================================
@@ -1058,21 +803,13 @@ const CreateProject = () => {
         ====================================================== */}
 
         <div className="print-footer">
+          <p>PrintTech Printing Press</p>
 
-          <p>
-            PrintTech Printing Press
-          </p>
-
-          <p>
-            Thank you for your business.
-          </p>
-
+          <p>Thank you for your business.</p>
         </div>
-
       </div>
     </>
   );
 };
 
 export default CreateProject;
-

@@ -11,10 +11,13 @@ import {
 } from "react-icons/fi";
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
 
 const AllProject = () => {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
+
+  const navigate = useNavigate();
 
   // ================= PROJECT DATA =================
 
@@ -390,13 +393,17 @@ const AllProject = () => {
                     {/* Project */}
 
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => navigate(`/projects/${project.id}`)}
+                        className="flex items-center gap-3 text-left"
+                      >
                         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-orange-500 dark:bg-orange-500/10">
                           <FiFileText size={18} />
                         </div>
 
                         <div className="min-w-0">
-                          <p className="max-w-[220px] truncate text-sm font-semibold text-slate-800 dark:text-slate-200">
+                          <p className="max-w-[220px] truncate text-sm font-semibold text-slate-800 transition hover:text-orange-500 dark:text-slate-200">
                             {project.name}
                           </p>
 
@@ -404,9 +411,8 @@ const AllProject = () => {
                             {project.id}
                           </p>
                         </div>
-                      </div>
+                      </button>
                     </td>
-
                     {/* Customer */}
 
                     <td className="px-6 py-4">
@@ -536,19 +542,25 @@ const AllProject = () => {
 
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex min-w-0 items-center gap-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-orange-500 dark:bg-orange-500/10">
-                      <FiFileText size={18} />
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => navigate(`/projects/${project.id}`)}
+                      className="flex min-w-0 items-center gap-3 text-left"
+                    >
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-orange-500 dark:bg-orange-500/10">
+                        <FiFileText size={18} />
+                      </div>
 
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold text-slate-800 dark:text-slate-200">
-                        {project.name}
-                      </p>
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-semibold text-slate-800 dark:text-slate-200">
+                          {project.name}
+                        </p>
 
-                      <p className="mt-1 text-xs text-orange-500">
-                        {project.id}
-                      </p>
-                    </div>
+                        <p className="mt-1 text-xs text-orange-500">
+                          {project.id}
+                        </p>
+                      </div>
+                    </button>
                   </div>
 
                   <button

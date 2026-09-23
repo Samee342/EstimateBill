@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   FaUser,
   FaPhone,
@@ -11,61 +12,179 @@ import {
 } from "react-icons/fa";
 
 const AddCustomer = () => {
+  const navigate = useNavigate();
+  const { id } = useParams();
+
+  const isEditMode = Boolean(id);
+
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
-  } = useForm();
+  } = useForm({
+    defaultValues: {
+      fullName: "",
+      phone: "",
+      email: "",
+      company: "",
+      customerType: "individual",
+      address: "",
+      notes: "",
+    },
+  });
 
+  // =========================================================
+  // EDIT MODE
+  // =========================================================
+  useEffect(() => {
+    if (!isEditMode) return;
+
+    // Temporary customer data
+    // Replace this later with API data from useCustomer(id)
+    const customers = [
+      {
+        id: "CUS-1001",
+        fullName: "Ram Sharma",
+        phone: "9841234567",
+        email: "ram@example.com",
+        company: "Ram Enterprises",
+        customerType: "business",
+        address: "Butwal, Rupandehi",
+        notes: "Regular printing customer.",
+      },
+      {
+        id: "CUS-1002",
+        fullName: "Sita Karki",
+        phone: "9851234567",
+        email: "sita@example.com",
+        company: "Sita Collection",
+        customerType: "business",
+        address: "Bhairahawa, Rupandehi",
+        notes: "",
+      },
+    ];
+
+    const customer = customers.find((item) => item.id === id);
+
+    if (customer) {
+      reset({
+        fullName: customer.fullName || "",
+        phone: customer.phone || "",
+        email: customer.email || "",
+        company: customer.company || "",
+        customerType: customer.customerType || "individual",
+        address: customer.address || "",
+        notes: customer.notes || "",
+      });
+    }
+  }, [id, isEditMode, reset]);
+
+  // =========================================================
+  // SUBMIT
+  // =========================================================
   const onSubmit = async (data) => {
-    console.log("Customer Data:", data);
+    try {
+      if (isEditMode) {
+        console.log("Updating Customer:", id, data);
 
-    // API call here
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+        // API call here
+        await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    reset();
+        alert("Customer updated successfully");
+      } else {
+        console.log("Creating Customer:", data);
+
+        // API call here
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
+        alert("Customer created successfully");
+      }
+
+      navigate("/customers");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  // =========================================================
+  // CANCEL
+  // =========================================================
+  const handleCancel = () => {
+    navigate("/customers");
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-800 px-4 py-8 sm:px-6 lg:px-10">
+    <div className="min-h-screen bg-slate-50 px-4 py-8 dark:bg-slate-800 sm:px-6 lg:px-10">
       <div className="mx-auto max-w-4xl">
-        {/* Header */}
-        <div className="mb-5">
+        {/* =====================================================
+            HEADER
+        ====================================================== */}
+        <div className="mb-5 flex items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-300 sm:text-3xl">
-              Add Customer
+              {isEditMode ? "Edit Customer" : "Add Customer"}
             </h1>
+
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+              {isEditMode
+                ? "Update customer information"
+                : "Add a new customer to your system"}
+            </p>
           </div>
+
+          <button
+            type="button"
+            onClick={handleCancel}
+            className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600"
+          >
+            <FaArrowLeft size={14} />
+            <span className="hidden sm:inline">Back</span>
+          </button>
         </div>
 
-        {/* Form Card */}
-        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white dark:bg-slate-800 shadow-sm">
-          {/* Card Header */}
-          <div className="border-b border-slate-100 bg-slate-50/70 dark:bg-slate-800 px-3 py-2  sm:px-8">
+        {/* =====================================================
+            FORM CARD
+        ====================================================== */}
+        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800">
+          {/* ===================================================
+              CARD HEADER
+          ==================================================== */}
+          <div className="border-b border-slate-100 bg-slate-50/70 px-4 py-3 dark:border-slate-700 dark:bg-slate-800 sm:px-8">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-100 text-orange-600">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-100 text-orange-600 dark:bg-orange-500/10 dark:text-orange-400">
                 <FaUser />
               </div>
+
               <div>
                 <h2 className="font-semibold text-slate-900 dark:text-slate-300">
                   Customer Information
                 </h2>
+
+                <p className="mt-0.5 text-xs text-slate-400">
+                  {isEditMode
+                    ? `Editing ${id}`
+                    : "Enter customer details below"}
+                </p>
               </div>
             </div>
           </div>
 
-          {/* Form */}
+          {/* ===================================================
+              FORM
+          ==================================================== */}
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="space-y-8 px-4 py-7 sm:px-8">
-              {/* Personal Information */}
+              {/* =================================================
+                  PERSONAL INFORMATION
+              ================================================== */}
               <div>
                 <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-slate-400">
                   Personal Information
                 </h3>
 
                 <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                  {/* Full Name */}
+                  {/* FULL NAME */}
                   <div className="sm:col-span-2">
                     <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
                       Full Name
@@ -78,7 +197,7 @@ const AddCustomer = () => {
                       <input
                         type="text"
                         placeholder="Enter customer's full name"
-                        className={`w-full rounded-xl border bg-white dark:bg-slate-700 dark:text-slate-300 py-3 pl-11 pr-4 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:ring-2 ${
+                        className={`w-full rounded-xl border bg-white py-3 pl-11 pr-4 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:ring-2 dark:bg-slate-700 dark:text-slate-300 ${
                           errors.fullName
                             ? "border-red-400 focus:border-red-500 focus:ring-red-100"
                             : "border-slate-200 focus:border-orange-500 focus:ring-orange-100"
@@ -100,7 +219,7 @@ const AddCustomer = () => {
                     )}
                   </div>
 
-                  {/* Phone */}
+                  {/* PHONE */}
                   <div>
                     <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
                       Phone Number
@@ -113,7 +232,7 @@ const AddCustomer = () => {
                       <input
                         type="tel"
                         placeholder="98XXXXXXXX"
-                        className={`w-full rounded-xl border bg-white dark:bg-slate-700 dark:text-slate-300 py-3 pl-11 pr-4 text-sm outline-none transition placeholder:text-slate-400 focus:ring-2 ${
+                        className={`w-full rounded-xl border bg-white py-3 pl-11 pr-4 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:ring-2 dark:bg-slate-700 dark:text-slate-300 ${
                           errors.phone
                             ? "border-red-400 focus:border-red-500 focus:ring-red-100"
                             : "border-slate-200 focus:border-orange-500 focus:ring-orange-100"
@@ -135,7 +254,7 @@ const AddCustomer = () => {
                     )}
                   </div>
 
-                  {/* Email */}
+                  {/* EMAIL */}
                   <div>
                     <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
                       Email Address
@@ -147,8 +266,10 @@ const AddCustomer = () => {
                       <input
                         type="email"
                         placeholder="customer@example.com"
-                        className={`w-full rounded-xl border bg-white dark:bg-slate-700 dark:text-slate-300 py-3 pl-11 pr-4 text-sm outline-none transition placeholder:text-slate-400 focus:border-orange-500 focus:ring-2 focus:ring-orange-100 ${
-                          errors.email ? "border-red-400" : "border-slate-200"
+                        className={`w-full rounded-xl border bg-white py-3 pl-11 pr-4 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:ring-2 dark:bg-slate-700 dark:text-slate-300 ${
+                          errors.email
+                            ? "border-red-400 focus:border-red-500 focus:ring-red-100"
+                            : "border-slate-200 focus:border-orange-500 focus:ring-orange-100"
                         }`}
                         {...register("email", {
                           pattern: {
@@ -168,14 +289,16 @@ const AddCustomer = () => {
                 </div>
               </div>
 
-              {/* Business Information */}
-              <div className="border-t border-slate-100 pt-7">
+              {/* =================================================
+                  BUSINESS INFORMATION
+              ================================================== */}
+              <div className="border-t border-slate-100 pt-7 dark:border-slate-700">
                 <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-slate-400">
                   Business Information
                 </h3>
 
                 <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                  {/* Company */}
+                  {/* COMPANY */}
                   <div>
                     <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
                       Company / Business
@@ -187,31 +310,34 @@ const AddCustomer = () => {
                       <input
                         type="text"
                         placeholder="Company name"
-                        className="w-full rounded-xl border border-slate-200 bg-white dark:bg-slate-700 dark:text-slate-300 py-3 pl-11 pr-4 text-sm outline-none transition placeholder:text-slate-400 focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+                        className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-11 pr-4 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-orange-500 focus:ring-2 focus:ring-orange-100 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-300"
                         {...register("company")}
                       />
                     </div>
                   </div>
 
-                  {/* Customer Type */}
+                  {/* CUSTOMER TYPE */}
                   <div>
                     <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
                       Customer Type
                     </label>
 
                     <select
-                      className="w-full rounded-xl border border-slate-200 bg-white dark:bg-slate-700 dark:text-slate-300 px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+                      className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-300"
                       {...register("customerType")}
                     >
                       <option value="individual">Individual</option>
+
                       <option value="business">Business</option>
                     </select>
                   </div>
                 </div>
               </div>
 
-              {/* Address */}
-              <div className="border-t border-slate-100 pt-7">
+              {/* =================================================
+                  ADDRESS
+              ================================================== */}
+              <div className="border-t border-slate-100 pt-7 dark:border-slate-700">
                 <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-slate-400">
                   Address
                 </h3>
@@ -222,33 +348,37 @@ const AddCustomer = () => {
                   <textarea
                     rows="3"
                     placeholder="Enter customer's address"
-                    className="w-full resize-none rounded-xl border border-slate-200 bg-white dark:text-slate-300 dark:bg-slate-800  py-3 pl-11 pr-4 text-sm outline-none transition placeholder:text-slate-400 focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+                    className="w-full resize-none rounded-xl border border-slate-200 bg-white py-3 pl-11 pr-4 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-orange-500 focus:ring-2 focus:ring-orange-100 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-300"
                     {...register("address")}
                   />
                 </div>
               </div>
 
-              {/* Notes */}
+              {/* =================================================
+                  NOTES
+              ================================================== */}
               <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700">
+                <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
                   Notes
                 </label>
 
                 <textarea
                   rows="3"
                   placeholder="Add any additional notes about this customer..."
-                  className="w-full resize-none rounded-xl border border-slate-200 bg-white dark:bg-slate-700 dark:text-slate-300  px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+                  className="w-full resize-none rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-orange-500 focus:ring-2 focus:ring-orange-100 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-300"
                   {...register("notes")}
                 />
               </div>
             </div>
 
-            {/* Footer */}
-            <div className="flex flex-col-reverse gap-3 border-t border-slate-100 dark:bg-slate-800 bg-slate-50/50 px-6 py-5 sm:flex-row sm:justify-end sm:px-8">
+            {/* ===================================================
+                FOOTER
+            ==================================================== */}
+            <div className="flex flex-col-reverse gap-3 border-t border-slate-100 bg-slate-50/50 px-6 py-5 dark:border-slate-700 dark:bg-slate-800 sm:flex-row sm:justify-end sm:px-8">
               <button
                 type="button"
-                onClick={() => reset()}
-                className="rounded-xl border border-slate-200 bg-white dark:bg-slate-700 px-5 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50"
+                onClick={handleCancel}
+                className="rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600"
               >
                 Cancel
               </button>
@@ -260,7 +390,13 @@ const AddCustomer = () => {
               >
                 <FaSave />
 
-                {isSubmitting ? "Saving..." : "Save Customer"}
+                {isSubmitting
+                  ? isEditMode
+                    ? "Updating..."
+                    : "Saving..."
+                  : isEditMode
+                    ? "Update Customer"
+                    : "Save Customer"}
               </button>
             </div>
           </form>

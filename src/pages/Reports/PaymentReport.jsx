@@ -10,10 +10,13 @@ import {
   FiCalendar,
 } from "react-icons/fi";
 import { FaMoneyBillWave } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const PaymentReport = () => {
   const [search, setSearch] = useState("");
   const [paymentFilter, setPaymentFilter] = useState("All");
+
+  const navigate = useNavigate();
 
   const payments = [
     {
@@ -523,10 +526,19 @@ const PaymentReport = () => {
                       {payment.customer}
                     </td>
 
-                    <td className="px-6 py-4 text-sm text-orange-600">
-                      {payment.invoice}
+                    <td className="px-6 py-4">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          navigate(
+                            `/transactions?invoice=${encodeURIComponent(payment.invoice)}`,
+                          )
+                        }
+                        className="text-sm font-semibold text-orange-600 transition hover:text-orange-700 hover:underline"
+                      >
+                        {payment.invoice}
+                      </button>
                     </td>
-
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2 text-sm text-slate-500">
                         <FiCalendar size={15} />

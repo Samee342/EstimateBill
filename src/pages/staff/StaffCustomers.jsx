@@ -9,6 +9,7 @@ import {
   FiEye,
   FiX,
 } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
 
 const customersData = [
   {
@@ -66,6 +67,8 @@ const customersData = [
 const StaffCustomers = () => {
   const [search, setSearch] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState(null);
+
+  const navigate = useNavigate();
 
   const filteredCustomers = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -257,15 +260,23 @@ const StaffCustomers = () => {
                             {customer.name.charAt(0).toUpperCase()}
                           </div>
 
-                          <div>
-                            <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
-                              {customer.name}
-                            </p>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              navigate(`/staff/customers/${customer.id}`)
+                            }
+                            className="group cursor-pointer text-left"
+                          >
+                            <div>
+                              <p className="text-sm font-semibold text-slate-800 transition group-hover:text-orange-500 dark:text-slate-100 dark:group-hover:text-orange-400">
+                                {customer.name}
+                              </p>
 
-                            <p className="text-xs text-slate-400">
-                              {customer.id}
-                            </p>
-                          </div>
+                              <p className="text-xs text-slate-400">
+                                {customer.id}
+                              </p>
+                            </div>
+                          </button>
                         </div>
                       </td>
 

@@ -288,15 +288,19 @@ const AllCustomers = () => {
                   >
                     {/* CUSTOMER */}
                     <td className="px-5 py-4">
-                      <div>
-                        <p className="font-semibold text-slate-800">
+                      <button
+                        type="button"
+                        onClick={() => handleView(customer.id)}
+                        className="group text-left"
+                      >
+                        <p className="font-semibold text-slate-800 transition group-hover:text-orange-500 dark:text-slate-200">
                           {customer.name}
                         </p>
 
                         <p className="mt-1 text-xs text-slate-400">
                           {customer.id}
                         </p>
-                      </div>
+                      </button>
                     </td>
 
                     {/* CONTACT */}
@@ -392,9 +396,13 @@ const AllCustomers = () => {
               <div key={customer.id} className="p-4">
                 <div className="flex items-start justify-between">
                   <div>
-                    <h3 className="font-semibold text-slate-800">
+                    <button
+                      type="button"
+                      onClick={() => handleView(customer.id)}
+                      className="text-left font-semibold text-slate-800 transition hover:text-orange-500 dark:text-slate-200"
+                    >
                       {customer.name}
-                    </h3>
+                    </button>
 
                     <p className="mt-1 text-xs text-slate-400">{customer.id}</p>
                   </div>

@@ -16,6 +16,7 @@ import {
   FiMenu,
   FiX,
 } from "react-icons/fi";
+import { IoSettingsOutline } from "react-icons/io5";
 
 import { useDispatch, useSelector } from "react-redux";
 import { toggleTheme } from "../redux/slices/themeSlice";
@@ -60,14 +61,6 @@ const StaffLayout = () => {
   };
 
   // =====================================================
-  // NOTIFICATION
-  // =====================================================
-
-  const handleNotificationClick = () => {
-    navigate("/notifications");
-  };
-
-  // =====================================================
   // NAVIGATION ITEMS
   // =====================================================
 
@@ -96,7 +89,7 @@ const StaffLayout = () => {
     {
       name: "Setting",
       path: "/staff/profile",
-      icon: FiUser,
+      icon: IoSettingsOutline,
     },
   ];
 
@@ -596,7 +589,7 @@ const StaffLayout = () => {
               type="button"
               onClick={() => dispatch(toggleTheme())}
               className="
-                rounded-xl
+                rounded-xl mr-4
                 border
                 border-slate-200
                 p-2.5
@@ -621,52 +614,6 @@ const StaffLayout = () => {
               }
             >
               {theme === "dark" ? <FiSun size={19} /> : <FiMoon size={19} />}
-            </button>
-
-            {/* Notifications */}
-
-            <button
-              type="button"
-              onClick={handleNotificationClick}
-              className="
-                relative
-                rounded-xl
-                border
-                border-slate-200
-                p-2.5
-
-                text-slate-500
-
-                transition
-
-                hover:bg-slate-50
-                hover:text-orange-500
-
-                dark:border-slate-700
-                dark:text-slate-300
-                dark:hover:bg-slate-800
-                dark:hover:text-orange-400
-              "
-              aria-label="Notifications"
-              title="Notifications"
-            >
-              <FiBell size={19} />
-
-              {/* Notification Dot */}
-
-              <span
-                className="
-                  absolute
-                  right-2
-                  top-2
-
-                  h-2
-                  w-2
-
-                  rounded-full
-                  bg-orange-500
-                "
-              />
             </button>
 
             {/* User Details */}

@@ -387,7 +387,6 @@ PrintTech
                     text-sm outline-none
                     transition
                     focus:border-orange-400
-                    focus:bg-white
                     focus:ring-2
                     focus:ring-orange-100
                     dark:border-slate-700
@@ -482,7 +481,6 @@ PrintTech
                       text-sm outline-none
                       transition
                       focus:border-orange-400
-                      focus:bg-white
                       focus:ring-2
                       focus:ring-orange-100
                       dark:border-slate-700

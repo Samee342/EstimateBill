@@ -9,6 +9,7 @@ import {
   FiClock,
 } from "react-icons/fi";
 import { FaMoneyBillWave } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 // ========================================
 // SALES DATA
@@ -182,6 +183,8 @@ const SalesReport = () => {
   const [search, setSearch] = useState("");
   const [period, setPeriod] = useState("This Month");
   const [statusFilter, setStatusFilter] = useState("All");
+
+  const navigate = useNavigate();
 
   // ========================================
   // FILTER SALES
@@ -438,7 +441,7 @@ const SalesReport = () => {
             return (
               <div
                 key={stat.title}
-                className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-700 dark:bg-slate-800"
+                className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-700 dark:bg-slate-700"
               >
                 <div className="flex justify-between">
                   <div>
@@ -597,7 +600,10 @@ const SalesReport = () => {
                     key={sale.id}
                     className="border-b border-slate-100 last:border-0 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-700"
                   >
-                    <td className="px-6 py-4">
+                    <td
+                      className="cursor-pointer px-6 py-4 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                      onClick={() => navigate(`/projects/${sale.id}`)}
+                    >
                       <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
                         {sale.project}
                       </p>

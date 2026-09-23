@@ -19,6 +19,8 @@ const RouteMeta = () => {
       title = "PrintTech | Settings";
     } else if (path.startsWith("/notifications")) {
       title = "PrintTech | Notifications";
+    } else if (path.startsWith("/team")) {
+      title = "PrintTech | Team";
     } else if (path.startsWith("/trash")) {
       title = "PrintTech | Trash";
     } else if (path === "/dashboard") {
