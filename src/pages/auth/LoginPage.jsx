@@ -12,7 +12,7 @@ import { FiEye, FiEyeOff } from "react-icons/fi";
 
 import { loginUser } from "../../utils/auth";
 import Logo from "../../assets/Logo.png";
-import LoginImage from "../../assets/LoginImage.jpeg";
+import LoginImage from "../../assets/LoginImage.jpg";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -69,12 +69,16 @@ const LoginPage = () => {
         {/* =====================================================
             LEFT SIDE - SIMPLE LOGIN IMAGE
         ====================================================== */}
-        <div className="hidden lg:flex lg:w-1/2 items-center justify-center bg-orange-50/50 p-8 border-r border-gray-200">
+        <div className="hidden lg:flex lg:w-1/2 relative items-center justify-center bg-orange-50/50 border-r border-gray-200 overflow-hidden">
+          {/* Image */}
           <img
             src={LoginImage}
             alt="PrintTech Workspace"
-            className="h-full max-h-[500px] w-full object-contain"
+            className="w-full h-full object-cover object-right"
           />
+
+          {/* Subtle bottom gradient */}
+          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-orange-50/40 to-transparent pointer-events-none" />
         </div>
 
         {/* =====================================================
@@ -93,7 +97,7 @@ const LoginPage = () => {
               </div>
               <div>
                 <h1 className="text-lg font-bold text-gray-900">
-                  Print<span className="text-orange-500">Tech</span>
+                  Print<span className="text-orange-500">tech</span>
                 </h1>
               </div>
             </div>
@@ -104,7 +108,7 @@ const LoginPage = () => {
                 Welcome back
               </p>
               <h2 className="text-3xl font-bold tracking-tight text-gray-900">
-                Sign in to PrintTech
+                Sign in to Print<span className="text-orange-400">Tech</span>
               </h2>
               <p className="mt-2 text-sm text-gray-500">
                 Enter your email and password to access your dashboard.
