@@ -24,8 +24,8 @@ const AddCustomer = () => {
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
-      fullName: "",
-      phone: "",
+      name: "",
+      contact_no: "",
       email: "",
       company: "",
       customerType: "individual",
@@ -202,7 +202,7 @@ const AddCustomer = () => {
                             ? "border-red-400 focus:border-red-500 focus:ring-red-100"
                             : "border-slate-200 focus:border-orange-500 focus:ring-orange-100"
                         }`}
-                        {...register("fullName", {
+                        {...register("name", {
                           required: "Full name is required",
                           minLength: {
                             value: 2,
@@ -237,7 +237,7 @@ const AddCustomer = () => {
                             ? "border-red-400 focus:border-red-500 focus:ring-red-100"
                             : "border-slate-200 focus:border-orange-500 focus:ring-orange-100"
                         }`}
-                        {...register("phone", {
+                        {...register("contact_no", {
                           required: "Phone number is required",
                           pattern: {
                             value: /^[0-9]{10}$/,

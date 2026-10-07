@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { FaEye, FaEyeSlash, FaFacebookF, FaGoogle } from "react-icons/fa";
 import svgImage from "../../assets/svgImage.jpg";
 import Logo from "../../assets/Logo.png";
+import { Register } from "../../api/auth";
 
 const RegisterPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -18,7 +19,21 @@ const RegisterPage = () => {
   const password = watch("password");
 
   const onSubmit = async (data) => {
-    console.log("Form Submitted:", data);
+    try {
+      const response = await Register({
+        username: data.username,
+        phone_no: data.phone_no,
+        email: data.email,
+        password: data.password,
+        confirm_password: data.confirm_password,
+      });
+
+      console.log("Registration successful:", response);
+    } catch (error) {
+      console.log("STATUS:", error.response?.status);
+      console.log("DATA:", error.response?.data);
+      console.log("FULL ERROR:", error);
+    }
   };
 
   return (
@@ -29,7 +44,7 @@ const RegisterPage = () => {
 
       {/* Main Container Card */}
       <div className="w-full max-w-4xl bg-white rounded-3xl shadow-xl overflow-hidden grid grid-cols-1 md:grid-cols-2 relative z-10 border border-slate-100">
-        {/* Left Column: Illustration Area */}
+        {/* Left Column */}
         <div className="bg-[#FAF4ED] p-8 sm:p-12 flex flex-col justify-between items-center relative min-h-[350px] md:min-h-[520px]">
           {/* Top Brand Logo */}
           <div className="w-full flex justify-start">
@@ -50,11 +65,10 @@ const RegisterPage = () => {
             />
           </div>
 
-          {/* Bottom spacing */}
           <div className="w-full" />
         </div>
 
-        {/* Right Column: Registration Form */}
+        {/* Right Column */}
         <div className="p-8 sm:p-12 flex flex-col justify-center">
           <div className="mb-6">
             <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
@@ -101,7 +115,7 @@ const RegisterPage = () => {
                   type="tel"
                   placeholder="98XXXXXXXX"
                   className="w-full rounded-lg border border-slate-200 px-3 py-2 text-xs text-slate-800 placeholder:text-slate-300 outline-none transition focus:border-[#FF7A00] focus:ring-1 focus:ring-[#FF7A00]"
-                  {...register("phone", {
+                  {...register("phone_no", {
                     required: "Phone is required",
                   })}
                 />
@@ -193,7 +207,7 @@ const RegisterPage = () => {
                     type={showConfirmPassword ? "text" : "password"}
                     placeholder="Confirm Password"
                     className="w-full rounded-lg border border-slate-200 px-3 py-2 pr-8 text-xs text-slate-800 placeholder:text-slate-300 outline-none transition focus:border-[#FF7A00] focus:ring-1 focus:ring-[#FF7A00]"
-                    {...register("confirmPassword", {
+                    {...register("confirm_password", {
                       required: "Required",
                       validate: (value) =>
                         value === password || "Passwords mismatch",
@@ -221,7 +235,7 @@ const RegisterPage = () => {
               </div>
             </div>
 
-            {/* Register Submit Button */}
+            {/* Register */}
             <button
               type="submit"
               disabled={isSubmitting}
@@ -242,7 +256,7 @@ const RegisterPage = () => {
             </span>
           </div>
 
-          {/* Social Login Buttons */}
+          {/* Social Login */}
           <div className="flex justify-center items-center gap-3">
             <button className="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-blue-600 hover:bg-slate-50 transition shadow-sm">
               <FaFacebookF size={12} />
@@ -253,7 +267,7 @@ const RegisterPage = () => {
             </button>
           </div>
 
-          {/* Bottom Login Link */}
+          {/* Login */}
           <p className="mt-6 text-center text-xs text-slate-400">
             Already have an Account?{" "}
             <a

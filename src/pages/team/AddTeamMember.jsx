@@ -22,8 +22,8 @@ const AddTeamMember = () => {
   const [copied, setCopied] = useState(false);
 
   const [formData, setFormData] = useState({
-    name: "",
-    phone: "",
+    username: "",
+    phone_no: "",
     email: "",
     skill: "",
     password: "",

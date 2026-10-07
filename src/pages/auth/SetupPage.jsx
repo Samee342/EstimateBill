@@ -160,7 +160,7 @@ const SetupPage = () => {
                   type="text"
                   placeholder="Enter your shop name"
                   className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-11 pr-4 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
-                  {...register("shopName", {
+                  {...register("shop_name", {
                     required: "Shop name is required",
                   })}
                 />
@@ -190,7 +190,7 @@ const SetupPage = () => {
                   type="tel"
                   placeholder="98XXXXXXXX"
                   className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-11 pr-4 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
-                  {...register("phone")}
+                  {...register("contact_phone")}
                 />
               </div>
             </div>
@@ -212,7 +212,7 @@ const SetupPage = () => {
                   type="text"
                   placeholder="Enter PAN or VAT number"
                   className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-11 pr-4 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
-                  {...register("panVatNumber")}
+                  {...register("pan_no")}
                 />
               </div>
             </div>
