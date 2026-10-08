@@ -7,12 +7,16 @@ import {
   FiHash,
   FiArrowRight,
   FiUpload,
-  FiImage,
   FiX,
 } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
 import Logo from "../../assets/Logo.png";
+import toast from "react-hot-toast";
+import { createTenant } from "../../api/admin";
 
 const SetupPage = () => {
+  const navigate = useNavigate();
+
   const [logoPreview, setLogoPreview] = useState(null);
 
   const {
@@ -22,15 +26,53 @@ const SetupPage = () => {
   } = useForm();
 
   const onSubmit = async (data) => {
-    console.log(data);
+    try {
+      const formData = new FormData();
 
-    // data.logo will contain the selected file
+      formData.append("shop_name", data.shop_name);
+      formData.append("contact_phone", data.contact_phone || "");
+      formData.append("pan_no", data.pan_no || "");
+      formData.append("address", data.address || "");
+
+      // data.logo is a FileList
+      if (data.logo?.[0]) {
+        formData.append("logo", data.logo[0]);
+      }
+
+      const response = await createTenant(formData);
+
+      console.log("Tenant created successfully:", response);
+
+      toast.success("Business setup completed successfully!");
+
+      // Change this route if your dashboard route is different
+      setTimeout(() => {
+        navigate("/dashboard", { replace: true });
+      }, 1000);
+    } catch (error) {
+      console.log("STATUS:", error.response?.status);
+      console.log("DATA:", error.response?.data);
+      console.log("FULL ERROR:", error);
+
+      toast.error(
+        error.response?.data?.message ||
+          error.response?.data?.detail ||
+          "Failed to complete business setup.",
+      );
+    }
   };
 
   const handleLogoChange = (event) => {
     const file = event.target.files[0];
 
     if (!file) return;
+
+    // 2MB validation
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("Logo size must be less than 2MB.");
+      event.target.value = "";
+      return;
+    }
 
     const previewUrl = URL.createObjectURL(file);
     setLogoPreview(previewUrl);
@@ -46,8 +88,8 @@ const SetupPage = () => {
         {/* Brand */}
         <div className="mb-7 text-center">
           <div className="inline-flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl  shadow-lg shadow-orange-600/20">
-              <img src={Logo} className="h-10 w-10" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl shadow-lg shadow-orange-600/20">
+              <img src={Logo} className="h-10 w-10" alt="PrintTech" />
             </div>
 
             <h1 className="text-2xl font-bold tracking-tight text-slate-900">
@@ -65,7 +107,7 @@ const SetupPage = () => {
           {/* Header */}
           <div className="mb-8">
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-orange-50">
-              <img src={Logo} className="h-10 w-10" />
+              <img src={Logo} className="h-10 w-10" alt="PrintTech" />
             </div>
 
             <h2 className="text-2xl font-bold tracking-tight text-slate-900">
@@ -126,6 +168,7 @@ const SetupPage = () => {
                       <p className="text-sm font-medium text-slate-700">
                         Logo selected
                       </p>
+
                       <p className="mt-1 text-xs text-slate-400">
                         Your logo will appear on invoices and receipts.
                       </p>
@@ -143,6 +186,7 @@ const SetupPage = () => {
                 </div>
               )}
             </div>
+
             {/* Shop Name */}
             <div className="mb-5">
               <label
@@ -166,9 +210,9 @@ const SetupPage = () => {
                 />
               </div>
 
-              {errors.shopName && (
+              {errors.shop_name && (
                 <p className="mt-1.5 text-xs text-red-500">
-                  {errors.shopName.message}
+                  {errors.shop_name.message}
                 </p>
               )}
             </div>

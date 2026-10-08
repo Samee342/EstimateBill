@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   FiPlus,
   FiSearch,
@@ -12,96 +12,116 @@ import {
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import DeleteModal from "../../modal/DeleteModal";
+import { getProjects, deleteProject } from "../../api/project";
 
 const AllProject = () => {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
+  const [projects, setProjects] = useState([]);
+
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [selectedProject, setSelectedProject] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   const navigate = useNavigate();
 
-  // ================= PROJECT DATA =================
+  // =====================================================
+  // GET PROJECTS
+  // =====================================================
 
-  const [projects, setProjects] = useState([
-    {
-      id: "PRJ-1001",
-      name: "Business Card Printing",
-      customer: "Ram Sharma",
-      date: "2026-09-07",
-      dueDate: "2026-09-10",
-      amount: "Rs. 12,500",
-      status: "Completed",
-    },
-    {
-      id: "PRJ-1002",
-      name: "Wedding Invitation Cards",
-      customer: "Sita Karki",
-      date: "2026-09-07",
-      dueDate: "2026-09-15",
-      amount: "Rs. 18,750",
-      status: "Pending",
-    },
-    {
-      id: "PRJ-1003",
-      name: "Restaurant Menu Printing",
-      customer: "Hari Thapa",
-      date: "2026-09-06",
-      dueDate: "2026-09-12",
-      amount: "Rs. 24,300",
-      status: "Printed",
-    },
-    {
-      id: "PRJ-1004",
-      name: "Flex Banner Design",
-      customer: "Aashish Gurung",
-      date: "2026-09-06",
-      dueDate: "2026-09-11",
-      amount: "Rs. 5,600",
-      status: "Pending",
-    },
-    {
-      id: "PRJ-1005",
-      name: "Company Brochure",
-      customer: "Mina Rai",
-      date: "2026-09-05",
-      dueDate: "2026-09-14",
-      amount: "Rs. 18,900",
-      status: "Completed",
-    },
-    {
-      id: "PRJ-1006",
-      name: "Product Label Printing",
-      customer: "Everest Traders",
-      date: "2026-09-04",
-      dueDate: "2026-09-13",
-      amount: "Rs. 32,500",
-      status: "Printed",
-    },
-    {
-      id: "PRJ-1007",
-      name: "Office Letterhead",
-      customer: "ABC Enterprises",
-      date: "2026-09-03",
-      dueDate: "2026-09-09",
-      amount: "Rs. 7,800",
-      status: "Pending",
-    },
-    {
-      id: "PRJ-1008",
-      name: "Promotional Posters",
-      customer: "New Star Hotel",
-      date: "2026-09-02",
-      dueDate: "2026-09-08",
-      amount: "Rs. 15,400",
-      status: "Completed",
-    },
-  ]);
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const response = await getProjects();
 
-  // ================= DATE FORMAT =================
+        console.log("Projects API response:", response);
+
+        if (Array.isArray(response)) {
+          setProjects(response);
+        } else if (Array.isArray(response?.results)) {
+          setProjects(response.results);
+        } else if (Array.isArray(response?.data)) {
+          setProjects(response.data);
+        } else if (Array.isArray(response?.data?.results)) {
+          setProjects(response.data.results);
+        } else {
+          setProjects([]);
+        }
+      } catch (error) {
+        console.error("Get projects error:", error);
+        setProjects([]);
+      }
+    };
+
+    fetchProjects();
+  }, []);
+
+  // =====================================================
+  // DELETE PROJECT
+  // =====================================================
+
+  const handleDeleteClick = (project) => {
+    setSelectedProject(project);
+    setDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!selectedProject) return;
+
+    try {
+      setDeleteLoading(true);
+
+      await deleteProject(selectedProject.id);
+
+      setProjects((previousProjects) =>
+        previousProjects.filter((project) => project.id !== selectedProject.id),
+      );
+
+      setDeleteModalOpen(false);
+      setSelectedProject(null);
+    } catch (error) {
+      console.error("Delete project error:", error);
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
+  const handleDeleteClose = () => {
+    if (deleteLoading) return;
+
+    setDeleteModalOpen(false);
+    setSelectedProject(null);
+  };
+
+  // =====================================================
+  // EDIT PROJECT
+  // =====================================================
+
+  const handleEditProject = (project) => {
+    navigate(`/projects/edit/${project.id}`);
+  };
+
+  // =====================================================
+  // VIEW PROJECT
+  // =====================================================
+
+  const handleViewProject = (project) => {
+    navigate(`/projects/${project.id}`);
+  };
+
+  // =====================================================
+  // DATE FORMAT
+  // =====================================================
 
   const formatDate = (date) => {
-    if (!date) return "";
+    if (!date) return "-";
 
-    const [year, month, day] = date.split("-");
+    const dateOnly = String(date).split("T")[0];
+
+    const [year, month, day] = dateOnly.split("-");
+
+    if (!year || !month || !day) return "-";
 
     const months = [
       "Jan",
@@ -121,7 +141,19 @@ const AllProject = () => {
     return `${day} ${months[Number(month) - 1]} ${year}`;
   };
 
-  // ================= UPDATE DATE =================
+  // =====================================================
+  // DATE INPUT VALUE
+  // =====================================================
+
+  const getDateInputValue = (date) => {
+    if (!date) return "";
+
+    return String(date).split("T")[0];
+  };
+
+  // =====================================================
+  // UPDATE DATE
+  // =====================================================
 
   const updateProjectDate = (projectId, field, newDate) => {
     setProjects((previousProjects) =>
@@ -136,17 +168,21 @@ const AllProject = () => {
     );
   };
 
-  // ================= STATUS STYLE =================
+  // =====================================================
+  // STATUS STYLE
+  // =====================================================
 
   const getStatusStyle = (status) => {
-    switch (status) {
-      case "Completed":
+    const normalizedStatus = String(status || "").toLowerCase();
+
+    switch (normalizedStatus) {
+      case "completed":
         return "bg-green-50 text-green-700 dark:bg-green-500/10 dark:text-green-400";
 
-      case "Printed":
+      case "printed":
         return "bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400";
 
-      case "Pending":
+      case "pending":
         return "bg-orange-50 text-orange-700 dark:bg-orange-500/10 dark:text-orange-400";
 
       default:
@@ -154,21 +190,48 @@ const AllProject = () => {
     }
   };
 
-  // ================= SEARCH + FILTER =================
+  // =====================================================
+  // SEARCH + FILTER
+  // =====================================================
 
-  const filteredProjects = projects.filter((project) => {
+  const filteredProjects = useMemo(() => {
     const searchValue = search.toLowerCase().trim();
 
-    const matchesSearch =
-      project.name.toLowerCase().includes(searchValue) ||
-      project.customer.toLowerCase().includes(searchValue) ||
-      project.id.toLowerCase().includes(searchValue);
+    return projects.filter((project) => {
+      const projectName = String(project?.name || "").toLowerCase();
+      const customerName = String(project?.customer || "").toLowerCase();
+      const projectId = String(project?.id || "").toLowerCase();
+      const projectStatus = String(project?.status || "").toLowerCase();
 
-    const matchesStatus =
-      statusFilter === "All" || project.status === statusFilter;
+      const matchesSearch =
+        projectName.includes(searchValue) ||
+        customerName.includes(searchValue) ||
+        projectId.includes(searchValue);
 
-    return matchesSearch && matchesStatus;
-  });
+      const matchesStatus =
+        statusFilter === "All" || projectStatus === statusFilter.toLowerCase();
+
+      return matchesSearch && matchesStatus;
+    });
+  }, [projects, search, statusFilter]);
+
+  // =====================================================
+  // PROJECT SUMMARY DATA
+  // =====================================================
+
+  const totalProjects = projects.length;
+
+  const pendingProjects = projects.filter(
+    (project) => String(project?.status || "").toLowerCase() === "pending",
+  ).length;
+
+  const printedProjects = projects.filter(
+    (project) => String(project?.status || "").toLowerCase() === "printed",
+  ).length;
+
+  const completedProjects = projects.filter(
+    (project) => String(project?.status || "").toLowerCase() === "completed",
+  ).length;
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-[#f7f8fa] text-slate-800 dark:bg-slate-700 dark:text-slate-200">
@@ -188,13 +251,14 @@ const AllProject = () => {
             </p>
           </div>
 
-          <a
-            href="/projects/create-project"
+          <button
+            type="button"
+            onClick={() => navigate("/projects/create-project")}
             className="flex w-full items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-orange-600 sm:w-auto"
           >
             <FiPlus size={18} />
             New Project
-          </a>
+          </button>
         </div>
       </header>
 
@@ -209,6 +273,7 @@ const AllProject = () => {
 
         <div className="mb-6 grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
           {/* Total */}
+
           <div className="rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-600 dark:bg-slate-800 sm:rounded-2xl sm:p-5">
             <div className="flex items-center justify-between gap-2">
               <div className="min-w-0">
@@ -217,7 +282,7 @@ const AllProject = () => {
                 </p>
 
                 <h3 className="mt-1 text-xl font-bold text-slate-900 dark:text-slate-200 sm:mt-2 sm:text-2xl">
-                  248
+                  {totalProjects}
                 </h3>
               </div>
 
@@ -228,6 +293,7 @@ const AllProject = () => {
           </div>
 
           {/* Pending */}
+
           <div className="rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-600 dark:bg-slate-800 sm:rounded-2xl sm:p-5">
             <div className="flex items-center justify-between gap-2">
               <div className="min-w-0">
@@ -236,7 +302,7 @@ const AllProject = () => {
                 </p>
 
                 <h3 className="mt-1 text-xl font-bold text-slate-900 dark:text-slate-200 sm:mt-2 sm:text-2xl">
-                  32
+                  {pendingProjects}
                 </h3>
               </div>
 
@@ -247,6 +313,7 @@ const AllProject = () => {
           </div>
 
           {/* Printed */}
+
           <div className="rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-600 dark:bg-slate-800 sm:rounded-2xl sm:p-5">
             <div className="flex items-center justify-between gap-2">
               <div className="min-w-0">
@@ -255,7 +322,7 @@ const AllProject = () => {
                 </p>
 
                 <h3 className="mt-1 text-xl font-bold text-slate-900 dark:text-slate-200 sm:mt-2 sm:text-2xl">
-                  64
+                  {printedProjects}
                 </h3>
               </div>
 
@@ -266,6 +333,7 @@ const AllProject = () => {
           </div>
 
           {/* Completed */}
+
           <div className="rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-600 dark:bg-slate-800 sm:rounded-2xl sm:p-5">
             <div className="flex items-center justify-between gap-2">
               <div className="min-w-0">
@@ -274,7 +342,7 @@ const AllProject = () => {
                 </p>
 
                 <h3 className="mt-1 text-xl font-bold text-slate-900 dark:text-slate-200 sm:mt-2 sm:text-2xl">
-                  152
+                  {completedProjects}
                 </h3>
               </div>
 
@@ -291,8 +359,6 @@ const AllProject = () => {
 
         <div className="mb-6 rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-600 dark:bg-slate-800 sm:rounded-2xl">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            {/* Search */}
-
             <div className="relative w-full lg:max-w-md">
               <FiSearch
                 size={18}
@@ -307,8 +373,6 @@ const AllProject = () => {
                 className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-orange-400 focus:ring-2 focus:ring-orange-100 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 dark:placeholder:text-slate-500 dark:focus:ring-orange-500/10"
               />
             </div>
-
-            {/* Status */}
 
             <div className="flex w-full items-center gap-2 lg:w-auto">
               <span className="shrink-0 text-sm text-slate-500 dark:text-slate-400">
@@ -334,8 +398,6 @@ const AllProject = () => {
         ====================================================== */}
 
         <div className="overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-600 dark:bg-slate-800 sm:rounded-2xl">
-          {/* Table Header */}
-
           <div className="border-b border-slate-200 p-4 dark:border-slate-600 sm:p-6">
             <h3 className="font-bold text-slate-900 dark:text-white">
               All Projects
@@ -395,7 +457,7 @@ const AllProject = () => {
                     <td className="px-6 py-4">
                       <button
                         type="button"
-                        onClick={() => navigate(`/projects/${project.id}`)}
+                        onClick={() => handleViewProject(project)}
                         className="flex items-center gap-3 text-left"
                       >
                         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-orange-500 dark:bg-orange-500/10">
@@ -404,7 +466,7 @@ const AllProject = () => {
 
                         <div className="min-w-0">
                           <p className="max-w-[220px] truncate text-sm font-semibold text-slate-800 transition hover:text-orange-500 dark:text-slate-200">
-                            {project.name}
+                            {project.name || "Unnamed Project"}
                           </p>
 
                           <p className="mt-1 text-xs text-orange-500">
@@ -413,16 +475,19 @@ const AllProject = () => {
                         </div>
                       </button>
                     </td>
+
                     {/* Customer */}
 
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
                         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-600 dark:bg-slate-600 dark:text-slate-200">
-                          {project.customer.charAt(0)}
+                          {project.customer
+                            ? String(project.customer).charAt(0).toUpperCase()
+                            : "C"}
                         </div>
 
                         <span className="whitespace-nowrap text-sm text-slate-700 dark:text-slate-200">
-                          {project.customer}
+                          {project.customer || "-"}
                         </span>
                       </div>
                     </td>
@@ -440,7 +505,7 @@ const AllProject = () => {
 
                           <input
                             type="date"
-                            value={project.date}
+                            value={getDateInputValue(project.date)}
                             onChange={(e) =>
                               updateProjectDate(
                                 project.id,
@@ -467,7 +532,7 @@ const AllProject = () => {
 
                           <input
                             type="date"
-                            value={project.dueDate}
+                            value={getDateInputValue(project.dueDate)}
                             onChange={(e) =>
                               updateProjectDate(
                                 project.id,
@@ -485,7 +550,7 @@ const AllProject = () => {
 
                     <td className="whitespace-nowrap px-6 py-4">
                       <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-                        {project.amount}
+                        {project.amount ?? "-"}
                       </span>
                     </td>
 
@@ -497,7 +562,7 @@ const AllProject = () => {
                           project.status,
                         )}`}
                       >
-                        {project.status}
+                        {project.status || "Unknown"}
                       </span>
                     </td>
 
@@ -508,6 +573,7 @@ const AllProject = () => {
                         <button
                           type="button"
                           title="Edit project"
+                          onClick={() => handleEditProject(project)}
                           className="rounded-lg p-2 text-yellow-600 transition hover:bg-yellow-100 hover:text-yellow-700 dark:hover:bg-yellow-500/10"
                         >
                           <FaEdit size={17} />
@@ -516,6 +582,7 @@ const AllProject = () => {
                         <button
                           type="button"
                           title="Delete project"
+                          onClick={() => handleDeleteClick(project)}
                           className="rounded-lg p-2 text-red-600 transition hover:bg-red-100 hover:text-red-700 dark:hover:bg-red-500/10"
                         >
                           <MdDelete size={19} />
@@ -541,31 +608,30 @@ const AllProject = () => {
                 {/* Project Header */}
 
                 <div className="flex items-start justify-between gap-3">
-                  <div className="flex min-w-0 items-center gap-3">
-                    <button
-                      type="button"
-                      onClick={() => navigate(`/projects/${project.id}`)}
-                      className="flex min-w-0 items-center gap-3 text-left"
-                    >
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-orange-500 dark:bg-orange-500/10">
-                        <FiFileText size={18} />
-                      </div>
+                  <button
+                    type="button"
+                    onClick={() => handleViewProject(project)}
+                    className="flex min-w-0 items-center gap-3 text-left"
+                  >
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-orange-500 dark:bg-orange-500/10">
+                      <FiFileText size={18} />
+                    </div>
 
-                      <div className="min-w-0">
-                        <p className="truncate text-sm font-semibold text-slate-800 dark:text-slate-200">
-                          {project.name}
-                        </p>
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold text-slate-800 dark:text-slate-200">
+                        {project.name || "Unnamed Project"}
+                      </p>
 
-                        <p className="mt-1 text-xs text-orange-500">
-                          {project.id}
-                        </p>
-                      </div>
-                    </button>
-                  </div>
+                      <p className="mt-1 text-xs text-orange-500">
+                        {project.id}
+                      </p>
+                    </div>
+                  </button>
 
                   <button
                     type="button"
                     aria-label="Project actions"
+                    onClick={() => handleEditProject(project)}
                     className="shrink-0 rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
                   >
                     <FiMoreVertical size={18} />
@@ -587,7 +653,7 @@ const AllProject = () => {
                     </p>
 
                     <p className="mt-1 truncate text-sm font-medium text-slate-700 dark:text-slate-200">
-                      {project.customer}
+                      {project.customer || "-"}
                     </p>
                   </div>
 
@@ -599,7 +665,7 @@ const AllProject = () => {
                     </p>
 
                     <p className="mt-1 truncate text-sm font-bold text-slate-800 dark:text-slate-100">
-                      {project.amount}
+                      {project.amount ?? "-"}
                     </p>
                   </div>
 
@@ -620,7 +686,7 @@ const AllProject = () => {
 
                         <input
                           type="date"
-                          value={project.date}
+                          value={getDateInputValue(project.date)}
                           onChange={(e) =>
                             updateProjectDate(
                               project.id,
@@ -651,7 +717,7 @@ const AllProject = () => {
 
                         <input
                           type="date"
-                          value={project.dueDate}
+                          value={getDateInputValue(project.dueDate)}
                           onChange={(e) =>
                             updateProjectDate(
                               project.id,
@@ -678,7 +744,7 @@ const AllProject = () => {
                       project.status,
                     )}`}
                   >
-                    {project.status}
+                    {project.status || "Unknown"}
                   </span>
                 </div>
 
@@ -687,6 +753,7 @@ const AllProject = () => {
                 <div className="mt-3 flex gap-2">
                   <button
                     type="button"
+                    onClick={() => handleEditProject(project)}
                     className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-slate-200 py-2 text-xs font-medium text-yellow-600 transition hover:bg-yellow-50 dark:border-slate-600 dark:hover:bg-yellow-500/10"
                   >
                     <FaEdit size={14} />
@@ -695,6 +762,7 @@ const AllProject = () => {
 
                   <button
                     type="button"
+                    onClick={() => handleDeleteClick(project)}
                     className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-slate-200 py-2 text-xs font-medium text-red-600 transition hover:bg-red-50 dark:border-slate-600 dark:hover:bg-red-500/10"
                   >
                     <MdDelete size={17} />
@@ -721,12 +789,32 @@ const AllProject = () => {
               </h3>
 
               <p className="mt-1 text-sm text-slate-400">
-                Try changing your search or status filter.
+                {projects.length === 0
+                  ? "You have not created any projects yet."
+                  : "Try changing your search or status filter."}
               </p>
             </div>
           )}
         </div>
       </main>
+
+      {/* =====================================================
+          DELETE MODAL
+      ====================================================== */}
+
+      <DeleteModal
+        isOpen={deleteModalOpen}
+        onClose={handleDeleteClose}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Project"
+        message="Are you sure you want to delete this project?"
+        itemName={
+          selectedProject
+            ? `${selectedProject.name || "Project"} • ${selectedProject.id}`
+            : ""
+        }
+        loading={deleteLoading}
+      />
     </div>
   );
 };

@@ -35,6 +35,7 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
   const [customerOpen, setCustomerOpen] = useState(false);
   const [teamOpen, setTeamOpen] = useState(false);
   const [settingOpen, setSettingOpen] = useState(false);
+  const [companyName, setCompanyName] = useState("");
 
   // =====================================================
   // ACTIVE SECTIONS
@@ -111,6 +112,26 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
       setSettingOpen(false);
     }
   }, [sideBarOpen]);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+
+    if (!storedUser || storedUser === "undefined") {
+      setCompanyName("");
+      return;
+    }
+
+    try {
+      const user = JSON.parse(storedUser);
+
+      setCompanyName(user?.company_name || "");
+    } catch (error) {
+      console.error("Invalid user data in localStorage:", error);
+
+      localStorage.removeItem("user");
+      setCompanyName("");
+    }
+  }, []);
 
   // =====================================================
   // MAIN NAVIGATION CLASS
@@ -395,7 +416,7 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
               </h1>
 
               <p className="truncate text-xs text-slate-400 dark:text-slate-500">
-                Printing System
+                {companyName || "Printing System"}
               </p>
             </div>
           )}

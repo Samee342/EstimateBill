@@ -1,11 +1,15 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { FaEye, FaEyeSlash, FaFacebookF, FaGoogle } from "react-icons/fa";
 import svgImage from "../../assets/svgImage.jpg";
 import Logo from "../../assets/Logo.png";
 import { Register } from "../../api/auth";
+import toast from "react-hot-toast";
 
 const RegisterPage = () => {
+  const navigate = useNavigate();
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -19,23 +23,34 @@ const RegisterPage = () => {
   const password = watch("password");
 
   const onSubmit = async (data) => {
-    try {
-      const response = await Register({
-        username: data.username,
-        phone_no: data.phone_no,
-        email: data.email,
-        password: data.password,
-        confirm_password: data.confirm_password,
-      });
+  try {
+    const response = await Register({
+      username: data.username,
+      phone_no: data.phone_no,
+      email: data.email,
+      password: data.password,
+      confirm_password: data.confirm_password,
+    });
 
-      console.log("Registration successful:", response);
-    } catch (error) {
-      console.log("STATUS:", error.response?.status);
-      console.log("DATA:", error.response?.data);
-      console.log("FULL ERROR:", error);
-    }
-  };
+    console.log("Registration successful:", response);
 
+    toast.success("Registration successful!");
+
+    setTimeout(() => {
+      navigate("/setup");
+    }, 1000);
+  } catch (error) {
+    console.log("STATUS:", error.response?.status);
+    console.log("DATA:", error.response?.data);
+    console.log("FULL ERROR:", error);
+
+    toast.error(
+      error.response?.data?.message ||
+        error.response?.data?.detail ||
+        "Registration failed. Please try again."
+    );
+  }
+};
   return (
     <div className="min-h-screen bg-[#FDFBF7] flex items-center justify-center p-4 relative overflow-hidden">
       {/* Soft background decorative shapes */}

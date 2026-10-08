@@ -2,13 +2,14 @@ import { useEffect, useState } from "react";
 import {
   FiUser,
   FiBriefcase,
-  FiFileText,
-  FiCreditCard,
   FiBell,
-  FiPrinter,
   FiSave,
   FiCamera,
+  FiEye,
+  FiEyeOff,
+  FiLock,
 } from "react-icons/fi";
+import { updateTenant, changePasswordByTenant } from "../../api/admin";
 
 const STORAGE_KEY = "printing_press_studio_settings";
 
@@ -27,16 +28,6 @@ const defaultSettings = {
   address: "Butwal, Rupandehi, Nepal",
   panVat: "123456789",
 
-  // INVOICE
-  invoicePrefix: "INV-",
-  estimatePrefix: "EST-",
-  currency: "NPR",
-  taxEnabled: true,
-  taxRate: 13,
-  showLogo: true,
-  showCustomerPan: true,
-  showSignature: true,
-
   // PAYMENT
   defaultPaymentMethod: "Cash",
   partialPayment: true,
@@ -49,11 +40,6 @@ const defaultSettings = {
   paymentDue: true,
   projectCompleted: true,
   lowStock: true,
-
-  // PRINTING
-  defaultPriority: "Normal",
-  defaultProjectStatus: "Pending",
-  defaultWorkType: "Digital Printing",
 };
 
 const StudioSettings = () => {
@@ -75,13 +61,36 @@ const StudioSettings = () => {
   });
 
   const [savedMessage, setSavedMessage] = useState("");
+  const [saving, setSaving] = useState(false);
 
-  // Automatically save settings
+  // =========================================
+  // PASSWORD STATES
+  // =========================================
+
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const [passwordMessage, setPasswordMessage] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [changingPassword, setChangingPassword] = useState(false);
+
+  // =========================================
+  // AUTOMATIC LOCAL STORAGE SAVE
+  // =========================================
+
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
   }, [settings]);
 
-  // Handle input / checkbox / select changes
+  // =========================================
+  // HANDLE INPUT / CHECKBOX / SELECT
+  // =========================================
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
 
@@ -91,18 +100,133 @@ const StudioSettings = () => {
     }));
   };
 
-  // Save button
-  const saveSettings = () => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+  // =========================================
+  // SAVE TENANT SETTINGS
+  // =========================================
 
-    setSavedMessage("Settings saved successfully.");
+  const saveSettings = async () => {
+    setSavedMessage("");
+    setSaving(true);
 
-    setTimeout(() => {
-      setSavedMessage("");
-    }, 2500);
+    try {
+      await updateTenant({
+        profileName: settings.profileName,
+        profileEmail: settings.profileEmail,
+        profilePhone: settings.profilePhone,
+        profileRole: settings.profileRole,
+
+        businessName: settings.businessName,
+        ownerName: settings.ownerName,
+        businessPhone: settings.businessPhone,
+        businessEmail: settings.businessEmail,
+        address: settings.address,
+        panVat: settings.panVat,
+
+        defaultPaymentMethod: settings.defaultPaymentMethod,
+        partialPayment: settings.partialPayment,
+        dueReminder: settings.dueReminder,
+        reminderDays: settings.reminderDays,
+
+        newProject: settings.newProject,
+        paymentReceived: settings.paymentReceived,
+        paymentDue: settings.paymentDue,
+        projectCompleted: settings.projectCompleted,
+        lowStock: settings.lowStock,
+      });
+
+      // Keep local storage updated as well
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+
+      setSavedMessage("Settings saved successfully.");
+
+      setTimeout(() => {
+        setSavedMessage("");
+      }, 2500);
+    } catch (error) {
+      console.error("Update tenant error:", error);
+
+      setSavedMessage(
+        error?.response?.data?.message ||
+          "Failed to save settings. Please try again.",
+      );
+
+      setTimeout(() => {
+        setSavedMessage("");
+      }, 3000);
+    } finally {
+      setSaving(false);
+    }
   };
 
-  // Common input classes
+  // =========================================
+  // CHANGE PASSWORD
+  // =========================================
+
+  const handleChangePassword = async () => {
+    setPasswordMessage("");
+    setPasswordError("");
+
+    if (!oldPassword || !newPassword || !confirmPassword) {
+      setPasswordError("Please fill all password fields.");
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      setPasswordError("New password must be at least 6 characters.");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setPasswordError("New password and confirm password do not match.");
+      return;
+    }
+
+    if (oldPassword === newPassword) {
+      setPasswordError(
+        "New password must be different from your current password.",
+      );
+      return;
+    }
+
+    setChangingPassword(true);
+
+    try {
+      await changePasswordByTenant({
+        oldPassword,
+        newPassword,
+      });
+
+      setPasswordMessage("Password changed successfully.");
+
+      // Clear password fields after successful change
+      setOldPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+
+      // Hide passwords again
+      setShowOldPassword(false);
+      setShowNewPassword(false);
+      setShowConfirmPassword(false);
+
+      setTimeout(() => {
+        setPasswordMessage("");
+      }, 2500);
+    } catch (error) {
+      console.error("Change password error:", error);
+
+      setPasswordError(
+        error?.response?.data?.message ||
+          "Failed to change password. Please try again.",
+      );
+    } finally {
+      setChangingPassword(false);
+    }
+  };
+
+  // =========================================
+  // COMMON INPUT CLASSES
+  // =========================================
+
   const inputClass =
     "w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2.5 text-sm text-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none focus:border-orange-400 dark:focus:border-orange-500 transition";
 
@@ -137,10 +261,12 @@ const StudioSettings = () => {
             <button
               type="button"
               onClick={saveSettings}
-              className="flex items-center gap-2 rounded-lg bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-orange-600"
+              disabled={saving}
+              className="flex items-center gap-2 rounded-lg bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
             >
               <FiSave size={16} />
-              Save Changes
+
+              {saving ? "Saving..." : "Save Changes"}
             </button>
           </div>
         </div>
@@ -176,24 +302,14 @@ const StudioSettings = () => {
                 Business
               </a>
 
-              {/* INVOICE */}
+              {/* CHANGE PASSWORD */}
 
               <a
-                href="#invoice"
+                href="#password"
                 className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-800 dark:hover:text-slate-200 transition"
               >
-                <FiFileText size={16} />
-                Invoice & Estimate
-              </a>
-
-              {/* PAYMENT */}
-
-              <a
-                href="#payment"
-                className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-800 dark:hover:text-slate-200 transition"
-              >
-                <FiCreditCard size={16} />
-                Payment
+                <FiLock size={16} />
+                Change Password
               </a>
 
               {/* NOTIFICATIONS */}
@@ -204,16 +320,6 @@ const StudioSettings = () => {
               >
                 <FiBell size={16} />
                 Notifications
-              </a>
-
-              {/* PRINTING */}
-
-              <a
-                href="#printing"
-                className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-800 dark:hover:text-slate-200 transition"
-              >
-                <FiPrinter size={16} />
-                Printing
               </a>
             </div>
           </div>
@@ -414,244 +520,153 @@ const StudioSettings = () => {
             </section>
 
             {/* =========================================
-                INVOICE & ESTIMATE
+                CHANGE PASSWORD
             ========================================== */}
 
             <section
-              id="invoice"
+              id="password"
               className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 transition-colors"
             >
               <div className="border-b border-slate-200 dark:border-slate-700 px-5 py-4">
                 <h2 className="font-semibold text-slate-800 dark:text-slate-100">
-                  Invoice & Estimate
+                  Change Password
                 </h2>
 
                 <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                  Control invoice and estimate numbering.
+                  Update your account password to keep your account secure.
                 </p>
               </div>
 
-              <div className="space-y-5 p-5">
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                  <div>
-                    <label className={labelClass}>Invoice Prefix</label>
-
-                    <input
-                      type="text"
-                      name="invoicePrefix"
-                      value={settings.invoicePrefix}
-                      onChange={handleChange}
-                      className={inputClass}
-                    />
-                  </div>
+              <div className="p-5">
+                <div className="max-w-xl space-y-4">
+                  {/* CURRENT PASSWORD */}
 
                   <div>
-                    <label className={labelClass}>Estimate Prefix</label>
+                    <label className={labelClass}>Current Password</label>
 
-                    <input
-                      type="text"
-                      name="estimatePrefix"
-                      value={settings.estimatePrefix}
-                      onChange={handleChange}
-                      className={inputClass}
-                    />
+                    <div className="relative">
+                      <input
+                        type={showOldPassword ? "text" : "password"}
+                        value={oldPassword}
+                        onChange={(e) => {
+                          setOldPassword(e.target.value);
+                          setPasswordError("");
+                        }}
+                        placeholder="Enter current password"
+                        className={`${inputClass} pr-11`}
+                      />
+
+                      <button
+                        type="button"
+                        onClick={() => setShowOldPassword((prev) => !prev)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-600 dark:hover:text-slate-200"
+                      >
+                        {showOldPassword ? (
+                          <FiEyeOff size={17} />
+                        ) : (
+                          <FiEye size={17} />
+                        )}
+                      </button>
+                    </div>
                   </div>
+
+                  {/* NEW PASSWORD */}
 
                   <div>
-                    <label className={labelClass}>Currency</label>
+                    <label className={labelClass}>New Password</label>
 
-                    <select
-                      name="currency"
-                      value={settings.currency}
-                      onChange={handleChange}
-                      className={inputClass}
-                    >
-                      <option value="NPR">NPR</option>
-                      <option value="INR">INR</option>
-                      <option value="USD">USD</option>
-                    </select>
+                    <div className="relative">
+                      <input
+                        type={showNewPassword ? "text" : "password"}
+                        value={newPassword}
+                        onChange={(e) => {
+                          setNewPassword(e.target.value);
+                          setPasswordError("");
+                        }}
+                        placeholder="Enter new password"
+                        className={`${inputClass} pr-11`}
+                      />
+
+                      <button
+                        type="button"
+                        onClick={() => setShowNewPassword((prev) => !prev)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-600 dark:hover:text-slate-200"
+                      >
+                        {showNewPassword ? (
+                          <FiEyeOff size={17} />
+                        ) : (
+                          <FiEye size={17} />
+                        )}
+                      </button>
+                    </div>
+
+                    <p className="mt-1.5 text-xs text-slate-400 dark:text-slate-500">
+                      Password must be at least 6 characters.
+                    </p>
                   </div>
-                </div>
 
-                {/* INVOICE OPTIONS */}
+                  {/* CONFIRM PASSWORD */}
 
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  <label className="flex items-center justify-between rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 transition hover:bg-slate-50 dark:hover:bg-slate-800">
-                    <span className="text-sm text-slate-700 dark:text-slate-300">
-                      Enable Tax / VAT
-                    </span>
+                  <div>
+                    <label className={labelClass}>Confirm New Password</label>
 
-                    <input
-                      type="checkbox"
-                      name="taxEnabled"
-                      checked={settings.taxEnabled}
-                      onChange={handleChange}
-                      className="h-4 w-4 accent-orange-500"
-                    />
-                  </label>
+                    <div className="relative">
+                      <input
+                        type={showConfirmPassword ? "text" : "password"}
+                        value={confirmPassword}
+                        onChange={(e) => {
+                          setConfirmPassword(e.target.value);
+                          setPasswordError("");
+                        }}
+                        placeholder="Confirm new password"
+                        className={`${inputClass} pr-11`}
+                      />
 
-                  <label className="flex items-center justify-between rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 transition hover:bg-slate-50 dark:hover:bg-slate-800">
-                    <span className="text-sm text-slate-700 dark:text-slate-300">
-                      Show Logo on Invoice
-                    </span>
-
-                    <input
-                      type="checkbox"
-                      name="showLogo"
-                      checked={settings.showLogo}
-                      onChange={handleChange}
-                      className="h-4 w-4 accent-orange-500"
-                    />
-                  </label>
-
-                  <label className="flex items-center justify-between rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 transition hover:bg-slate-50 dark:hover:bg-slate-800">
-                    <span className="text-sm text-slate-700 dark:text-slate-300">
-                      Show Customer PAN
-                    </span>
-
-                    <input
-                      type="checkbox"
-                      name="showCustomerPan"
-                      checked={settings.showCustomerPan}
-                      onChange={handleChange}
-                      className="h-4 w-4 accent-orange-500"
-                    />
-                  </label>
-
-                  <label className="flex items-center justify-between rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 transition hover:bg-slate-50 dark:hover:bg-slate-800">
-                    <span className="text-sm text-slate-700 dark:text-slate-300">
-                      Show Signature
-                    </span>
-
-                    <input
-                      type="checkbox"
-                      name="showSignature"
-                      checked={settings.showSignature}
-                      onChange={handleChange}
-                      className="h-4 w-4 accent-orange-500"
-                    />
-                  </label>
-                </div>
-
-                {/* TAX RATE */}
-
-                {settings.taxEnabled && (
-                  <div className="max-w-xs">
-                    <label className={labelClass}>Tax Rate (%)</label>
-
-                    <input
-                      type="number"
-                      name="taxRate"
-                      value={settings.taxRate}
-                      onChange={handleChange}
-                      className={inputClass}
-                    />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword((prev) => !prev)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-600 dark:hover:text-slate-200"
+                      >
+                        {showConfirmPassword ? (
+                          <FiEyeOff size={17} />
+                        ) : (
+                          <FiEye size={17} />
+                        )}
+                      </button>
+                    </div>
                   </div>
-                )}
-              </div>
-            </section>
 
-            {/* =========================================
-                PAYMENT
-            ========================================== */}
+                  {/* PASSWORD ERROR */}
 
-            <section
-              id="payment"
-              className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 transition-colors"
-            >
-              <div className="border-b border-slate-200 dark:border-slate-700 px-5 py-4">
-                <h2 className="font-semibold text-slate-800 dark:text-slate-100">
-                  Payment Settings
-                </h2>
+                  {passwordError && (
+                    <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2.5 text-sm font-medium text-red-600 dark:border-red-900/50 dark:bg-red-950/20 dark:text-red-400">
+                      {passwordError}
+                    </div>
+                  )}
 
-                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                  Configure payment and due reminders.
-                </p>
-              </div>
+                  {/* PASSWORD SUCCESS */}
 
-              <div className="space-y-4 p-5">
-                {/* PAYMENT METHOD */}
+                  {passwordMessage && (
+                    <div className="rounded-lg border border-green-200 bg-green-50 px-3 py-2.5 text-sm font-medium text-green-600 dark:border-green-900/50 dark:bg-green-950/20 dark:text-green-400">
+                      {passwordMessage}
+                    </div>
+                  )}
 
-                <div className="max-w-sm">
-                  <label className={labelClass}>Default Payment Method</label>
+                  {/* CHANGE PASSWORD BUTTON */}
 
-                  <select
-                    name="defaultPaymentMethod"
-                    value={settings.defaultPaymentMethod}
-                    onChange={handleChange}
-                    className={inputClass}
+                  <button
+                    type="button"
+                    onClick={handleChangePassword}
+                    disabled={changingPassword}
+                    className="flex items-center gap-2 rounded-lg bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    <option>Cash</option>
-                    <option>Bank Transfer</option>
-                    <option>eSewa</option>
-                    <option>Khalti</option>
-                    <option>Card</option>
-                    <option>Cheque</option>
-                  </select>
+                    <FiLock size={16} />
+
+                    {changingPassword
+                      ? "Changing Password..."
+                      : "Change Password"}
+                  </button>
                 </div>
-
-                {/* PARTIAL PAYMENT */}
-
-                <label className="flex items-center justify-between rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 transition hover:bg-slate-50 dark:hover:bg-slate-800">
-                  <div>
-                    <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                      Allow Partial Payments
-                    </p>
-
-                    <p className="text-xs text-slate-400 dark:text-slate-500">
-                      Customer can pay the bill in multiple installments.
-                    </p>
-                  </div>
-
-                  <input
-                    type="checkbox"
-                    name="partialPayment"
-                    checked={settings.partialPayment}
-                    onChange={handleChange}
-                    className="h-4 w-4 accent-orange-500"
-                  />
-                </label>
-
-                {/* PAYMENT REMINDER */}
-
-                <label className="flex items-center justify-between rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 transition hover:bg-slate-50 dark:hover:bg-slate-800">
-                  <div>
-                    <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                      Payment Due Reminder
-                    </p>
-
-                    <p className="text-xs text-slate-400 dark:text-slate-500">
-                      Show reminder for upcoming payments.
-                    </p>
-                  </div>
-
-                  <input
-                    type="checkbox"
-                    name="dueReminder"
-                    checked={settings.dueReminder}
-                    onChange={handleChange}
-                    className="h-4 w-4 accent-orange-500"
-                  />
-                </label>
-
-                {/* REMINDER DAYS */}
-
-                {settings.dueReminder && (
-                  <div className="max-w-xs">
-                    <label className={labelClass}>
-                      Reminder Before Due (Days)
-                    </label>
-
-                    <input
-                      type="number"
-                      min="0"
-                      name="reminderDays"
-                      value={settings.reminderDays}
-                      onChange={handleChange}
-                      className={inputClass}
-                    />
-                  </div>
-                )}
               </div>
             </section>
 
@@ -698,82 +713,6 @@ const StudioSettings = () => {
                     />
                   </label>
                 ))}
-              </div>
-            </section>
-
-            {/* =========================================
-                PRINTING
-            ========================================== */}
-
-            <section
-              id="printing"
-              className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 transition-colors"
-            >
-              <div className="border-b border-slate-200 dark:border-slate-700 px-5 py-4">
-                <h2 className="font-semibold text-slate-800 dark:text-slate-100">
-                  Printing Defaults
-                </h2>
-
-                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                  Set defaults for new printing projects.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 gap-4 p-5 md:grid-cols-3">
-                {/* PRIORITY */}
-
-                <div>
-                  <label className={labelClass}>Default Priority</label>
-
-                  <select
-                    name="defaultPriority"
-                    value={settings.defaultPriority}
-                    onChange={handleChange}
-                    className={inputClass}
-                  >
-                    <option>Low</option>
-                    <option>Normal</option>
-                    <option>High</option>
-                    <option>Urgent</option>
-                  </select>
-                </div>
-
-                {/* PROJECT STATUS */}
-
-                <div>
-                  <label className={labelClass}>Default Project Status</label>
-
-                  <select
-                    name="defaultProjectStatus"
-                    value={settings.defaultProjectStatus}
-                    onChange={handleChange}
-                    className={inputClass}
-                  >
-                    <option>Pending</option>
-                    <option>In Progress</option>
-                    <option>Completed</option>
-                  </select>
-                </div>
-
-                {/* WORK TYPE */}
-
-                <div>
-                  <label className={labelClass}>Default Work Type</label>
-
-                  <select
-                    name="defaultWorkType"
-                    value={settings.defaultWorkType}
-                    onChange={handleChange}
-                    className={inputClass}
-                  >
-                    <option>Digital Printing</option>
-                    <option>Offset Printing</option>
-                    <option>Flex Printing</option>
-                    <option>Business Cards</option>
-                    <option>Brochure</option>
-                    <option>Wedding Cards</option>
-                  </select>
-                </div>
               </div>
             </section>
           </div>

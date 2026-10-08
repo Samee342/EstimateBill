@@ -10,11 +10,16 @@ import {
   FaSave,
   FaArrowLeft,
 } from "react-icons/fa";
+import {
+  createCustomer,
+  getCustomer,
+  updateCustomer,
+} from "../../api/customer";
+import toast from "react-hot-toast";
 
 const AddCustomer = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-
   const isEditMode = Boolean(id);
 
   const {
@@ -28,58 +33,48 @@ const AddCustomer = () => {
       contact_no: "",
       email: "",
       company: "",
-      customerType: "individual",
+      pan_no: "",
+      customer_type: "individual",
       address: "",
-      notes: "",
     },
   });
 
   // =========================================================
   // EDIT MODE
   // =========================================================
+
   useEffect(() => {
     if (!isEditMode) return;
 
-    // Temporary customer data
-    // Replace this later with API data from useCustomer(id)
-    const customers = [
-      {
-        id: "CUS-1001",
-        fullName: "Ram Sharma",
-        phone: "9841234567",
-        email: "ram@example.com",
-        company: "Ram Enterprises",
-        customerType: "business",
-        address: "Butwal, Rupandehi",
-        notes: "Regular printing customer.",
-      },
-      {
-        id: "CUS-1002",
-        fullName: "Sita Karki",
-        phone: "9851234567",
-        email: "sita@example.com",
-        company: "Sita Collection",
-        customerType: "business",
-        address: "Bhairahawa, Rupandehi",
-        notes: "",
-      },
-    ];
+    const fetchCustomer = async () => {
+      try {
+        const response = await getCustomer(id);
 
-    const customer = customers.find((item) => item.id === id);
+        console.log("Customer details:", response);
 
-    if (customer) {
-      reset({
-        fullName: customer.fullName || "",
-        phone: customer.phone || "",
-        email: customer.email || "",
-        company: customer.company || "",
-        customerType: customer.customerType || "individual",
-        address: customer.address || "",
-        notes: customer.notes || "",
-      });
-    }
-  }, [id, isEditMode, reset]);
+        reset({
+          name: response.name || "",
+          contact_no: response.contact_no || "",
+          email: response.email || "",
+          company: response.company || "",
+          customer_type: response.customer_type || "individual",
+          address: response.address || "",
+        });
+      } catch (error) {
+        console.error("Get customer error:", error);
 
+        alert(
+          error.response?.data?.message ||
+            error.response?.data?.detail ||
+            "Failed to load customer.",
+        );
+
+        navigate("/customers");
+      }
+    };
+
+    fetchCustomer();
+  }, [id, isEditMode, reset, navigate]);
   // =========================================================
   // SUBMIT
   // =========================================================
@@ -88,28 +83,56 @@ const AddCustomer = () => {
       if (isEditMode) {
         console.log("Updating Customer:", id, data);
 
-        // API call here
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        const response = await updateCustomer(id, data);
 
-        alert("Customer updated successfully");
+        console.log("Customer updated successfully:", response);
+
+        toast.success("Customer updated successfully!");
       } else {
         console.log("Creating Customer:", data);
 
-        // API call here
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        const response = await createCustomer(data);
 
-        alert("Customer created successfully");
+        console.log("Customer created successfully:", response);
+
+        toast.success("Customer created successfully!");
       }
 
       navigate("/customers");
     } catch (error) {
-      console.error(error);
+      console.error("Customer save error:", error);
+
+      console.log("STATUS:", error.response?.status);
+      console.log("BACKEND ERROR:", error.response?.data);
+
+      const backendError = error.response?.data;
+
+      // Django validation errors
+      if (backendError && typeof backendError === "object") {
+        const firstError = Object.entries(backendError)[0];
+
+        if (firstError) {
+          const [field, messages] = firstError;
+
+          const message = Array.isArray(messages) ? messages[0] : messages;
+
+          toast.error(`${field}: ${message}`);
+          return;
+        }
+      }
+
+      toast.error(
+        backendError?.message ||
+          backendError?.detail ||
+          "Something went wrong. Please try again.",
+      );
     }
   };
 
   // =========================================================
   // CANCEL
   // =========================================================
+
   const handleCancel = () => {
     navigate("/customers");
   };
@@ -120,6 +143,7 @@ const AddCustomer = () => {
         {/* =====================================================
             HEADER
         ====================================================== */}
+
         <div className="mb-5 flex items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-300 sm:text-3xl">
@@ -146,10 +170,12 @@ const AddCustomer = () => {
         {/* =====================================================
             FORM CARD
         ====================================================== */}
+
         <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800">
           {/* ===================================================
               CARD HEADER
           ==================================================== */}
+
           <div className="border-b border-slate-100 bg-slate-50/70 px-4 py-3 dark:border-slate-700 dark:bg-slate-800 sm:px-8">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-100 text-orange-600 dark:bg-orange-500/10 dark:text-orange-400">
@@ -173,11 +199,13 @@ const AddCustomer = () => {
           {/* ===================================================
               FORM
           ==================================================== */}
+
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="space-y-8 px-4 py-7 sm:px-8">
               {/* =================================================
                   PERSONAL INFORMATION
               ================================================== */}
+
               <div>
                 <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-slate-400">
                   Personal Information
@@ -185,6 +213,7 @@ const AddCustomer = () => {
 
                 <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                   {/* FULL NAME */}
+
                   <div className="sm:col-span-2">
                     <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
                       Full Name
@@ -198,7 +227,7 @@ const AddCustomer = () => {
                         type="text"
                         placeholder="Enter customer's full name"
                         className={`w-full rounded-xl border bg-white py-3 pl-11 pr-4 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:ring-2 dark:bg-slate-700 dark:text-slate-300 ${
-                          errors.fullName
+                          errors.name
                             ? "border-red-400 focus:border-red-500 focus:ring-red-100"
                             : "border-slate-200 focus:border-orange-500 focus:ring-orange-100"
                         }`}
@@ -212,14 +241,15 @@ const AddCustomer = () => {
                       />
                     </div>
 
-                    {errors.fullName && (
+                    {errors.name && (
                       <p className="mt-1.5 text-xs text-red-500">
-                        {errors.fullName.message}
+                        {errors.name.message}
                       </p>
                     )}
                   </div>
 
                   {/* PHONE */}
+
                   <div>
                     <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
                       Phone Number
@@ -233,7 +263,7 @@ const AddCustomer = () => {
                         type="tel"
                         placeholder="98XXXXXXXX"
                         className={`w-full rounded-xl border bg-white py-3 pl-11 pr-4 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:ring-2 dark:bg-slate-700 dark:text-slate-300 ${
-                          errors.phone
+                          errors.contact_no
                             ? "border-red-400 focus:border-red-500 focus:ring-red-100"
                             : "border-slate-200 focus:border-orange-500 focus:ring-orange-100"
                         }`}
@@ -247,14 +277,15 @@ const AddCustomer = () => {
                       />
                     </div>
 
-                    {errors.phone && (
+                    {errors.contact_no && (
                       <p className="mt-1.5 text-xs text-red-500">
-                        {errors.phone.message}
+                        {errors.contact_no.message}
                       </p>
                     )}
                   </div>
 
                   {/* EMAIL */}
+
                   <div>
                     <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
                       Email Address
@@ -292,6 +323,7 @@ const AddCustomer = () => {
               {/* =================================================
                   BUSINESS INFORMATION
               ================================================== */}
+
               <div className="border-t border-slate-100 pt-7 dark:border-slate-700">
                 <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-slate-400">
                   Business Information
@@ -299,6 +331,7 @@ const AddCustomer = () => {
 
                 <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                   {/* COMPANY */}
+
                   <div>
                     <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
                       Company / Business
@@ -317,6 +350,7 @@ const AddCustomer = () => {
                   </div>
 
                   {/* CUSTOMER TYPE */}
+
                   <div>
                     <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
                       Customer Type
@@ -324,12 +358,37 @@ const AddCustomer = () => {
 
                     <select
                       className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-300"
-                      {...register("customerType")}
+                      {...register("customer_type")}
                     >
                       <option value="individual">Individual</option>
-
                       <option value="business">Business</option>
                     </select>
+                  </div>
+
+                  {/* PAN Number */}
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                      PAN Number
+                    </label>
+
+                    <div className="relative">
+                      <FaBuilding className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+
+                      <input
+                        type="text"
+                        placeholder="Enter PAN number"
+                        className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-11 pr-4 text-sm text-slate-700 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-300"
+                        {...register("pan_no", {
+                          required: "PAN number is required",
+                        })}
+                      />
+                    </div>
+
+                    {errors.pan_no && (
+                      <p className="mt-1 text-xs text-red-500">
+                        {errors.pan_no.message}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -337,6 +396,7 @@ const AddCustomer = () => {
               {/* =================================================
                   ADDRESS
               ================================================== */}
+
               <div className="border-t border-slate-100 pt-7 dark:border-slate-700">
                 <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-slate-400">
                   Address
@@ -353,27 +413,12 @@ const AddCustomer = () => {
                   />
                 </div>
               </div>
-
-              {/* =================================================
-                  NOTES
-              ================================================== */}
-              <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                  Notes
-                </label>
-
-                <textarea
-                  rows="3"
-                  placeholder="Add any additional notes about this customer..."
-                  className="w-full resize-none rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-orange-500 focus:ring-2 focus:ring-orange-100 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-300"
-                  {...register("notes")}
-                />
-              </div>
             </div>
 
             {/* ===================================================
                 FOOTER
             ==================================================== */}
+
             <div className="flex flex-col-reverse gap-3 border-t border-slate-100 bg-slate-50/50 px-6 py-5 dark:border-slate-700 dark:bg-slate-800 sm:flex-row sm:justify-end sm:px-8">
               <button
                 type="button"

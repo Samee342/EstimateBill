@@ -43,7 +43,6 @@ const CreateProject = () => {
       // PROJECT / ORDER INFORMATION
       // ========================================
       projectName: "",
-      customer: "",
       description: "",
       dueDate: "",
       priority: "Normal",
@@ -262,21 +261,6 @@ const CreateProject = () => {
                   type="text"
                   placeholder="Example: Wedding Cards"
                   {...register("projectName")}
-                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
-                />
-              </div>
-
-              {/* CUSTOMER */}
-
-              <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                  Customer
-                </label>
-
-                <input
-                  type="text"
-                  placeholder="Customer name"
-                  {...register("customer")}
                   className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
                 />
               </div>

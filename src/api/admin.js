@@ -5,15 +5,25 @@ const createTenant = async (data) => {
   return response.data;
 };
 const getTenant = async () => {
-  const response = await api.get("/tenantapi/tenants");
+  const response = await api.get("/tenantapi/tenants/");
   return response.data.data;
 };
 const updateTenant = async (id, data) => {
-  const response = await api.put(`/tenantapi/tenants/${id}`, data);
+  const response = await api.put(`/tenantapi/tenants/${id}/`, data);
   return response.data;
 };
 const deleteTenant = async (id) => {
   const response = await api.delete(`/tenatapi/tenants/${id}`);
   return response.data;
 };
-export { createTenant, getTenant, updateTenant, deleteTenant };
+const changePasswordByTenant = async (id) => {
+  const response = await api.put();
+  return response.data;
+};
+export {
+  createTenant,
+  getTenant,
+  updateTenant,
+  deleteTenant,
+  changePasswordByTenant,
+};

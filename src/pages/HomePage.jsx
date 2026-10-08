@@ -1062,7 +1062,7 @@ const HomePage = () => {
         type="button"
         title="WhatsApp"
         aria-label="Open WhatsApp"
-        onClick={() => window.open("https://wa.me/9779742992187", "_blank")}
+        onClick={() => window.open("https://wa.me/9779800526479", "_blank")}
         className="
           fixed
           bottom-4

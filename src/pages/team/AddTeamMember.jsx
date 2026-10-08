@@ -9,23 +9,27 @@ import {
   FaUser,
   FaPhone,
   FaEnvelope,
-  FaBriefcase,
   FaLock,
   FaPaperPlane,
+  FaEye,
+  FaEyeSlash,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
+import { createTeam } from "../../api/team";
 
 const AddTeamMember = () => {
   const navigate = useNavigate();
 
   const [mode, setMode] = useState("invite");
   const [copied, setCopied] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const [formData, setFormData] = useState({
-    username: "",
-    phone_no: "",
+    name: "",
+    phone: "",
     email: "",
-    skill: "",
     password: "",
   });
 
@@ -55,7 +59,7 @@ Hello ${formData.name || "there"} 👋
 
 You have been invited to join our PrintTech team.
 
-Role: ${formData.skill || "Team Member"}
+Role: Team Member
 
 Please use the invitation link below to create your account:
 
@@ -73,7 +77,7 @@ PrintTech
 
   const handleWhatsAppInvite = () => {
     if (!formData.phone) {
-      alert("Please enter phone number first.");
+      toast.error("Please enter phone number first.");
       return;
     }
 
@@ -84,6 +88,8 @@ PrintTech
       encodeURIComponent(whatsappMessage);
 
     window.open(whatsappUrl, "_blank", "noopener,noreferrer");
+
+    toast.success("WhatsApp invitation is ready!");
   };
 
   // =========================
@@ -96,11 +102,15 @@ PrintTech
 
       setCopied(true);
 
+      toast.success("Invitation link copied!");
+
       setTimeout(() => {
         setCopied(false);
       }, 2000);
     } catch (error) {
       console.error("Copy failed:", error);
+
+      toast.error("Failed to copy invitation link.");
     }
   };
 
@@ -108,14 +118,46 @@ PrintTech
   // MANUAL ADD
   // =========================
 
-  const handleManualSubmit = (e) => {
+  const handleManualSubmit = async (e) => {
     e.preventDefault();
 
-    console.log("Manual Team Member:", formData);
+    try {
+      setLoading(true);
 
-    alert("Team member added successfully!");
+      // Convert full name into a valid Django username
+      const username = formData.name
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, "_")
+        .replace(/[^a-z0-9_]/g, "");
 
-    navigate("/team");
+      const response = await createTeam({
+        username,
+        phone_no: formData.phone,
+        email: formData.email,
+        password: formData.password,
+      });
+
+      console.log("Team member created:", response);
+
+      toast.success("Team member added successfully!");
+
+      navigate("/team");
+    } catch (error) {
+      console.log("STATUS:", error.response?.status);
+      console.log("DATA:", error.response?.data);
+      console.log("USERNAME ERROR:", error.response?.data?.username);
+      console.log("EMAIL ERROR:", error.response?.data?.email);
+      console.log("FULL ERROR:", error);
+
+      toast.error(
+        error?.response?.data?.message ||
+          error?.response?.data?.detail ||
+          "Failed to create team member. Please try again.",
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -130,11 +172,14 @@ PrintTech
             type="button"
             onClick={() => navigate("/team")}
             className="
-              flex h-10 w-10 shrink-0 items-center
-              justify-center rounded-xl
+              flex h-10 w-10 shrink-0
+              items-center justify-center
+              rounded-xl
               border border-slate-200
-              bg-white text-slate-600
-              shadow-sm transition
+              bg-white
+              text-slate-600
+              shadow-sm
+              transition
               hover:border-orange-200
               hover:bg-orange-50
               hover:text-orange-600
@@ -216,7 +261,7 @@ PrintTech
             ${
               mode === "manual"
                 ? "border-orange-300 bg-orange-50 shadow-sm dark:border-orange-500/40 dark:bg-orange-500/10"
-                : "border-slate-200 bg-white hover:border-orange-200 dark:hover:bg-slate-800 dark:border-slate-700 dark:bg-slate-900"
+                : "border-slate-200 bg-white hover:border-orange-200 dark:border-slate-700 dark:bg-slate-900"
             }
           `}
         >
@@ -398,63 +443,6 @@ PrintTech
               </div>
             </div>
 
-            {/* SKILL */}
-
-            <div>
-              <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                Skill / Department
-              </label>
-
-              <div className="relative">
-                <FaBriefcase className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-
-                <select
-                  name="skill"
-                  value={formData.skill}
-                  onChange={handleChange}
-                  required
-                  className="
-                    w-full appearance-none
-                    rounded-xl
-                    border border-slate-200
-                    bg-slate-50
-                    py-3 pl-10 pr-4
-                    text-sm outline-none
-                    transition
-                    focus:border-orange-400
-                    focus:bg-white
-                    focus:ring-2
-                    focus:ring-orange-100
-                    dark:border-slate-700
-                    dark:bg-slate-800
-                    dark:text-white
-                  "
-                >
-                  <option value="">Select department</option>
-
-                  <option value="Designer">Designer</option>
-
-                  <option value="Pre-Press">Pre-Press</option>
-
-                  <option value="Printer">Printer</option>
-
-                  <option value="Cutting">Cutting</option>
-
-                  <option value="Lamination">Lamination</option>
-
-                  <option value="Binding">Binding</option>
-
-                  <option value="Finishing">Finishing</option>
-
-                  <option value="Packing">Packing</option>
-
-                  <option value="Quality Check">Quality Check</option>
-
-                  <option value="Delivery">Delivery</option>
-                </select>
-              </div>
-            </div>
-
             {/* PASSWORD ONLY MANUAL */}
 
             {mode === "manual" && (
@@ -467,7 +455,7 @@ PrintTech
                   <FaLock className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
 
                   <input
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
@@ -477,7 +465,7 @@ PrintTech
                       w-full rounded-xl
                       border border-slate-200
                       bg-slate-50
-                      py-3 pl-10 pr-4
+                      py-3 pl-10 pr-12
                       text-sm outline-none
                       transition
                       focus:border-orange-400
@@ -489,6 +477,23 @@ PrintTech
                       dark:focus:bg-slate-800
                     "
                   />
+
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="
+                      absolute right-3 top-1/2
+                      -translate-y-1/2
+                      text-slate-400
+                      transition
+                      hover:text-orange-500
+                    "
+                    aria-label={
+                      showPassword ? "Hide password" : "Show password"
+                    }
+                  >
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  </button>
                 </div>
 
                 <p className="mt-2 text-xs text-slate-400">
@@ -659,6 +664,7 @@ PrintTech
             {mode === "manual" && (
               <button
                 type="submit"
+                disabled={loading}
                 className="
                   flex items-center
                   justify-center gap-2
@@ -670,10 +676,18 @@ PrintTech
                   shadow-sm
                   transition
                   hover:bg-orange-600
+                  disabled:cursor-not-allowed
+                  disabled:opacity-60
                 "
               >
-                <FaUserPlus />
-                Create Team Member
+                {loading ? (
+                  "Creating..."
+                ) : (
+                  <>
+                    <FaUserPlus />
+                    Create Team Member
+                  </>
+                )}
               </button>
             )}
           </div>

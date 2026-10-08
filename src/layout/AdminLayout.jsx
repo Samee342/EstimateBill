@@ -334,7 +334,7 @@ const AdminLayout = () => {
                 ${profileOpen ? "bg-slate-50 dark:bg-slate-800" : ""}
               `}
             >
-              {/* Avatar */}
+              {/* Company Avatar */}
 
               <div
                 className="
@@ -353,7 +353,7 @@ const AdminLayout = () => {
                   dark:text-orange-400
                 "
               >
-                {user?.name?.charAt(0)?.toUpperCase() || "A"}
+                {user?.company_name?.charAt(0)?.toUpperCase() || "P"}
               </div>
 
               {/* User Info */}
@@ -361,15 +361,15 @@ const AdminLayout = () => {
               <div className="hidden text-left lg:block">
                 <p
                   className="
-                    max-w-[130px]
-                    truncate
-                    text-sm
-                    font-semibold
-                    text-slate-700
-                    dark:text-slate-200
-                  "
+    max-w-[150px]
+    truncate
+    text-sm
+    font-semibold
+    text-slate-700
+    dark:text-slate-200
+  "
                 >
-                  {user?.name || "Admin"}
+                  {user?.company_name?.split(" ")[0] || "PrintTech"}
                 </p>
 
                 <p
@@ -380,7 +380,7 @@ const AdminLayout = () => {
                     dark:text-slate-500
                   "
                 >
-                  {user?.role || "Administrator"}
+                  {user?.name || "Admin"}
                 </p>
               </div>
 
@@ -437,6 +437,8 @@ const AdminLayout = () => {
                   "
                 >
                   <div className="flex items-center gap-3">
+                    {/* User Avatar */}
+
                     <div
                       className="
                         flex
@@ -454,20 +456,20 @@ const AdminLayout = () => {
                         dark:text-orange-400
                       "
                     >
-                      {user?.name?.charAt(0)?.toUpperCase() || "A"}
+                      {user?.username?.charAt(0)?.toUpperCase() || "A"}{" "}
                     </div>
 
                     <div className="min-w-0">
                       <p
                         className="
-                          truncate
-                          text-sm
-                          font-semibold
-                          text-slate-800
-                          dark:text-white
-                        "
+    truncate
+    text-sm
+    font-semibold
+    text-slate-800
+    dark:text-white
+  "
                       >
-                        {user?.name || "Admin"}
+                        {user?.username || "Admin"}
                       </p>
 
                       <p

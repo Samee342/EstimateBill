@@ -31,7 +31,6 @@ const LoginPage = () => {
       });
 
       console.log("Login successful:", response);
-
       // Save tokens
       localStorage.setItem("accessToken", response.access);
       localStorage.setItem("refreshToken", response.refresh);
@@ -39,6 +38,13 @@ const LoginPage = () => {
       // Save user
       localStorage.setItem("user", JSON.stringify(response.user));
 
+      // Save company
+      localStorage.setItem(
+        "company",
+        JSON.stringify({
+          companyName: response.user.company_name,
+        }),
+      );
       // Check role
       if (response.user.role === "admin") {
         navigate("/dashboard", { replace: true });
