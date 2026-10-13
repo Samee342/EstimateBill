@@ -1,470 +1,142 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import {
   FiArrowLeft,
   FiCalendar,
   FiClock,
-  FiEdit,
   FiFileText,
   FiMapPin,
-  FiPhone,
   FiPrinter,
   FiTrash2,
   FiUser,
 } from "react-icons/fi";
 
 import { FaMoneyBillWave } from "react-icons/fa";
-
-// ======================================================
-// TEMPORARY PROJECT DATA
-// Later this will come from your backend
-// ======================================================
-
-const projects = [
-  {
-    id: "PRJ-1001",
-    estimateNo: "EST-10245",
-    name: "Business Card Printing",
-
-    customer: {
-      name: "Ram Sharma",
-      phone: "9841234567",
-      address: "Butwal, Rupandehi",
-      pan: "609874321",
-    },
-
-    date: "2026-09-07",
-    dueDate: "2026-09-10",
-    priority: "Normal",
-    status: "Completed",
-
-    totalAmount: 12500,
-    advance: 5000,
-    remaining: 7500,
-
-    paymentStatus: "Partial",
-
-    items: [
-      {
-        description: "Business Card",
-        quantity: 500,
-        size: "3.5 x 2 inch",
-        paperType: "300 GSM Art Card",
-        ink: "4 Color",
-        rate: 25,
-        total: 12500,
-        bindingType: "-",
-        workType: "Printing",
-      },
-    ],
-
-    production: {
-      designDate: "2026-09-07",
-      designPerson: "Aashish",
-      printingDate: "2026-09-08",
-      printingPerson: "Ram",
-      bindingDate: "-",
-      bindingPerson: "-",
-    },
-
-    description: "Business cards printed for company staff and management.",
-  },
-
-  {
-    id: "PRJ-1002",
-    estimateNo: "EST-10246",
-    name: "Wedding Invitation Cards",
-
-    customer: {
-      name: "Sita Karki",
-      phone: "9812345678",
-      address: "Bhairahawa, Rupandehi",
-      pan: "601234567",
-    },
-
-    date: "2026-09-07",
-    dueDate: "2026-09-15",
-    priority: "High",
-    status: "Pending",
-
-    totalAmount: 18750,
-    advance: 8000,
-    remaining: 10750,
-
-    paymentStatus: "Partial",
-
-    items: [
-      {
-        description: "Wedding Invitation Card",
-        quantity: 750,
-        size: "5 x 7 inch",
-        paperType: "250 GSM Textured",
-        ink: "4 Color",
-        rate: 25,
-        total: 18750,
-        bindingType: "Folding",
-        workType: "Printing + Finishing",
-      },
-    ],
-
-    production: {
-      designDate: "2026-09-08",
-      designPerson: "Suman",
-      printingDate: "2026-09-12",
-      printingPerson: "Ram",
-      bindingDate: "2026-09-13",
-      bindingPerson: "Hari",
-    },
-
-    description: "Wedding invitation cards with custom design and folding.",
-  },
-
-  {
-    id: "PRJ-1003",
-    estimateNo: "EST-10247",
-    name: "Restaurant Menu Printing",
-
-    customer: {
-      name: "Hari Thapa",
-      phone: "9867890123",
-      address: "Nepalgunj, Banke",
-      pan: "608765432",
-    },
-
-    date: "2026-09-06",
-    dueDate: "2026-09-12",
-    priority: "Normal",
-    status: "Printed",
-
-    totalAmount: 24300,
-    advance: 10000,
-    remaining: 14300,
-
-    paymentStatus: "Partial",
-
-    items: [
-      {
-        description: "Restaurant Menu",
-        quantity: 100,
-        size: "A4",
-        paperType: "300 GSM Art Card",
-        ink: "4 Color",
-        rate: 243,
-        total: 24300,
-        bindingType: "Lamination",
-        workType: "Printing + Finishing",
-      },
-    ],
-
-    production: {
-      designDate: "2026-09-06",
-      designPerson: "Suman",
-      printingDate: "2026-09-08",
-      printingPerson: "Ram",
-      bindingDate: "2026-09-09",
-      bindingPerson: "Hari",
-    },
-
-    description: "Premium restaurant menu printing with laminated finishing.",
-  },
-
-  {
-    id: "PRJ-1004",
-    estimateNo: "EST-10248",
-    name: "Flex Banner Design",
-
-    customer: {
-      name: "Aashish Gurung",
-      phone: "9801234567",
-      address: "Butwal, Rupandehi",
-      pan: "605432198",
-    },
-
-    date: "2026-09-06",
-    dueDate: "2026-09-11",
-    priority: "High",
-    status: "Pending",
-
-    totalAmount: 5600,
-    advance: 2000,
-    remaining: 3600,
-
-    paymentStatus: "Partial",
-
-    items: [
-      {
-        description: "Promotional Flex Banner",
-        quantity: 4,
-        size: "4 x 8 ft",
-        paperType: "Flex",
-        ink: "Eco Solvent",
-        rate: 1400,
-        total: 5600,
-        bindingType: "Eyelet",
-        workType: "Design + Printing",
-      },
-    ],
-
-    production: {
-      designDate: "2026-09-07",
-      designPerson: "Aashish",
-      printingDate: "2026-09-09",
-      printingPerson: "Ram",
-      bindingDate: "2026-09-10",
-      bindingPerson: "Hari",
-    },
-
-    description: "Large promotional flex banners for outdoor advertising.",
-  },
-
-  {
-    id: "PRJ-1005",
-    estimateNo: "EST-10249",
-    name: "Company Brochure",
-
-    customer: {
-      name: "Mina Rai",
-      phone: "9823456789",
-      address: "Kohalpur, Banke",
-      pan: "607654321",
-    },
-
-    date: "2026-09-05",
-    dueDate: "2026-09-14",
-    priority: "Normal",
-    status: "Completed",
-
-    totalAmount: 18900,
-    advance: 9000,
-    remaining: 9900,
-
-    paymentStatus: "Partial",
-
-    items: [
-      {
-        description: "Company Brochure",
-        quantity: 300,
-        size: "A4",
-        paperType: "130 GSM Glossy",
-        ink: "4 Color",
-        rate: 63,
-        total: 18900,
-        bindingType: "Center Pin",
-        workType: "Printing + Binding",
-      },
-    ],
-
-    production: {
-      designDate: "2026-09-06",
-      designPerson: "Suman",
-      printingDate: "2026-09-08",
-      printingPerson: "Ram",
-      bindingDate: "2026-09-10",
-      bindingPerson: "Hari",
-    },
-
-    description: "Corporate brochure with professional full-color printing.",
-  },
-
-  {
-    id: "PRJ-1006",
-    estimateNo: "EST-10250",
-    name: "Product Label Printing",
-
-    customer: {
-      name: "Everest Traders",
-      phone: "9856789012",
-      address: "Nepalgunj, Banke",
-      pan: "604321987",
-    },
-
-    date: "2026-09-04",
-    dueDate: "2026-09-13",
-    priority: "High",
-    status: "Printed",
-
-    totalAmount: 32500,
-    advance: 15000,
-    remaining: 17500,
-
-    paymentStatus: "Partial",
-
-    items: [
-      {
-        description: "Product Labels",
-        quantity: 2500,
-        size: "3 x 4 inch",
-        paperType: "Sticker Paper",
-        ink: "4 Color",
-        rate: 13,
-        total: 32500,
-        bindingType: "-",
-        workType: "Printing",
-      },
-    ],
-
-    production: {
-      designDate: "2026-09-05",
-      designPerson: "Aashish",
-      printingDate: "2026-09-08",
-      printingPerson: "Ram",
-      bindingDate: "-",
-      bindingPerson: "-",
-    },
-
-    description: "Product labels for retail packaging and branding.",
-  },
-
-  {
-    id: "PRJ-1007",
-    estimateNo: "EST-10251",
-    name: "Office Letterhead",
-
-    customer: {
-      name: "ABC Enterprises",
-      phone: "9811122233",
-      address: "Butwal, Rupandehi",
-      pan: "601122334",
-    },
-
-    date: "2026-09-03",
-    dueDate: "2026-09-09",
-    priority: "Normal",
-    status: "Pending",
-
-    totalAmount: 7800,
-    advance: 3000,
-    remaining: 4800,
-
-    paymentStatus: "Partial",
-
-    items: [
-      {
-        description: "Office Letterhead",
-        quantity: 1000,
-        size: "A4",
-        paperType: "100 GSM Offset",
-        ink: "4 Color",
-        rate: 7.8,
-        total: 7800,
-        bindingType: "-",
-        workType: "Printing",
-      },
-    ],
-
-    production: {
-      designDate: "2026-09-04",
-      designPerson: "Suman",
-      printingDate: "2026-09-06",
-      printingPerson: "Ram",
-      bindingDate: "-",
-      bindingPerson: "-",
-    },
-
-    description: "Official company letterheads with branded header and footer.",
-  },
-
-  {
-    id: "PRJ-1008",
-    estimateNo: "EST-10252",
-    name: "Promotional Posters",
-
-    customer: {
-      name: "New Star Hotel",
-      phone: "9845678901",
-      address: "Nepalgunj, Banke",
-      pan: "603456789",
-    },
-
-    date: "2026-09-02",
-    dueDate: "2026-09-08",
-    priority: "Normal",
-    status: "Completed",
-
-    totalAmount: 15400,
-    advance: 15400,
-    remaining: 0,
-
-    paymentStatus: "Paid",
-
-    items: [
-      {
-        description: "Promotional Poster",
-        quantity: 200,
-        size: "A3",
-        paperType: "170 GSM Glossy",
-        ink: "4 Color",
-        rate: 77,
-        total: 15400,
-        bindingType: "-",
-        workType: "Printing",
-      },
-    ],
-
-    production: {
-      designDate: "2026-09-03",
-      designPerson: "Aashish",
-      printingDate: "2026-09-05",
-      printingPerson: "Ram",
-      bindingDate: "-",
-      bindingPerson: "-",
-    },
-
-    description: "Promotional posters for hotel marketing campaign.",
-  },
-];
+import { getProjects, deleteProject } from "../../api/project";
 
 // ======================================================
 // HELPERS
 // ======================================================
 
-const formatCurrency = (amount) => {
-  return `Rs. ${Number(amount).toLocaleString("en-IN")}`;
+const getRecords = (response) => {
+  const data = response?.data ?? response;
+
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data?.results)) return data.results;
+  if (Array.isArray(data?.orders)) return data.orders;
+  if (Array.isArray(data?.data)) return data.data;
+
+  return [];
 };
 
-const statusStyles = {
-  Pending:
-    "bg-amber-50 text-amber-600 border-amber-100 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20",
+const formatCurrency = (amount) =>
+  `Rs. ${Number(amount || 0).toLocaleString("en-IN", {
+    maximumFractionDigits: 2,
+  })}`;
 
-  Printed:
-    "bg-blue-50 text-blue-600 border-blue-100 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20",
+const formatDate = (date) => {
+  if (!date) return "-";
 
-  Completed:
-    "bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20",
+  const parsedDate = new Date(
+    /^\d{4}-\d{2}-\d{2}$/.test(String(date)) ? `${date}T00:00:00` : date,
+  );
+
+  if (Number.isNaN(parsedDate.getTime())) return date;
+
+  return parsedDate.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+};
+
+const getPaymentStatus = (paid, balance) => {
+  if (balance <= 0 && paid > 0) return "Paid";
+  if (paid > 0) return "Partial";
+  return "Pending";
+};
+
+const getStatusStyle = (status) => {
+  const value = String(status || "").toLowerCase();
+
+  if (["completed", "delivered", "finished"].includes(value)) {
+    return "bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20";
+  }
+
+  if (["printed", "printing"].includes(value)) {
+    return "bg-blue-50 text-blue-600 border-blue-100 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20";
+  }
+
+  return "bg-amber-50 text-amber-600 border-amber-100 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20";
+};
+
+const getProjectDetails = (project) => {
+  const totalAmount = Number(project.total_amount ?? 0);
+  const paidAmount = Number(project.paid_amount ?? 0);
+  const balance =
+    project.balance !== undefined && project.balance !== null
+      ? Number(project.balance)
+      : Math.max(totalAmount - paidAmount, 0);
+
+  const customer = project.customer_details || {};
+
+  return {
+    ...project,
+    name: project.project_name || "Untitled Project",
+    estimateNo: `EST-${project.slip_no ?? "-"}`,
+    customer: {
+      name:
+        customer.name ||
+        project.customer_name ||
+        "Customer information unavailable",
+      phone: customer.contact_no || customer.phone || project.contact_no || "-",
+      address: customer.address || project.customer_address || "-",
+      pan: customer.pan_no || project.pan_no || "-",
+    },
+    date: project.slip_date || project.created_at || "",
+    dueDate: project.delivery_date || "",
+    priority: project.priority || "Normal",
+    status: project.work_stage || "pending",
+    totalAmount,
+    advance: paidAmount,
+    remaining: Math.max(balance, 0),
+    paymentStatus: getPaymentStatus(paidAmount, balance),
+    items: Array.isArray(project.items)
+      ? project.items
+      : Array.isArray(project.slip_items)
+        ? project.slip_items
+        : [],
+    production: project.production || {},
+    description: project.description || project.notes || "",
+  };
 };
 
 // ======================================================
 // SMALL COMPONENTS
 // ======================================================
 
-const InfoItem = ({ label, value }) => {
-  return (
-    <div>
-      <p className="mb-1 text-xs font-medium uppercase tracking-wide text-slate-400 dark:text-slate-500">
-        {label}
-      </p>
+const InfoItem = ({ label, value }) => (
+  <div>
+    <p className="mb-1 text-xs font-medium uppercase tracking-wide text-slate-400 dark:text-slate-500">
+      {label}
+    </p>
+    <p className="break-words text-sm font-semibold text-slate-800 dark:text-slate-200">
+      {value || "-"}
+    </p>
+  </div>
+);
 
-      <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-        {value || "-"}
-      </p>
+const SectionTitle = ({ icon: Icon, title }) => (
+  <div className="mb-5 flex items-center gap-3">
+    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-orange-50 text-orange-500 dark:bg-orange-500/10">
+      <Icon size={17} />
     </div>
-  );
-};
-
-const SectionTitle = ({ icon: Icon, title }) => {
-  return (
-    <div className="mb-5 flex items-center gap-3">
-      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-orange-50 text-orange-500 dark:bg-orange-500/10">
-        <Icon size={17} />
-      </div>
-
-      <h2 className="text-base font-bold text-slate-800 dark:text-slate-100">
-        {title}
-      </h2>
-    </div>
-  );
-};
+    <h2 className="text-base font-bold text-slate-800 dark:text-slate-100">
+      {title}
+    </h2>
+  </div>
+);
 
 // ======================================================
 // PAGE
@@ -474,12 +146,146 @@ const ProjectDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const project = projects.find(
-    (projectItem) => projectItem.id.toLowerCase() === id?.toLowerCase(),
-  );
+  const [project, setProject] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [deleting, setDeleting] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+
+    const fetchProject = async () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        const response = await getProjects();
+
+        console.log("Full backend response:", response);
+        console.log("Data sent by backend:", response?.data);
+
+        const records = getRecords(response);
+
+        console.log("First project:", records[0]);
+        console.log("Project description:", records[0]?.description);
+        console.log("Customer details:", records[0]?.customer_details);
+        console.log(
+          "Customer phone:",
+          records[0]?.customer_details?.contact_no,
+        );
+
+        const found = records.find(
+          (item) =>
+            String(item.id).toLowerCase() === String(id).toLowerCase() ||
+            String(item.slip_no) === String(id),
+        );
+
+        if (!active) return;
+
+        if (!found) {
+          setProject(null);
+          setError("");
+          return;
+        }
+
+        setProject(getProjectDetails(found));
+      } catch (err) {
+        if (!active) return;
+
+        console.error("Failed to fetch project details:", err);
+
+        setError(
+          err?.response?.data?.detail ||
+            err?.response?.data?.message ||
+            "Unable to load project details. Please try again.",
+        );
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+
+    fetchProject();
+
+    return () => {
+      active = false;
+    };
+  }, [id]);
+
+  const handleDelete = async () => {
+    if (!project?.id || deleting) return;
+
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${project.name}"?`,
+    );
+
+    if (!confirmed) return;
+
+    try {
+      setDeleting(true);
+      await deleteProject(project.id);
+      navigate("/projects", {
+        replace: true,
+        state: { message: "Project deleted successfully." },
+      });
+    } catch (err) {
+      console.error("Failed to delete project:", err);
+
+      window.alert(
+        err?.response?.data?.detail ||
+          err?.response?.data?.message ||
+          "Failed to delete project. Please try again.",
+      );
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   // ====================================================
-  // PROJECT NOT FOUND
+  // LOADING
+  // ====================================================
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-950">
+        <div className="text-center">
+          <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-orange-100 border-t-orange-500" />
+          <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">
+            Loading project details...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // ====================================================
+  // ERROR
+  // ====================================================
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-slate-50 px-4 py-10 dark:bg-slate-950">
+        <div className="mx-auto max-w-3xl">
+          <div className="rounded-2xl border border-red-200 bg-white p-8 text-center dark:border-red-900 dark:bg-slate-900">
+            <h1 className="text-xl font-bold text-slate-800 dark:text-white">
+              Could Not Load Project
+            </h1>
+            <p className="mt-3 text-sm text-red-500">{error}</p>
+
+            <button
+              type="button"
+              onClick={() => window.location.reload()}
+              className="mt-6 rounded-lg bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-orange-600"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ====================================================
+  // NOT FOUND
   // ====================================================
 
   if (!project) {
@@ -489,30 +295,24 @@ const ProjectDetails = () => {
           <button
             type="button"
             onClick={() => navigate("/projects")}
-            className="mb-6 flex items-center gap-2 text-sm font-semibold text-slate-600 transition hover:text-orange-500 dark:text-slate-400"
+            className="mb-6 flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-orange-500 dark:text-slate-400"
           >
             <FiArrowLeft size={17} />
             Back to Projects
           </button>
 
           <div className="rounded-2xl border border-slate-200 bg-white p-10 text-center dark:border-slate-800 dark:bg-slate-900">
-            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-orange-50 text-orange-500 dark:bg-orange-500/10">
-              <FiFileText size={24} />
-            </div>
-
-            <h1 className="text-xl font-bold text-slate-800 dark:text-slate-100">
+            <FiFileText size={28} className="mx-auto mb-4 text-orange-500" />
+            <h1 className="text-xl font-bold text-slate-800 dark:text-white">
               Project Not Found
             </h1>
-
             <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-              No project was found with ID{" "}
-              <span className="font-semibold">{id}</span>.
+              No project was found with ID {id}.
             </p>
-
             <button
               type="button"
               onClick={() => navigate("/projects")}
-              className="mt-6 rounded-lg bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-orange-600"
+              className="mt-6 rounded-lg bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-orange-600"
             >
               Back to Projects
             </button>
@@ -522,27 +322,15 @@ const ProjectDetails = () => {
     );
   }
 
-  // ====================================================
-  // PAGE
-  // ====================================================
+  const customerName = project.customer.name;
+  const production = project.production;
 
   return (
     <div className="min-h-screen bg-slate-50 px-4 py-6 dark:bg-slate-950 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
-        {/* ================================================
-            TOP BAR
-        ================================================= */}
+        {/* TOP BAR */}
 
         <div className="mb-6">
-          <button
-            type="button"
-            onClick={() => navigate("/projects")}
-            className="mb-5 flex items-center gap-2 text-sm font-medium text-slate-500 transition hover:text-orange-500 dark:text-slate-400"
-          >
-            <FiArrowLeft size={17} />
-            Back to Projects
-          </button>
-
           <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex items-start gap-4">
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-orange-500 dark:bg-orange-500/10">
@@ -556,48 +344,41 @@ const ProjectDetails = () => {
                   </h1>
 
                   <span
-                    className={`rounded-full border px-3 py-1 text-xs font-semibold ${statusStyles[project.status]}`}
+                    className={`rounded-full border px-3 py-1 text-xs font-semibold ${getStatusStyle(project.status)}`}
                   >
-                    {project.status}
+                    {String(project.status).replaceAll("_", " ")}
                   </span>
                 </div>
 
                 <div className="mt-1 flex flex-wrap items-center gap-3 text-sm text-slate-500 dark:text-slate-400">
-                  <span>{project.id}</span>
-
+                  <span>Slip #{project.slip_no ?? "-"}</span>
                   <span className="text-slate-300 dark:text-slate-700">•</span>
-
                   <span>{project.estimateNo}</span>
                 </div>
               </div>
             </div>
 
-            {/* ACTIONS */}
-
             <div className="flex flex-wrap gap-2">
-              {/* DELETE */}
-
               <button
                 type="button"
-                className="flex w-full items-center justify-center gap-2 rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-sm font-semibold text-red-500 transition hover:bg-red-100 dark:border-red-500/20 dark:bg-red-500/10 dark:hover:bg-red-500/20"
+                disabled={deleting}
+                onClick={handleDelete}
+                className="flex w-full items-center justify-center gap-2 rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-sm font-semibold text-red-500 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-red-500/20 dark:bg-red-500/10 dark:hover:bg-red-500/20 sm:w-auto"
               >
                 <FiTrash2 size={16} />
-                Delete Project
+                {deleting ? "Deleting..." : "Delete Project"}
               </button>
             </div>
           </div>
         </div>
 
-        {/* ================================================
-            SUMMARY
-        ================================================= */}
+        {/* SUMMARY */}
 
         <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div className="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
             <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
               Total Amount
             </p>
-
             <p className="mt-2 text-xl font-bold text-slate-900 dark:text-white">
               {formatCurrency(project.totalAmount)}
             </p>
@@ -607,7 +388,6 @@ const ProjectDetails = () => {
             <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
               Advance Paid
             </p>
-
             <p className="mt-2 text-xl font-bold text-emerald-600 dark:text-emerald-400">
               {formatCurrency(project.advance)}
             </p>
@@ -617,44 +397,36 @@ const ProjectDetails = () => {
             <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
               Remaining
             </p>
-
             <p className="mt-2 text-xl font-bold text-orange-500">
               {formatCurrency(project.remaining)}
             </p>
           </div>
         </div>
 
-        {/* ================================================
-            MAIN GRID
-        ================================================= */}
+        {/* MAIN GRID */}
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          {/* ==============================================
-              LEFT / MAIN CONTENT
-          =============================================== */}
-
           <div className="space-y-6 lg:col-span-2">
-            {/* CUSTOMER */}
+            {/* CUSTOMER INFORMATION */}
 
             <section className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
               <SectionTitle icon={FiUser} title="Customer Information" />
 
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                <InfoItem label="Customer Name" value={project.customer.name} />
-
+                <InfoItem label="Customer Name" value={customerName} />
                 <InfoItem label="Phone" value={project.customer.phone} />
-
                 <InfoItem label="Address" value={project.customer.address} />
-
                 <InfoItem label="PAN / VAT" value={project.customer.pan} />
               </div>
 
-              <div className="mt-5 flex flex-wrap gap-2">
-                <div className="inline-flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600 dark:border-slate-700 dark:text-slate-300">
-                  <FiMapPin size={14} />
-                  {project.customer.address}
+              {project.customer.address !== "-" && (
+                <div className="mt-5 flex flex-wrap gap-2">
+                  <div className="inline-flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600 dark:border-slate-700 dark:text-slate-300">
+                    <FiMapPin size={14} />
+                    {project.customer.address}
+                  </div>
                 </div>
-              </div>
+              )}
             </section>
 
             {/* PROJECT INFORMATION */}
@@ -664,15 +436,19 @@ const ProjectDetails = () => {
 
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 <InfoItem label="Estimate No." value={project.estimateNo} />
-
-                <InfoItem label="Project Date" value={project.date} />
-
-                <InfoItem label="Due Date" value={project.dueDate} />
-
+                <InfoItem
+                  label="Project Date"
+                  value={formatDate(project.date)}
+                />
+                <InfoItem
+                  label="Due Date"
+                  value={formatDate(project.dueDate)}
+                />
                 <InfoItem label="Priority" value={project.priority} />
-
-                <InfoItem label="Status" value={project.status} />
-
+                <InfoItem
+                  label="Work Stage"
+                  value={String(project.status).replaceAll("_", " ")}
+                />
                 <InfoItem label="Payment" value={project.paymentStatus} />
               </div>
 
@@ -680,9 +456,9 @@ const ProjectDetails = () => {
                 <p className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-400">
                   Description
                 </p>
-
                 <p className="text-sm leading-6 text-slate-600 dark:text-slate-300">
-                  {project.description}
+                  {project.description ||
+                    "No description available for this project."}
                 </p>
               </div>
             </section>
@@ -692,234 +468,169 @@ const ProjectDetails = () => {
             <section className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
               <SectionTitle icon={FiPrinter} title="Printing Items" />
 
-              {/* Desktop */}
-
-              <div className="hidden overflow-x-auto md:block">
-                <table className="w-full min-w-[850px] text-left">
-                  <thead>
-                    <tr className="border-b border-slate-100 dark:border-slate-800">
-                      <th className="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-slate-400">
-                        Description
-                      </th>
-
-                      <th className="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-slate-400">
-                        Qty
-                      </th>
-
-                      <th className="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-slate-400">
-                        Size
-                      </th>
-
-                      <th className="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-slate-400">
-                        Paper
-                      </th>
-
-                      <th className="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-slate-400">
-                        Ink
-                      </th>
-
-                      <th className="px-3 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-400">
-                        Total
-                      </th>
-                    </tr>
-                  </thead>
-
-                  <tbody>
-                    {project.items.map((item, index) => (
-                      <tr
-                        key={index}
-                        className="border-b border-slate-50 last:border-0 dark:border-slate-800"
-                      >
-                        <td className="px-3 py-4">
-                          <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-                            {item.description}
-                          </p>
-
-                          <p className="mt-1 text-xs text-slate-400">
-                            {item.workType}
-                          </p>
-                        </td>
-
-                        <td className="px-3 py-4 text-sm text-slate-600 dark:text-slate-300">
-                          {item.quantity}
-                        </td>
-
-                        <td className="px-3 py-4 text-sm text-slate-600 dark:text-slate-300">
-                          {item.size}
-                        </td>
-
-                        <td className="px-3 py-4 text-sm text-slate-600 dark:text-slate-300">
-                          {item.paperType}
-                        </td>
-
-                        <td className="px-3 py-4 text-sm text-slate-600 dark:text-slate-300">
-                          {item.ink}
-                        </td>
-
-                        <td className="px-3 py-4 text-right text-sm font-semibold text-slate-800 dark:text-slate-200">
-                          {formatCurrency(item.total)}
-                        </td>
+              {project.items.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="w-full min-w-[650px] text-left">
+                    <thead>
+                      <tr className="border-b border-slate-100 dark:border-slate-800">
+                        {[
+                          "Description",
+                          "Qty",
+                          "Size",
+                          "Paper",
+                          "Ink",
+                          "Total",
+                        ].map((heading) => (
+                          <th
+                            key={heading}
+                            className="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-slate-400"
+                          >
+                            {heading}
+                          </th>
+                        ))}
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Mobile */}
-
-              <div className="space-y-3 md:hidden">
-                {project.items.map((item, index) => (
-                  <div
-                    key={index}
-                    className="rounded-lg border border-slate-100 p-4 dark:border-slate-800"
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-                          {item.description}
-                        </p>
-
-                        <p className="mt-1 text-xs text-slate-400">
-                          {item.workType}
-                        </p>
-                      </div>
-
-                      <p className="text-sm font-bold text-orange-500">
-                        {formatCurrency(item.total)}
-                      </p>
-                    </div>
-
-                    <div className="mt-4 grid grid-cols-2 gap-4">
-                      <InfoItem label="Quantity" value={item.quantity} />
-
-                      <InfoItem label="Size" value={item.size} />
-
-                      <InfoItem label="Paper" value={item.paperType} />
-
-                      <InfoItem label="Ink" value={item.ink} />
-
-                      <InfoItem label="Binding" value={item.bindingType} />
-
-                      <InfoItem
-                        label="Rate"
-                        value={formatCurrency(item.rate)}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
+                    </thead>
+                    <tbody>
+                      {project.items.map((item, index) => (
+                        <tr
+                          key={item.id || index}
+                          className="border-b border-slate-50 last:border-0 dark:border-slate-800"
+                        >
+                          <td className="px-3 py-4">
+                            <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+                              {item.description ||
+                                item.name ||
+                                item.item_name ||
+                                "-"}
+                            </p>
+                            <p className="mt-1 text-xs text-slate-400">
+                              {item.work_type || item.workType || "-"}
+                            </p>
+                          </td>
+                          <td className="px-3 py-4 text-sm text-slate-600 dark:text-slate-300">
+                            {item.quantity ?? item.qty ?? "-"}
+                          </td>
+                          <td className="px-3 py-4 text-sm text-slate-600 dark:text-slate-300">
+                            {item.size || "-"}
+                          </td>
+                          <td className="px-3 py-4 text-sm text-slate-600 dark:text-slate-300">
+                            {item.paper_type || item.paperType || "-"}
+                          </td>
+                          <td className="px-3 py-4 text-sm text-slate-600 dark:text-slate-300">
+                            {item.ink || item.color || "-"}
+                          </td>
+                          <td className="px-3 py-4 text-sm font-semibold text-slate-800 dark:text-slate-200">
+                            {formatCurrency(
+                              item.total ?? item.total_amount ?? item.amount,
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="rounded-lg border border-dashed border-slate-200 px-4 py-8 text-center dark:border-slate-700">
+                  <FiFileText
+                    className="mx-auto mb-2 text-slate-400"
+                    size={23}
+                  />
+                  <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
+                    Item details are not included in this project response.
+                  </p>
+                  <p className="mt-1 text-xs text-slate-400">
+                    Connect the slip-items API to display printing
+                    specifications here.
+                  </p>
+                </div>
+              )}
             </section>
 
-            {/* PRODUCTION */}
+            {/* PRODUCTION TIMELINE */}
 
             <section className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
               <SectionTitle icon={FiClock} title="Production Timeline" />
 
-              <div className="space-y-5">
-                <div className="flex gap-4">
-                  <div className="mt-1 h-3 w-3 shrink-0 rounded-full bg-orange-500 ring-4 ring-orange-50 dark:ring-orange-500/10" />
-
+              {[
+                {
+                  title: "Design",
+                  date: production.design_date || production.designDate,
+                  person: production.design_person || production.designPerson,
+                  color: "bg-orange-500 ring-orange-50 dark:ring-orange-500/10",
+                },
+                {
+                  title: "Printing",
+                  date: production.printing_date || production.printingDate,
+                  person:
+                    production.printing_person || production.printingPerson,
+                  color: "bg-blue-500 ring-blue-50 dark:ring-blue-500/10",
+                },
+                {
+                  title: "Binding / Finishing",
+                  date: production.binding_date || production.bindingDate,
+                  person: production.binding_person || production.bindingPerson,
+                  color:
+                    "bg-emerald-500 ring-emerald-50 dark:ring-emerald-500/10",
+                },
+              ].map((stage) => (
+                <div key={stage.title} className="mb-5 flex gap-4 last:mb-0">
+                  <div
+                    className={`mt-1 h-3 w-3 shrink-0 rounded-full ring-4 ${stage.color}`}
+                  />
                   <div className="flex-1">
                     <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-                      Design
+                      {stage.title}
                     </p>
-
                     <p className="mt-1 text-xs text-slate-400">
-                      {project.production.designDate}
+                      {stage.date
+                        ? formatDate(stage.date)
+                        : "No date available"}
                     </p>
-
                     <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
                       Responsible:{" "}
                       <span className="font-medium text-slate-700 dark:text-slate-300">
-                        {project.production.designPerson}
+                        {stage.person || "Not assigned"}
                       </span>
                     </p>
                   </div>
                 </div>
-
-                <div className="flex gap-4">
-                  <div className="mt-1 h-3 w-3 shrink-0 rounded-full bg-blue-500 ring-4 ring-blue-50 dark:ring-blue-500/10" />
-
-                  <div className="flex-1">
-                    <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-                      Printing
-                    </p>
-
-                    <p className="mt-1 text-xs text-slate-400">
-                      {project.production.printingDate}
-                    </p>
-
-                    <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
-                      Responsible:{" "}
-                      <span className="font-medium text-slate-700 dark:text-slate-300">
-                        {project.production.printingPerson}
-                      </span>
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex gap-4">
-                  <div className="mt-1 h-3 w-3 shrink-0 rounded-full bg-emerald-500 ring-4 ring-emerald-50 dark:ring-emerald-500/10" />
-
-                  <div className="flex-1">
-                    <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-                      Binding / Finishing
-                    </p>
-
-                    <p className="mt-1 text-xs text-slate-400">
-                      {project.production.bindingDate}
-                    </p>
-
-                    <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
-                      Responsible:{" "}
-                      <span className="font-medium text-slate-700 dark:text-slate-300">
-                        {project.production.bindingPerson}
-                      </span>
-                    </p>
-                  </div>
-                </div>
-              </div>
+              ))}
             </section>
           </div>
 
-          {/* ==============================================
-              RIGHT SIDEBAR
-          =============================================== */}
+          {/* RIGHT SIDEBAR */}
 
           <div className="space-y-6">
-            {/* PAYMENT */}
+            {/* PAYMENT SUMMARY */}
 
             <section className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
               <SectionTitle icon={FaMoneyBillWave} title="Payment Summary" />
 
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-3">
                   <span className="text-sm text-slate-500 dark:text-slate-400">
                     Total Amount
                   </span>
-
-                  <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+                  <span className="text-right text-sm font-semibold text-slate-800 dark:text-slate-200">
                     {formatCurrency(project.totalAmount)}
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-3">
                   <span className="text-sm text-slate-500 dark:text-slate-400">
                     Advance
                   </span>
-
-                  <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">
+                  <span className="text-right text-sm font-semibold text-emerald-600 dark:text-emerald-400">
                     {formatCurrency(project.advance)}
                   </span>
                 </div>
 
                 <div className="border-t border-slate-100 pt-4 dark:border-slate-800">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between gap-3">
                     <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
                       Remaining
                     </span>
-
-                    <span className="text-base font-bold text-orange-500">
+                    <span className="text-right text-base font-bold text-orange-500">
                       {formatCurrency(project.remaining)}
                     </span>
                   </div>
@@ -928,41 +639,36 @@ const ProjectDetails = () => {
 
               <div className="mt-5 rounded-lg bg-slate-50 p-4 dark:bg-slate-800/60">
                 <p className="text-xs text-slate-400">Payment Status</p>
-
                 <p className="mt-1 text-sm font-semibold text-slate-800 dark:text-slate-200">
                   {project.paymentStatus}
                 </p>
               </div>
             </section>
 
-            {/* DATES */}
+            {/* IMPORTANT DATES */}
 
             <section className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
               <SectionTitle icon={FiCalendar} title="Important Dates" />
 
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-3">
                   <div>
                     <p className="text-xs text-slate-400">Project Date</p>
-
                     <p className="mt-1 text-sm font-semibold text-slate-700 dark:text-slate-300">
-                      {project.date}
+                      {formatDate(project.date)}
                     </p>
                   </div>
-
-                  <FiCalendar className="text-slate-400" />
+                  <FiCalendar className="shrink-0 text-slate-400" />
                 </div>
 
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-3">
                   <div>
                     <p className="text-xs text-slate-400">Delivery Date</p>
-
                     <p className="mt-1 text-sm font-semibold text-orange-500">
-                      {project.dueDate}
+                      {formatDate(project.dueDate)}
                     </p>
                   </div>
-
-                  <FiClock className="text-orange-500" />
+                  <FiClock className="shrink-0 text-orange-500" />
                 </div>
               </div>
             </section>
@@ -973,17 +679,19 @@ const ProjectDetails = () => {
               <SectionTitle icon={FiUser} title="Customer" />
 
               <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-orange-50 font-bold text-orange-500 dark:bg-orange-500/10">
-                  {project.customer.name.charAt(0)}
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-orange-50 font-bold text-orange-500 dark:bg-orange-500/10">
+                  {customerName.charAt(0).toUpperCase()}
                 </div>
 
                 <div className="min-w-0">
                   <p className="truncate text-sm font-bold text-slate-800 dark:text-slate-200">
-                    {project.customer.name}
+                    {customerName}
                   </p>
-
-                  <p className="mt-1 text-xs text-slate-400">
-                    {project.customer.phone}
+                  <p className="mt-1 flex items-center gap-1 text-xs text-slate-400">
+                    {project.customer.phone !== "-" && (
+                      <span>{project.customer.phone}</span>
+                    )}
+                    {project.customer.phone === "-" && "Phone unavailable"}
                   </p>
                 </div>
               </div>
@@ -993,7 +701,7 @@ const ProjectDetails = () => {
                 onClick={() => navigate("/customers")}
                 className="mt-5 w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:border-orange-200 hover:text-orange-500 dark:border-slate-700 dark:text-slate-300"
               >
-                View Customer
+                View Customers
               </button>
             </section>
           </div>

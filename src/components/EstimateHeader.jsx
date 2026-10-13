@@ -12,24 +12,19 @@ import {
 import { createCustomer, getCustomer } from "../api/customer";
 import { toast } from "react-hot-toast";
 
-const EstimateHeader = ({ register, errors, setValue }) => {
+const EstimateHeader = ({ register, errors, setValue, slipNumber }) => {
   const [showCustomerModal, setShowCustomerModal] = useState(false);
-
   const [search, setSearch] = useState("");
-
   const [customers, setCustomers] = useState([]);
-
   const [selectedCustomer, setSelectedCustomer] = useState(null);
-
   const [loadingCustomers, setLoadingCustomers] = useState(false);
-
   const [creatingCustomer, setCreatingCustomer] = useState(false);
 
   const [newCustomer, setNewCustomer] = useState({
     name: "",
-    pan: "",
+    pan_no: "",
     address: "",
-    contact: "",
+    contact_no: "",
   });
 
   // ==========================================
@@ -37,54 +32,83 @@ const EstimateHeader = ({ register, errors, setValue }) => {
   // ==========================================
 
   useEffect(() => {
-  const fetchCustomers = async () => {
-    try {
-      setLoadingCustomers(true);
+    const fetchCustomers = async () => {
+      try {
+        setLoadingCustomers(true);
 
-      const response = await getCustomer();
+        const response = await getCustomer();
 
-      console.log("FULL CUSTOMER RESPONSE:", response);
+        const customerList = Array.isArray(response)
+          ? response
+          : Array.isArray(response?.data)
+            ? response.data
+            : Array.isArray(response?.data?.results)
+              ? response.data.results
+              : [];
+        setCustomers(customerList);
+      } catch (error) {
+        console.error("Create customer full error:", error?.response);
 
-      setCustomers(Array.isArray(response) ? response : []);
-    } catch (error) {
-      console.error("Failed to fetch customers:", error);
-      toast.error("Failed to load customers.");
-    } finally {
-      setLoadingCustomers(false);
-    }
-  };
+        toast.error(
+          error?.response?.data?.message ||
+            error?.response?.data?.detail ||
+            error?.response?.data?.error ||
+            "Server crashed while adding customer. Check backend terminal.",
+        );
+      } finally {
+        setLoadingCustomers(false);
+      }
+    };
 
-  fetchCustomers();
-}, []);
+    fetchCustomers();
+  }, []);
 
   // ==========================================
   // SEARCH CUSTOMERS
   // ==========================================
 
   const filteredCustomers = customers.filter((customer) => {
-  const name = customer.name || "";
-  const phone = customer.phone_no || "";
+    const name = (customer.name || customer.customer_name || "").toLowerCase();
 
-  return (
-    name.toLowerCase().includes(search.toLowerCase()) ||
-    phone.toLowerCase().includes(search.toLowerCase())
-  );
-});
+    const phone = String(
+      customer.contact_no || customer.phone || customer.phone_no || "",
+    ).toLowerCase();
+
+    const searchTerm = search.toLowerCase();
+
+    return name.includes(searchTerm) || phone.includes(searchTerm);
+  });
 
   // ==========================================
   // SELECT CUSTOMER
   // ==========================================
 
   const handleSelectCustomer = (customer) => {
-  setSelectedCustomer(customer);
+    setSelectedCustomer(customer);
 
-  setValue("customerName", customer.name || "");
-  setValue("panNumber", customer.pan_no || "");
-  setValue("address", customer.address || "");
-  setValue("contactNumber", customer.phone_no || "");
+    // Store the customer ID for the project API.
+    setValue("customer", customer.id ?? customer.uuid ?? "", {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
 
-  setSearch("");
-};
+    setValue("customerName", customer.name || customer.customer_name || "", {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+
+    setValue("pan_no", customer.pan_no || customer.pan || "");
+
+    setValue(
+      "contact_no",
+      customer.contact_no || customer.phone_no || customer.phone || "",
+    );
+
+    setValue("address", customer.address || "");
+
+    setSearch("");
+  };
+
   // ==========================================
   // ADD CUSTOMER
   // ==========================================
@@ -100,28 +124,12 @@ const EstimateHeader = ({ register, errors, setValue }) => {
 
       const payload = {
         name: newCustomer.name.trim(),
-        pan: newCustomer.pan.trim(),
+        pan_no: newCustomer.pan_no.trim(),
         address: newCustomer.address.trim(),
-        contact: newCustomer.contact.trim(),
+        contact_no: newCustomer.contact_no.trim(),
       };
 
-      console.log("Creating customer:", payload);
-
       const response = await createCustomer(payload);
-
-      console.log("Created customer:", response);
-
-      /*
-        Backend may return:
-
-        {
-          customer: {...}
-        }
-
-        or directly:
-
-        {...}
-      */
 
       const createdCustomer =
         response?.customer ||
@@ -129,18 +137,26 @@ const EstimateHeader = ({ register, errors, setValue }) => {
         response?.data ||
         response;
 
-      // Add newly created customer to local list
-      setCustomers((prev) => [...prev, createdCustomer]);
+      if (
+        !createdCustomer ||
+        typeof createdCustomer !== "object" ||
+        !(createdCustomer.name || createdCustomer.customer_name)
+      ) {
+        toast.error(
+          "Customer response did not contain the expected customer details.",
+        );
+        return;
+      }
 
-      // Automatically select it
+      setCustomers((previous) => [...previous, createdCustomer]);
+
       handleSelectCustomer(createdCustomer);
 
-      // Reset modal form
       setNewCustomer({
         name: "",
-        pan: "",
+        pan_no: "",
         address: "",
-        contact: "",
+        contact_no: "",
       });
 
       setShowCustomerModal(false);
@@ -152,7 +168,7 @@ const EstimateHeader = ({ register, errors, setValue }) => {
       toast.error(
         error?.response?.data?.message ||
           error?.response?.data?.detail ||
-          "Failed to add customer."
+          "Failed to add customer.",
       );
     } finally {
       setCreatingCustomer(false);
@@ -166,22 +182,29 @@ const EstimateHeader = ({ register, errors, setValue }) => {
   const handleClearCustomer = () => {
     setSelectedCustomer(null);
 
+    setValue("customer", "", {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+
     setValue("customerName", "");
-    setValue("panNumber", "");
+    setValue("pan_no", "");
+    setValue("contact_no", "");
     setValue("address", "");
-    setValue("contactNumber", "");
 
     setSearch("");
   };
 
+  // ==========================================
+  // RENDER
+  // ==========================================
+
   return (
     <>
-      <div className="w-full p-6 text-sm text-slate-700">
-        {/* =====================================
-            TOP ROW
-        ====================================== */}
+      <div className="w-full p-6 text-sm text-slate-700 dark:text-slate-200">
+        {/* TOP ROW */}
 
-        <div className="mb-7 flex flex-col gap-5 border-b border-slate-100 pb-6 md:flex-row md:items-center md:justify-between">
+        <div className="mb-7 flex flex-col gap-5 border-b border-slate-100 pb-6 md:flex-row md:items-center md:justify-between dark:border-slate-700">
           {/* SLIP NUMBER */}
 
           <div className="flex items-center gap-2">
@@ -191,9 +214,10 @@ const EstimateHeader = ({ register, errors, setValue }) => {
 
             <input
               type="text"
-              {...register("slipNumber")}
-              placeholder="Slip number"
-              className="w-36 border-b border-dashed border-slate-400 bg-transparent px-1 py-1 outline-none transition focus:border-orange-500"
+              value={slipNumber ?? ""}
+              readOnly
+              placeholder="Generated with project"
+              className="w-36 cursor-not-allowed border-b border-dashed border-slate-400 bg-slate-50 px-1 py-1 text-slate-600 outline-none dark:bg-slate-800 dark:text-slate-200"
             />
           </div>
 
@@ -204,9 +228,7 @@ const EstimateHeader = ({ register, errors, setValue }) => {
               Estimate Slip
             </h1>
 
-            <p className="mt-1 text-xs text-slate-400">
-              Printing Estimate
-            </p>
+            <p className="mt-1 text-xs text-slate-400">Printing Estimate</p>
           </div>
 
           {/* DATE */}
@@ -218,7 +240,7 @@ const EstimateHeader = ({ register, errors, setValue }) => {
 
             <input
               type="date"
-              {...register("date", {
+              {...register("slip_date", {
                 required: "Date is required",
               })}
               className="border-b border-dashed border-slate-400 bg-transparent px-1 py-1 outline-none transition focus:border-orange-500"
@@ -226,21 +248,15 @@ const EstimateHeader = ({ register, errors, setValue }) => {
           </div>
         </div>
 
-        {/* DATE ERROR */}
-
-        {errors?.date && (
+        {errors?.slip_date && (
           <p className="mb-4 text-xs text-red-500">
-            {errors.date.message}
+            {errors.slip_date.message}
           </p>
         )}
 
-        {/* =====================================
-            CUSTOMER SECTION
-        ====================================== */}
+        {/* CUSTOMER SECTION */}
 
         <div>
-          {/* SECTION HEADING */}
-
           <div className="mb-5 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-50 text-orange-600">
@@ -248,7 +264,7 @@ const EstimateHeader = ({ register, errors, setValue }) => {
               </div>
 
               <div>
-                <h2 className="font-semibold text-slate-800 dark:text-slate-300">
+                <h2 className="font-semibold text-slate-800 dark:text-slate-200">
                   Customer Information
                 </h2>
 
@@ -269,14 +285,10 @@ const EstimateHeader = ({ register, errors, setValue }) => {
             )}
           </div>
 
-          {/* =====================================
-              CUSTOMER SEARCH
-          ====================================== */}
+          {/* CUSTOMER SEARCH */}
 
           <div className="relative mb-6">
             <div className="flex gap-2">
-              {/* SEARCH */}
-
               <div className="relative flex-1">
                 <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-xs text-slate-400" />
 
@@ -286,69 +298,62 @@ const EstimateHeader = ({ register, errors, setValue }) => {
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder={
                     selectedCustomer
-                      ? selectedCustomer.name ||
-                        selectedCustomer.customer_name
+                      ? selectedCustomer.name || selectedCustomer.customer_name
                       : "Search customer..."
                   }
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-10 pr-4 text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100 dark:bg-slate-800"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-10 pr-4 text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100 dark:border-slate-700 dark:bg-slate-800"
                 />
               </div>
-
-              {/* ADD CUSTOMER */}
 
               <button
                 type="button"
                 onClick={() => setShowCustomerModal(true)}
-                className="flex h-[46px] shrink-0 items-center gap-2 rounded-xl bg-orange-600 px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-orange-700"
+                className="flex h-[46px] shrink-0 items-center gap-2 rounded-xl bg-orange-600 px-4 text-sm font-semibold text-white transition hover:bg-orange-700"
               >
                 <FaPlus className="text-xs" />
-
-                <span className="hidden sm:inline">
-                  Add Customer
-                </span>
+                <span className="hidden sm:inline">Add Customer</span>
               </button>
             </div>
 
             {/* SEARCH RESULTS */}
 
             {search && !selectedCustomer && (
-              <div className="absolute left-0 right-0 top-[52px] z-30 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl">
+              <div className="absolute left-0 right-0 top-[52px] z-30 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl dark:border-slate-700 dark:bg-slate-800">
                 {loadingCustomers ? (
                   <div className="px-4 py-5 text-center text-sm text-slate-400">
                     Loading customers...
                   </div>
                 ) : filteredCustomers.length > 0 ? (
-                  filteredCustomers.map((customer) => {
+                  filteredCustomers.map((customer, index) => {
                     const customerName =
                       customer.name ||
                       customer.customer_name ||
                       "Unnamed Customer";
 
                     const customerPhone =
-                      customer.contact ||
+                      customer.contact_no ||
                       customer.phone ||
                       customer.phone_no ||
                       "";
 
                     const customerId =
-                      customer.uuid ||
-                      customer.id;
+                      customer.uuid ??
+                      customer.id ??
+                      `${customerName}-${index}`;
 
                     return (
                       <button
                         type="button"
                         key={customerId}
-                        onClick={() =>
-                          handleSelectCustomer(customer)
-                        }
-                        className="flex w-full items-center gap-3 px-4 py-3 text-left transition hover:bg-orange-50"
+                        onClick={() => handleSelectCustomer(customer)}
+                        className="flex w-full items-center gap-3 border-b border-slate-100 px-4 py-3 text-left transition last:border-b-0 hover:bg-orange-50 dark:border-slate-700 dark:hover:bg-slate-700"
                       >
-                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-500">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-500 dark:bg-slate-600">
                           <FaUser className="text-xs" />
                         </div>
 
                         <div>
-                          <p className="text-sm font-semibold text-slate-800">
+                          <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
                             {customerName}
                           </p>
 
@@ -361,15 +366,13 @@ const EstimateHeader = ({ register, errors, setValue }) => {
                   })
                 ) : (
                   <div className="px-4 py-5 text-center">
-                    <p className="text-sm text-slate-500">
+                    <p className="text-sm text-slate-500 dark:text-slate-300">
                       No customer found.
                     </p>
 
                     <button
                       type="button"
-                      onClick={() =>
-                        setShowCustomerModal(true)
-                      }
+                      onClick={() => setShowCustomerModal(true)}
                       className="mt-2 text-xs font-semibold text-orange-600 hover:text-orange-700"
                     >
                       + Add new customer
@@ -380,9 +383,7 @@ const EstimateHeader = ({ register, errors, setValue }) => {
             )}
           </div>
 
-          {/* =====================================
-              CUSTOMER DETAILS
-          ====================================== */}
+          {/* CUSTOMER DETAILS */}
 
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
             {/* NAME */}
@@ -390,9 +391,7 @@ const EstimateHeader = ({ register, errors, setValue }) => {
             <div>
               <label className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-300">
                 नाम
-                <span className="ml-1 text-orange-500">
-                  *
-                </span>
+                <span className="ml-1 text-orange-500">*</span>
               </label>
 
               <div className="relative">
@@ -406,8 +405,8 @@ const EstimateHeader = ({ register, errors, setValue }) => {
                   readOnly={!!selectedCustomer}
                   className={`w-full rounded-xl border py-3 pl-10 pr-4 text-sm outline-none transition ${
                     selectedCustomer
-                      ? "border-orange-100 bg-orange-50/50 text-slate-700"
-                      : "border-slate-200 bg-slate-50 focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+                      ? "border-orange-100 bg-orange-50/50 text-slate-700 dark:bg-slate-800 dark:text-slate-200"
+                      : "border-slate-200 bg-slate-50 focus:border-orange-500 focus:ring-2 focus:ring-orange-100 dark:border-slate-700 dark:bg-slate-800"
                   }`}
                   placeholder="Customer name"
                 />
@@ -432,10 +431,10 @@ const EstimateHeader = ({ register, errors, setValue }) => {
 
                 <input
                   type="text"
-                  {...register("panNumber")}
+                  {...register("pan_no")}
                   readOnly={!!selectedCustomer}
                   placeholder="PAN number"
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-10 pr-4 text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100 dark:bg-slate-500"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-10 pr-4 text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100 dark:border-slate-700 dark:bg-slate-800"
                 />
               </div>
             </div>
@@ -452,10 +451,10 @@ const EstimateHeader = ({ register, errors, setValue }) => {
 
                 <input
                   type="text"
-                  {...register("contactNumber")}
+                  {...register("contact_no")}
                   readOnly={!!selectedCustomer}
                   placeholder="Contact number"
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-10 pr-4 text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100 dark:bg-slate-500"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-10 pr-4 text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100 dark:border-slate-700 dark:bg-slate-800"
                 />
               </div>
             </div>
@@ -475,7 +474,7 @@ const EstimateHeader = ({ register, errors, setValue }) => {
                   {...register("address")}
                   readOnly={!!selectedCustomer}
                   placeholder="Customer address"
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-10 pr-4 text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100 dark:bg-slate-500"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-10 pr-4 text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100 dark:border-slate-700 dark:bg-slate-800"
                 />
               </div>
             </div>
@@ -483,18 +482,16 @@ const EstimateHeader = ({ register, errors, setValue }) => {
         </div>
       </div>
 
-      {/* =========================================
-          ADD CUSTOMER MODAL
-      ========================================== */}
+      {/* ADD CUSTOMER MODAL */}
 
       {showCustomerModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 px-4 backdrop-blur-sm">
-          <div className="w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-slate-700">
-            {/* HEADER */}
+          <div className="w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-slate-800">
+            {/* MODAL HEADER */}
 
-            <div className="flex items-center justify-between border-b border-slate-100 px-6 py-5">
+            <div className="flex items-center justify-between border-b border-slate-100 px-6 py-5 dark:border-slate-700">
               <div>
-                <h2 className="text-lg font-bold text-slate-900 dark:text-slate-300">
+                <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">
                   Add New Customer
                 </h2>
 
@@ -505,43 +502,37 @@ const EstimateHeader = ({ register, errors, setValue }) => {
 
               <button
                 type="button"
-                onClick={() =>
-                  setShowCustomerModal(false)
-                }
-                className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+                onClick={() => setShowCustomerModal(false)}
+                disabled={creatingCustomer}
+                aria-label="Close customer modal"
+                className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 disabled:opacity-50 dark:hover:bg-slate-700"
               >
                 <FaTimes />
               </button>
             </div>
 
-            {/* BODY */}
+            {/* MODAL BODY */}
 
             <div className="space-y-5 p-6">
-              {/* NAME */}
-
               <div>
                 <label className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-300">
                   Customer Name
-                  <span className="ml-1 text-orange-500">
-                    *
-                  </span>
+                  <span className="ml-1 text-orange-500">*</span>
                 </label>
 
                 <input
                   type="text"
                   value={newCustomer.name}
                   onChange={(e) =>
-                    setNewCustomer({
-                      ...newCustomer,
+                    setNewCustomer((previous) => ({
+                      ...previous,
                       name: e.target.value,
-                    })
+                    }))
                   }
                   placeholder="Enter customer name"
-                  className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+                  className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 dark:border-slate-700 dark:bg-slate-900"
                 />
               </div>
-
-              {/* CONTACT */}
 
               <div>
                 <label className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-300">
@@ -550,19 +541,17 @@ const EstimateHeader = ({ register, errors, setValue }) => {
 
                 <input
                   type="text"
-                  value={newCustomer.contact}
+                  value={newCustomer.contact_no}
                   onChange={(e) =>
-                    setNewCustomer({
-                      ...newCustomer,
-                      contact: e.target.value,
-                    })
+                    setNewCustomer((previous) => ({
+                      ...previous,
+                      contact_no: e.target.value,
+                    }))
                   }
                   placeholder="98XXXXXXXX"
-                  className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+                  className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 dark:border-slate-700 dark:bg-slate-900"
                 />
               </div>
-
-              {/* PAN */}
 
               <div>
                 <label className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-300">
@@ -571,19 +560,17 @@ const EstimateHeader = ({ register, errors, setValue }) => {
 
                 <input
                   type="text"
-                  value={newCustomer.pan}
+                  value={newCustomer.pan_no}
                   onChange={(e) =>
-                    setNewCustomer({
-                      ...newCustomer,
-                      pan: e.target.value,
-                    })
+                    setNewCustomer((previous) => ({
+                      ...previous,
+                      pan_no: e.target.value,
+                    }))
                   }
                   placeholder="PAN number"
-                  className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+                  className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 dark:border-slate-700 dark:bg-slate-900"
                 />
               </div>
-
-              {/* ADDRESS */}
 
               <div>
                 <label className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-300">
@@ -594,27 +581,25 @@ const EstimateHeader = ({ register, errors, setValue }) => {
                   type="text"
                   value={newCustomer.address}
                   onChange={(e) =>
-                    setNewCustomer({
-                      ...newCustomer,
+                    setNewCustomer((previous) => ({
+                      ...previous,
                       address: e.target.value,
-                    })
+                    }))
                   }
                   placeholder="Customer address"
-                  className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+                  className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 dark:border-slate-700 dark:bg-slate-900"
                 />
               </div>
             </div>
 
-            {/* FOOTER */}
+            {/* MODAL FOOTER */}
 
-            <div className="flex justify-end gap-3 border-t border-slate-100 bg-slate-50 px-6 py-4 dark:bg-slate-700">
+            <div className="flex justify-end gap-3 border-t border-slate-100 bg-slate-50 px-6 py-4 dark:border-slate-700 dark:bg-slate-900">
               <button
                 type="button"
-                onClick={() =>
-                  setShowCustomerModal(false)
-                }
+                onClick={() => setShowCustomerModal(false)}
                 disabled={creatingCustomer}
-                className="rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
               >
                 Cancel
               </button>
@@ -625,9 +610,7 @@ const EstimateHeader = ({ register, errors, setValue }) => {
                 disabled={creatingCustomer}
                 className="rounded-xl bg-orange-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {creatingCustomer
-                  ? "Adding..."
-                  : "Add Customer"}
+                {creatingCustomer ? "Adding..." : "Add Customer"}
               </button>
             </div>
           </div>

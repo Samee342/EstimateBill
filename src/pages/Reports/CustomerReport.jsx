@@ -1,8 +1,7 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   FiUsers,
   FiUserPlus,
-  FiDollarSign,
   FiClock,
   FiSearch,
   FiDownload,
@@ -10,102 +9,208 @@ import {
 } from "react-icons/fi";
 import { FaMoneyBillWave } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { getCustomer } from "../../api/customer";
+import { getProjects } from "../../api/project";
+
+// ========================================
+// HELPERS
+// ========================================
+
+const getRecords = (response) => {
+  if (Array.isArray(response)) return response;
+
+  if (Array.isArray(response?.results)) return response.results;
+  if (Array.isArray(response?.data)) return response.data;
+  if (Array.isArray(response?.customers)) return response.customers;
+  if (Array.isArray(response?.orders)) return response.orders;
+
+  return [];
+};
+
+const formatCurrency = (amount) =>
+  `Rs. ${Number(amount || 0).toLocaleString("en-IN", {
+    maximumFractionDigits: 2,
+  })}`;
+
+const parseDate = (date) => {
+  if (!date) return null;
+
+  const datePart = String(date).slice(0, 10);
+  const [year, month, day] = datePart.split("-").map(Number);
+
+  if (!year || !month || !day) return null;
+
+  const parsed = new Date(year, month - 1, day);
+
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+};
+
+const formatDate = (date) => {
+  const parsed = parseDate(date);
+
+  if (!parsed) return "—";
+
+  return parsed.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+};
+
+const getErrorMessage = (error) => {
+  const data = error.response?.data;
+
+  if (typeof data === "string") return data;
+  if (data?.detail) return data.detail;
+  if (data?.message) return data.message;
+
+  return error.message || "Unable to load customer report.";
+};
+
+const getCustomerStatus = (projects) => {
+  return projects.length > 0 ? "Active" : "No Orders";
+};
+
+// ========================================
+// CUSTOMER REPORT
+// ========================================
 
 const CustomerReport = () => {
-  const [search, setSearch] = useState("");
-
   const navigate = useNavigate();
 
-  const customers = [
-    {
-      id: "CUS-1001",
-      name: "Ram Sharma",
-      phone: "98XXXXXXXX",
-      projects: 12,
-      totalAmount: 125000,
-      paid: 110000,
-      due: 15000,
-      lastOrder: "07 Sep 2026",
-      status: "Active",
-    },
-    {
-      id: "CUS-1002",
-      name: "Sita Karki",
-      phone: "98XXXXXXXX",
-      projects: 8,
-      totalAmount: 87500,
-      paid: 70000,
-      due: 17500,
-      lastOrder: "07 Sep 2026",
-      status: "Active",
-    },
-    {
-      id: "CUS-1003",
-      name: "Hari Thapa",
-      phone: "98XXXXXXXX",
-      projects: 15,
-      totalAmount: 245000,
-      paid: 245000,
-      due: 0,
-      lastOrder: "06 Sep 2026",
-      status: "Active",
-    },
-    {
-      id: "CUS-1004",
-      name: "Aashish Gurung",
-      phone: "98XXXXXXXX",
-      projects: 4,
-      totalAmount: 32000,
-      paid: 10000,
-      due: 22000,
-      lastOrder: "06 Sep 2026",
-      status: "Active",
-    },
-    {
-      id: "CUS-1005",
-      name: "Mina Rai",
-      phone: "98XXXXXXXX",
-      projects: 10,
-      totalAmount: 156000,
-      paid: 156000,
-      due: 0,
-      lastOrder: "05 Sep 2026",
-      status: "Active",
-    },
-    {
-      id: "CUS-1006",
-      name: "Everest Traders",
-      phone: "98XXXXXXXX",
-      projects: 22,
-      totalAmount: 425000,
-      paid: 350000,
-      due: 75000,
-      lastOrder: "04 Sep 2026",
-      status: "Active",
-    },
-    {
-      id: "CUS-1007",
-      name: "ABC Enterprises",
-      phone: "98XXXXXXXX",
-      projects: 6,
-      totalAmount: 78000,
-      paid: 78000,
-      due: 0,
-      lastOrder: "03 Sep 2026",
-      status: "Active",
-    },
-    {
-      id: "CUS-1008",
-      name: "New Star Hotel",
-      phone: "98XXXXXXXX",
-      projects: 18,
-      totalAmount: 315000,
-      paid: 250000,
-      due: 65000,
-      lastOrder: "02 Sep 2026",
-      status: "Active",
-    },
-  ];
+  const [search, setSearch] = useState("");
+  const [customers, setCustomers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  // ========================================
+  // FETCH REAL CUSTOMERS AND PROJECTS
+  // ========================================
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchReport = async () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        const [customerResponse, projectResponse] = await Promise.all([
+          getCustomer(),
+          getProjects(),
+        ]);
+
+        const customerRecords = getRecords(customerResponse);
+        const projectRecords = getRecords(projectResponse);
+
+        console.log("[CUSTOMER REPORT] Customers:", customerRecords);
+        console.log("[CUSTOMER REPORT] Projects:", projectRecords);
+
+        const mappedCustomers = customerRecords.map((customer) => {
+          // Match orders using the customer ID returned by the API.
+          const customerProjects = projectRecords.filter(
+            (project) => String(project.customer) === String(customer.id),
+          );
+
+          const totalAmount = customerProjects.reduce(
+            (total, project) => total + (Number(project.total_amount) || 0),
+            0,
+          );
+
+          const paid = customerProjects.reduce(
+            (total, project) => total + (Number(project.paid_amount) || 0),
+            0,
+          );
+
+          const due = customerProjects.reduce((total, project) => {
+            if (
+              project.balance !== null &&
+              project.balance !== undefined &&
+              project.balance !== ""
+            ) {
+              return total + Math.max(Number(project.balance) || 0, 0);
+            }
+
+            const amount = Number(project.total_amount) || 0;
+            const received = Number(project.paid_amount) || 0;
+
+            return total + Math.max(amount - received, 0);
+          }, 0);
+
+          const sortedProjects = [...customerProjects].sort((a, b) => {
+            const dateA =
+              parseDate(a.slip_date || a.created_at)?.getTime() || 0;
+            const dateB =
+              parseDate(b.slip_date || b.created_at)?.getTime() || 0;
+
+            return dateB - dateA;
+          });
+
+          const latestOrder = sortedProjects[0];
+
+          return {
+            id: customer.id,
+            createdAt: customer.created_at,
+            displayId: `CUS-${String(customer.id).padStart(4, "0")}`,
+            name: customer.name || customer.company_name || "Unnamed Customer",
+            phone: customer.contact_no || "—",
+            projects: customerProjects.length,
+            totalAmount,
+            paid,
+            due,
+            lastOrder: latestOrder
+              ? latestOrder.slip_date || latestOrder.created_at
+              : null,
+            status: getCustomerStatus(customerProjects),
+          };
+        });
+
+        if (isMounted) {
+          setCustomers(mappedCustomers);
+        }
+      } catch (err) {
+        console.error("[CUSTOMER REPORT] Failed to load:", err);
+        console.error(
+          "[CUSTOMER REPORT] Backend response:",
+          err.response?.data,
+        );
+
+        if (isMounted) {
+          setError(getErrorMessage(err));
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchReport();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // ========================================
+  // SEARCH
+  // ========================================
+
+  const filteredCustomers = useMemo(() => {
+    const query = search.trim().toLowerCase();
+
+    return customers.filter(
+      (customer) =>
+        customer.name.toLowerCase().includes(query) ||
+        customer.displayId.toLowerCase().includes(query) ||
+        String(customer.id).toLowerCase().includes(query) ||
+        customer.phone.toLowerCase().includes(query),
+    );
+  }, [customers, search]);
+
+  // ========================================
+  // SUMMARY TOTALS
+  // ========================================
 
   const totalBusiness = customers.reduce(
     (total, customer) => total + customer.totalAmount,
@@ -122,20 +227,94 @@ const CustomerReport = () => {
     0,
   );
 
-  const filteredCustomers = useMemo(() => {
-    return customers.filter(
-      (customer) =>
-        customer.name.toLowerCase().includes(search.toLowerCase()) ||
-        customer.id.toLowerCase().includes(search.toLowerCase()) ||
-        customer.phone.includes(search),
-    );
-  }, [search]);
+  // Customers created during the current calendar month.
+  const newCustomers = customers.filter((customer) => {
+    // Customer creation date is fetched separately below if available.
+    return customer.createdAt
+      ? (() => {
+          const date = parseDate(customer.createdAt);
+          const now = new Date();
+
+          return (
+            date &&
+            date.getMonth() === now.getMonth() &&
+            date.getFullYear() === now.getFullYear()
+          );
+        })()
+      : false;
+  }).length;
+
+  const paymentPercentage =
+    totalBusiness > 0 ? Math.min((totalPaid / totalBusiness) * 100, 100) : 0;
+
+  // ========================================
+  // EXPORT CSV
+  // ========================================
+
+  const handleExport = () => {
+    if (filteredCustomers.length === 0) return;
+
+    const headers = [
+      "Customer ID",
+      "Customer Name",
+      "Phone",
+      "Projects",
+      "Total Business",
+      "Paid",
+      "Due",
+      "Last Order",
+      "Status",
+    ];
+
+    const rows = filteredCustomers.map((customer) => [
+      customer.displayId,
+      customer.name,
+      customer.phone,
+      customer.projects,
+      customer.totalAmount,
+      customer.paid,
+      customer.due,
+      formatDate(customer.lastOrder),
+      customer.status,
+    ]);
+
+    const escapeCsvValue = (value) =>
+      `"${String(value ?? "").replace(/"/g, '""')}"`;
+
+    const csvContent = [headers, ...rows]
+      .map((row) => row.map(escapeCsvValue).join(","))
+      .join("\n");
+
+    const blob = new Blob(["\uFEFF" + csvContent], {
+      type: "text/csv;charset=utf-8;",
+    });
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = "printtech-customer-report.csv";
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    URL.revokeObjectURL(url);
+  };
+
+  // ========================================
+  // CUSTOMER ROW / CARD
+  // ========================================
+
+  const openCustomer = (id) => {
+    navigate(`/customers/${id}`);
+  };
 
   return (
-    <div className="min-h-screen bg-[#f7f8fa] dark:bg-slate-800 text-slate-800">
-      {/* Header */}
+    <div className="min-h-screen bg-[#f7f8fa] text-slate-800 dark:bg-slate-900 dark:text-slate-100">
+      {/* HEADER */}
 
-      <header className="border-b border-slate-200 bg-white dark:bg-slate-800 px-5 py-5 md:px-8">
+      <header className="border-b border-slate-200 bg-white px-5 py-5 dark:border-slate-700 dark:bg-slate-800 md:px-8">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <div className="flex items-center gap-2">
@@ -146,16 +325,21 @@ const CustomerReport = () => {
               </span>
             </div>
 
-            <h1 className="mt-1 text-2xl font-bold dark:text-slate-300 text-slate-900">
+            <h1 className="mt-1 text-2xl font-bold text-slate-900 dark:text-slate-100">
               Customer Report
             </h1>
 
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
               View customer-wise printing business and outstanding amounts.
             </p>
           </div>
 
-          <button className="flex w-fit items-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-orange-600">
+          <button
+            type="button"
+            onClick={handleExport}
+            disabled={loading || filteredCustomers.length === 0}
+            className="flex w-fit items-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-50"
+          >
             <FiDownload size={17} />
             Export Report
           </button>
@@ -163,9 +347,40 @@ const CustomerReport = () => {
       </header>
 
       <main className="p-5 md:p-8">
-        {/* Search */}
+        {/* LOADING */}
 
-        <div className="mb-6 rounded-2xl border border-slate-200 bg-white dark:bg-slate-800 p-4">
+        {loading && (
+          <div className="mb-6 flex items-center gap-3 rounded-xl border border-orange-100 bg-white p-5 text-sm text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
+            <span className="h-5 w-5 animate-spin rounded-full border-2 border-orange-500 border-t-transparent" />
+            Loading customer report...
+          </div>
+        )}
+
+        {/* ERROR */}
+
+        {!loading && error && (
+          <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 dark:border-red-900 dark:bg-red-950/30">
+            <p className="text-sm font-semibold text-red-700 dark:text-red-400">
+              Unable to load customer report
+            </p>
+
+            <p className="mt-1 break-words text-sm text-red-600 dark:text-red-300">
+              {error}
+            </p>
+
+            <button
+              type="button"
+              onClick={() => window.location.reload()}
+              className="mt-3 text-sm font-semibold text-red-700 underline dark:text-red-400"
+            >
+              Try again
+            </button>
+          </div>
+        )}
+
+        {/* SEARCH */}
+
+        <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-800">
           <div className="relative w-full md:max-w-md">
             <FiSearch
               size={18}
@@ -174,134 +389,127 @@ const CustomerReport = () => {
 
             <input
               type="text"
-              placeholder="Search customer..."
+              placeholder="Search customer name, ID or phone..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 dark:bg-slate-700 dark:text-slate-300 py-3 pl-10 pr-4 text-sm outline-none focus:border-orange-400 focus:bg-white"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-10 pr-4 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-orange-400 focus:bg-white dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 dark:focus:bg-slate-700"
             />
           </div>
+
+          {!loading && !error && (
+            <p className="mt-3 text-xs text-slate-400">
+              Showing {filteredCustomers.length} of {customers.length} customers
+            </p>
+          )}
         </div>
 
-        {/* Stats */}
+        {/* STATS */}
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {/* Customers */}
-
-          <div className="rounded-2xl border border-slate-200 bg-white dark:bg-slate-800 p-5">
-            <div className="flex justify-between">
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-700 dark:bg-slate-800">
+            <div className="flex justify-between gap-3">
               <div>
-                <p className="text-sm text-slate-500">Total Customers</p>
-
-                <h3 className="mt-2 text-2xl font-bold dark:text-slate-200">
-                  {customers.length}
+                <p className="text-sm text-slate-500 dark:text-slate-400">
+                  Total Customers
+                </p>
+                <h3 className="mt-2 text-2xl font-bold dark:text-slate-100">
+                  {loading ? "—" : customers.length.toLocaleString("en-IN")}
                 </h3>
               </div>
 
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-blue-500">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-blue-500 dark:bg-blue-500/10">
                 <FiUsers size={21} />
               </div>
             </div>
           </div>
 
-          {/* New */}
-
-          <div className="rounded-2xl border border-slate-200 bg-white dark:bg-slate-800 p-5">
-            <div className="flex justify-between">
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-700 dark:bg-slate-800">
+            <div className="flex justify-between gap-3">
               <div>
-                <p className="text-sm text-slate-500">New Customers</p>
-
-                <h3 className="mt-2 text-2xl font-bold dark:text-slate-200">
-                  24
+                <p className="text-sm text-slate-500 dark:text-slate-400">
+                  New Customers
+                </p>
+                <h3 className="mt-2 text-2xl font-bold dark:text-slate-100">
+                  {loading ? "—" : newCustomers}
                 </h3>
+                <p className="mt-1 text-xs text-slate-400">Added this month</p>
               </div>
 
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-green-50 text-green-600">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-green-50 text-green-600 dark:bg-green-500/10">
                 <FiUserPlus size={21} />
               </div>
             </div>
           </div>
 
-          {/* Business */}
-
-          <div className="rounded-2xl border border-slate-200 bg-white dark:bg-slate-800 p-5">
-            <div className="flex justify-between">
-              <div>
-                <p className="text-sm text-slate-500">Customer Business</p>
-
-                <h3 className="mt-2 text-2xl font-bold dark:text-slate-200">
-                  Rs. {totalBusiness.toLocaleString()}
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-700 dark:bg-slate-800">
+            <div className="flex justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-sm text-slate-500 dark:text-slate-400">
+                  Customer Business
+                </p>
+                <h3 className="mt-2 break-words text-xl font-bold dark:text-slate-100">
+                  {loading ? "—" : formatCurrency(totalBusiness)}
                 </h3>
               </div>
 
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-orange-50 text-orange-500">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-orange-500 dark:bg-orange-500/10">
                 <FaMoneyBillWave size={21} />
               </div>
             </div>
           </div>
 
-          {/* Due */}
-
-          <div className="rounded-2xl border border-slate-200 bg-white dark:bg-slate-800 p-5">
-            <div className="flex justify-between">
-              <div>
-                <p className="text-sm text-slate-500">Total Due</p>
-
-                <h3 className="mt-2 text-2xl font-bold dark:text-slate-200">
-                  Rs. {totalDue.toLocaleString()}
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-700 dark:bg-slate-800">
+            <div className="flex justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-sm text-slate-500 dark:text-slate-400">
+                  Total Due
+                </p>
+                <h3 className="mt-2 break-words text-xl font-bold text-red-500">
+                  {loading ? "—" : formatCurrency(totalDue)}
                 </h3>
               </div>
 
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-red-50 text-red-500">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-red-50 text-red-500 dark:bg-red-500/10">
                 <FiClock size={21} />
               </div>
             </div>
           </div>
         </div>
 
-        {/* Customer Table */}
+        {/* CUSTOMER TABLE */}
 
-        <div className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white dark:bg-slate-800">
-          <div className="border-b border-slate-200 p-6">
-            <h3 className="font-bold text-slate-900 dark:text-slate-300">
+        <div className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800">
+          <div className="border-b border-slate-200 p-6 dark:border-slate-700">
+            <h3 className="font-bold text-slate-900 dark:text-slate-100">
               Customer-wise Report
             </h3>
-
             <p className="mt-1 text-xs text-slate-400">
               Printing projects and payment summary by customer
             </p>
           </div>
 
+          {/* DESKTOP TABLE */}
+
           <div className="hidden overflow-x-auto md:block">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-slate-100 text-left">
-                  <th className="px-6 py-4 text-xs uppercase text-slate-400">
-                    Customer
-                  </th>
-
-                  <th className="px-6 py-4 text-xs uppercase text-slate-400">
-                    Projects
-                  </th>
-
-                  <th className="px-6 py-4 text-xs uppercase text-slate-400">
-                    Total Business
-                  </th>
-
-                  <th className="px-6 py-4 text-xs uppercase text-slate-400">
-                    Paid
-                  </th>
-
-                  <th className="px-6 py-4 text-xs uppercase text-slate-400">
-                    Due
-                  </th>
-
-                  <th className="px-6 py-4 text-xs uppercase text-slate-400">
-                    Last Order
-                  </th>
-
-                  <th className="px-6 py-4 text-xs uppercase text-slate-400">
-                    Status
-                  </th>
+                <tr className="border-b border-slate-100 text-left dark:border-slate-700">
+                  {[
+                    "Customer",
+                    "Projects",
+                    "Total Business",
+                    "Paid",
+                    "Due",
+                    "Last Order",
+                    "Status",
+                  ].map((heading) => (
+                    <th
+                      key={heading}
+                      className="whitespace-nowrap px-6 py-4 text-xs uppercase text-slate-400"
+                    >
+                      {heading}
+                    </th>
+                  ))}
                 </tr>
               </thead>
 
@@ -309,55 +517,63 @@ const CustomerReport = () => {
                 {filteredCustomers.map((customer) => (
                   <tr
                     key={customer.id}
-                    className="border-b border-slate-100 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-800"
+                    className="border-b border-slate-100 last:border-0 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-700/40"
                   >
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-orange-50 text-sm font-bold text-orange-600">
-                          {customer.name.charAt(0)}
+                      <button
+                        type="button"
+                        onClick={() => openCustomer(customer.id)}
+                        className="flex items-center gap-3 text-left"
+                      >
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-orange-50 text-sm font-bold text-orange-600 dark:bg-orange-500/10">
+                          {customer.name.charAt(0).toUpperCase()}
                         </div>
 
-                        <td
-                          className="cursor-pointer px-6 py-4 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50"
-                          onClick={() => navigate(`/customers/${customer.id}`)}
-                        >
-                          <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 hover:text-orange-500">
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold text-slate-800 transition hover:text-orange-500 dark:text-slate-200">
                             {customer.name}
                           </p>
-
                           <p className="mt-1 text-xs text-orange-500">
-                            {customer.id}
+                            {customer.displayId}
                           </p>
-                        </td>
-                      </div>
+                          <p className="mt-1 text-xs text-slate-400">
+                            {customer.phone}
+                          </p>
+                        </div>
+                      </button>
                     </td>
 
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-2 text-sm">
+                      <div className="flex items-center gap-2 text-sm dark:text-slate-300">
                         <FiFileText className="text-slate-400" />
-
                         {customer.projects}
                       </div>
                     </td>
 
-                    <td className="px-6 py-4 text-sm font-semibold dark:text-slate-300">
-                      Rs. {customer.totalAmount.toLocaleString()}
+                    <td className="whitespace-nowrap px-6 py-4 text-sm font-semibold dark:text-slate-300">
+                      {formatCurrency(customer.totalAmount)}
                     </td>
 
-                    <td className="px-6 py-4 text-sm font-semibold text-green-600">
-                      Rs. {customer.paid.toLocaleString()}
+                    <td className="whitespace-nowrap px-6 py-4 text-sm font-semibold text-green-600 dark:text-green-400">
+                      {formatCurrency(customer.paid)}
                     </td>
 
-                    <td className="px-6 py-4 text-sm font-semibold text-red-500">
-                      Rs. {customer.due.toLocaleString()}
+                    <td className="whitespace-nowrap px-6 py-4 text-sm font-semibold text-red-500">
+                      {formatCurrency(customer.due)}
                     </td>
 
-                    <td className="px-6 py-4 text-sm text-slate-500">
-                      {customer.lastOrder}
+                    <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-500 dark:text-slate-400">
+                      {formatDate(customer.lastOrder)}
                     </td>
 
                     <td className="px-6 py-4">
-                      <span className="rounded-full bg-green-50 px-3 py-1.5 text-xs font-semibold text-green-700">
+                      <span
+                        className={`whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold ${
+                          customer.status === "Active"
+                            ? "bg-green-50 text-green-700 dark:bg-green-500/10 dark:text-green-400"
+                            : "bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300"
+                        }`}
+                      >
                         {customer.status}
                       </span>
                     </td>
@@ -367,97 +583,132 @@ const CustomerReport = () => {
             </table>
           </div>
 
-          {/* Mobile */}
+          {/* MOBILE CARDS */}
 
           <div className="space-y-3 p-4 md:hidden">
             {filteredCustomers.map((customer) => (
-              <div
+              <button
+                type="button"
                 key={customer.id}
-                className="rounded-xl border border-slate-200 p-4"
+                onClick={() => openCustomer(customer.id)}
+                className="w-full rounded-xl border border-slate-200 p-4 text-left transition hover:border-orange-300 dark:border-slate-700"
               >
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-50 font-bold text-orange-600">
-                    {customer.name.charAt(0)}
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-orange-50 font-bold text-orange-600 dark:bg-orange-500/10">
+                      {customer.name.charAt(0).toUpperCase()}
+                    </div>
+
+                    <div className="min-w-0">
+                      <p className="break-words text-sm font-semibold text-slate-800 dark:text-slate-200">
+                        {customer.name}
+                      </p>
+                      <p className="mt-1 text-xs text-orange-500">
+                        {customer.displayId}
+                      </p>
+                      <p className="mt-1 text-xs text-slate-400">
+                        {customer.phone}
+                      </p>
+                    </div>
                   </div>
 
-                  <div>
-                    <p className="text-sm font-semibold">{customer.name}</p>
-
-                    <p className="text-xs text-slate-400">{customer.id}</p>
-                  </div>
+                  <span
+                    className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold ${
+                      customer.status === "Active"
+                        ? "bg-green-50 text-green-700 dark:bg-green-500/10 dark:text-green-400"
+                        : "bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300"
+                    }`}
+                  >
+                    {customer.status}
+                  </span>
                 </div>
 
                 <div className="mt-4 grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-[11px] text-slate-400">Projects</p>
-
-                    <p className="mt-1 text-sm font-semibold">
+                    <p className="mt-1 text-sm font-semibold dark:text-slate-200">
                       {customer.projects}
                     </p>
                   </div>
 
                   <div>
-                    <p className="text-[11px] text-slate-400">Business</p>
-
-                    <p className="mt-1 text-sm font-semibold">
-                      Rs. {customer.totalAmount.toLocaleString()}
+                    <p className="text-[11px] text-slate-400">Total Business</p>
+                    <p className="mt-1 break-words text-sm font-semibold dark:text-slate-200">
+                      {formatCurrency(customer.totalAmount)}
                     </p>
                   </div>
 
                   <div>
                     <p className="text-[11px] text-slate-400">Paid</p>
-
-                    <p className="mt-1 text-sm font-semibold text-green-600">
-                      Rs. {customer.paid.toLocaleString()}
+                    <p className="mt-1 text-sm font-semibold text-green-600 dark:text-green-400">
+                      {formatCurrency(customer.paid)}
                     </p>
                   </div>
 
                   <div>
                     <p className="text-[11px] text-slate-400">Due</p>
-
                     <p className="mt-1 text-sm font-semibold text-red-500">
-                      Rs. {customer.due.toLocaleString()}
+                      {formatCurrency(customer.due)}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-[11px] text-slate-400">Last Order</p>
+                    <p className="mt-1 text-sm dark:text-slate-300">
+                      {formatDate(customer.lastOrder)}
                     </p>
                   </div>
                 </div>
-              </div>
+              </button>
             ))}
           </div>
-        </div>
 
-        {/* Customer Summary */}
+          {/* NO RESULTS */}
 
-        <div className="mt-6 rounded-2xl border border-slate-200 bg-white dark:bg-slate-800 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="font-bold text-slate-900 dark:text-slate-300">
-                Payment Summary
-              </h3>
-
+          {!loading && !error && filteredCustomers.length === 0 && (
+            <div className="p-10 text-center">
+              <FiSearch className="mx-auto text-2xl text-slate-300" />
+              <p className="mt-3 text-sm font-medium text-slate-500 dark:text-slate-300">
+                No customers found.
+              </p>
               <p className="mt-1 text-xs text-slate-400">
-                Customer receivable summary
+                Try searching with another name, ID or phone number.
               </p>
             </div>
-          </div>
+          )}
+        </div>
 
-          <div className="mt-5 h-3 overflow-hidden rounded-full bg-slate-100">
+        {/* PAYMENT SUMMARY */}
+
+        <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-800">
+          <h3 className="font-bold text-slate-900 dark:text-slate-100">
+            Payment Summary
+          </h3>
+
+          <p className="mt-1 text-xs text-slate-400">
+            Received payments compared with total customer business
+          </p>
+
+          <div className="mt-5 h-3 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-700">
             <div
-              className="h-full rounded-full bg-green-500"
-              style={{
-                width: `${(totalPaid / totalBusiness) * 100}%`,
-              }}
+              className="h-full rounded-full bg-green-500 transition-all duration-500"
+              style={{ width: `${paymentPercentage}%` }}
             />
           </div>
 
-          <div className="mt-3 flex justify-between text-xs">
-            <span className="text-green-600">
-              Paid: Rs. {totalPaid.toLocaleString()}
+          <div className="mt-3 flex flex-col justify-between gap-2 text-xs sm:flex-row">
+            <span className="text-green-600 dark:text-green-400">
+              Paid: {formatCurrency(totalPaid)}
             </span>
 
             <span className="text-red-500">
-              Due: Rs. {totalDue.toLocaleString()}
+              Due: {formatCurrency(totalDue)}
             </span>
           </div>
+
+          <p className="mt-3 text-xs text-slate-400">
+            {paymentPercentage.toFixed(1)}% of total business received
+          </p>
         </div>
       </main>
     </div>

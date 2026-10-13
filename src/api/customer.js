@@ -16,4 +16,5 @@ const deleteCustomer = async (uuid) => {
   const response = await api.delete(`/customerapi/customers/${uuid}/`);
   return response.data;
 };
+
 export { createCustomer, getCustomer, updateCustomer, deleteCustomer };

@@ -14,7 +14,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { deleteCustomer, getCustomer } from "../../api/customer";
 import DeleteModal from "../../modal/DeleteModal";
-import { toast } from "react-hot-toast"
+import { toast } from "react-hot-toast";
 
 const AllCustomers = () => {
   const navigate = useNavigate();
@@ -95,29 +95,29 @@ const AllCustomers = () => {
   // ========================================
 
   const handleDeleteConfirm = async () => {
-  if (!selectedCustomer?.uuid) return;
+    if (!selectedCustomer?.uuid) return;
 
-  try {
-    setDeleteLoading(true);
+    try {
+      setDeleteLoading(true);
 
-    await deleteCustomer(selectedCustomer.uuid);
+      await deleteCustomer(selectedCustomer.uuid);
 
-    setCustomers((prev) =>
-      prev.filter((customer) => customer.uuid !== selectedCustomer.uuid),
-    );
+      setCustomers((prev) =>
+        prev.filter((customer) => customer.uuid !== selectedCustomer.uuid),
+      );
 
-    setDeleteModalOpen(false);
-    setSelectedCustomer(null);
+      setDeleteModalOpen(false);
+      setSelectedCustomer(null);
 
-    toast.success("Customer deleted successfully!");
-  } catch (error) {
-    console.error("Delete customer error:", error);
+      toast.success("Customer deleted successfully!");
+    } catch (error) {
+      console.error("Delete customer error:", error);
 
-    toast.error("Failed to delete customer.");
-  } finally {
-    setDeleteLoading(false);
-  }
-};
+      toast.error("Failed to delete customer.");
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
 
   // ========================================
   // CLOSE DELETE MODAL
@@ -130,14 +130,16 @@ const AllCustomers = () => {
     setSelectedCustomer(null);
   };
 
-  
-
   // ========================================
   // EDIT CUSTOMER
   // ========================================
 
   const handleEdit = (uuid) => {
     navigate(`/customers/${uuid}/edit`);
+  };
+
+  const handleView = (uuid) => {
+    navigate(`/customers/${uuid}`);
   };
 
   // ========================================
@@ -403,8 +405,6 @@ const AllCustomers = () => {
 
                     <td className="px-5 py-4">
                       <div className="flex items-center justify-end gap-1">
-                       
-
                         {/* Edit */}
 
                         <button

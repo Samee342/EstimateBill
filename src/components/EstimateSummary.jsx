@@ -1,51 +1,10 @@
 import React from "react";
-import { useWatch } from "react-hook-form";
-import {
-  FaMoneyBillWave,
-  FaHandHoldingUsd,
-  FaCalendarAlt,
-  FaCheckCircle,
-  FaFileAlt,
-} from "react-icons/fa";
+import { FaMoneyBillWave, FaCheckCircle, FaFileAlt } from "react-icons/fa";
 
-const EstimateSummary = ({ control, register }) => {
-  /*
-    Watch values from the form
-  */
-  const items = useWatch({
-    control,
-    name: "items",
-  });
-
-  const advance = useWatch({
-    control,
-    name: "advance",
-  });
-
-  /*
-    Calculate total from estimate items
-  */
-  const totalAmount =
-    items?.reduce((total, item) => {
-      const quantity = Number(item?.quantity) || 0;
-      const rate = Number(item?.rate) || 0;
-
-      return total + quantity * rate;
-    }, 0) || 0;
-
-  /*
-    Calculate remaining amount
-  */
-  const advanceAmount = Number(advance) || 0;
-
-  const remainingAmount = Math.max(totalAmount - advanceAmount, 0);
-
+const EstimateSummary = ({ register }) => {
   return (
-    <div className="mt-6 rounded-2xl border border-slate-200 bg-white dark:bg-slate-800 shadow-sm">
-      {/* =========================================
-          SECTION HEADER
-      ========================================== */}
-
+    <div className="mt-6 rounded-2xl border border-slate-200 bg-white shadow-sm dark:bg-slate-800">
+      {/* SECTION HEADER */}
       <div className="flex items-center gap-3 border-b border-slate-100 px-5 py-5">
         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-orange-600">
           <FaMoneyBillWave className="text-sm" />
@@ -56,200 +15,20 @@ const EstimateSummary = ({ control, register }) => {
             Estimate Summary
           </h2>
 
-          <p className="mt-1 text-xs text-slate-400">
-            Review payment, delivery and proof details.
-          </p>
+          <p className="mt-1 text-xs text-slate-400">Review proof details.</p>
         </div>
       </div>
 
-      {/* =========================================
-          PAYMENT & DATE SECTION
-      ========================================== */}
-
-      <div className="grid grid-cols-1 gap-4 p-5 sm:grid-cols-2 lg:grid-cols-5">
-        {/* TOTAL AMOUNT */}
-        <div className="rounded-xl border border-orange-100 bg-orange-50/60 dark:bg-slate-800 p-4">
-          <div className="mb-2 flex items-center gap-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-orange-100 text-orange-600">
-              <FaMoneyBillWave className="text-xs" />
-            </div>
-
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-300">
-              जम्मा रकम
-            </span>
-          </div>
-
-          <div className="flex items-center gap-1">
-            <span className="text-xs font-medium text-slate-400">Rs.</span>
-
-            <span className="text-xl font-bold text-slate-800 dark:text-slate-300">
-              {totalAmount.toLocaleString("en-IN")}
-            </span>
-          </div>
-
-          {/* Hidden form value */}
-          <input
-            type="hidden"
-            {...register("totalAmount", {
-              valueAsNumber: true,
-            })}
-            value={totalAmount}
-            readOnly
-          />
-        </div>
-
-        {/* ADVANCE */}
-        <div className="rounded-xl border border-slate-200 bg-white dark:bg-slate-800 p-4">
-          <label className="mb-2 flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-slate-200">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-100 text-slate-500">
-              <FaHandHoldingUsd className="text-xs" />
-            </div>
-            पेस्की
-          </label>
-
-          <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">
-              Rs.
-            </span>
-
-            <input
-              type="number"
-              min="0"
-              max={totalAmount}
-              {...register("advance", {
-                valueAsNumber: true,
-              })}
-              className="w-full rounded-lg border border-slate-200 bg-slate-50 dark:bg-slate-800 py-2.5 pl-9 pr-3 text-sm font-semibold text-slate-700 outline-none transition focus:border-orange-500 focus:bg-white focus:ring-2 focus:ring-orange-100"
-              placeholder="0"
-            />
-          </div>
-        </div>
-
-        {/* REMAINING */}
-        <div
-          className={`rounded-xl border p-4 ${
-            remainingAmount > 0
-              ? "border-red-100 bg-red-50/50"
-              : "border-green-100 bg-green-50/50  dark:bg-slate-800 "
-          }`}
-        >
-          <div className="mb-2 flex items-center gap-2">
-            <div
-              className={`flex h-7 w-7 items-center justify-center rounded-lg ${
-                remainingAmount > 0
-                  ? "bg-red-100 text-red-500"
-                  : "bg-green-100 text-green-600 dark:bg-slate-800"
-              }`}
-            >
-              <FaMoneyBillWave className="text-xs" />
-            </div>
-
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-300">
-              बाँकी
-            </span>
-          </div>
-
-          <div className="flex items-center gap-1">
-            <span className="text-xs font-medium text-slate-400">Rs.</span>
-
-            <span
-              className={`text-xl font-bold ${
-                remainingAmount > 0 ? "text-red-600" : "text-green-600"
-              }`}
-            >
-              {remainingAmount.toLocaleString("en-IN")}
-            </span>
-          </div>
-
-          {/* Hidden form value */}
-          <input
-            type="hidden"
-            {...register("remaining", {
-              valueAsNumber: true,
-            })}
-            value={remainingAmount}
-            readOnly
-          />
-        </div>
-
-        {/* DELIVERY DATE */}
-        <div className="rounded-xl border border-slate-200 bg-white dark:bg-slate-800 p-4">
-          <label className="mb-2 flex items-center gap-2 text-xs font-medium text-slate-500">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-100  text-slate-500">
-              <FaCalendarAlt className="text-xs" />
-            </div>
-            <p className="dark:text-slate-300"> सामान दिने मिति</p>
-          </label>
-
-          <input
-            type="date"
-            {...register("deliveryDate")}
-            className="w-full rounded-lg border border-slate-200 bg-slate-50 dark:bg-slate-800 px-3 py-2.5 text-sm text-slate-600 outline-none transition focus:border-orange-500 focus:bg-white focus:ring-2 focus:ring-orange-100"
-          />
-        </div>
-
-        {/* PAYMENT DATE */}
-        <div className="rounded-xl border border-slate-200 bg-white dark:bg-slate-800 p-4">
-          <label className="mb-2 flex items-center gap-2 text-xs font-medium text-slate-500">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-100  text-slate-500">
-              <FaCalendarAlt className="text-xs" />
-            </div>
-            <p className="dark:text-slate-300"> रकम चुक्ता गर्ने मिति </p>
-          </label>
-
-          <input
-            type="date"
-            {...register("paymentDate")}
-            className="w-full rounded-lg border border-slate-200 bg-slate-50 dark:bg-slate-800 px-3 py-2.5 text-sm text-slate-600 outline-none transition focus:border-orange-500 focus:bg-white focus:ring-2 focus:ring-orange-100"
-          />
-        </div>
-      </div>
-
-      {/* =========================================
-          PAYMENT STATUS
-      ========================================== */}
-
-      <div className="mx-5 mb-5 rounded-xl border border-slate-100 bg-slate-50/70 dark:bg-slate-800 px-4 py-3">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <FaMoneyBillWave className="text-orange-500" />
-
-            <span className="text-xs font-medium text-slate-500">
-              Payment Status
-            </span>
-          </div>
-
-          <span
-            className={`rounded-full px-3 py-1 text-xs font-semibold ${
-              remainingAmount === 0
-                ? "bg-green-100 text-green-700"
-                : advanceAmount > 0
-                  ? "bg-orange-100 text-orange-700"
-                  : "bg-red-100 text-red-600"
-            }`}
-          >
-            {remainingAmount === 0
-              ? "Paid"
-              : advanceAmount > 0
-                ? "Partially Paid"
-                : "Pending"}
-          </span>
-        </div>
-      </div>
-
-      {/* =========================================
-          PROOF METHOD
-      ========================================== */}
-
-      <div className="border-t border-slate-100 px-5 py-5">
+      {/* PROOF METHOD */}
+      <div className="px-5 py-5">
         <div className="mb-4 flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-500 dark:bg-slate-700">
             <FaFileAlt className="text-sm" />
           </div>
 
           <div>
             <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-              पुरुफ गर्ने तरिका
+              प्रुफ गर्ने तरिका
             </h3>
 
             <p className="mt-1 text-xs text-slate-400">
@@ -268,8 +47,8 @@ const EstimateSummary = ({ control, register }) => {
               className="peer sr-only"
             />
 
-            <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white dark:bg-slate-800 p-4 transition group-hover:border-orange-200 peer-checked:border-orange-500 peer-checked:bg-orange-50">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-500 transition peer-checked:bg-orange-100 peer-checked:text-orange-600">
+            <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 transition-all duration-200 group-hover:border-orange-300 peer-checked:border-orange-600 peer-checked:bg-orange-100 dark:bg-slate-800 dark:peer-checked:bg-orange-950/50 dark:peer-checked:border-orange-500">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-500 transition peer-checked:bg-orange-200 peer-checked:text-orange-700 dark:bg-slate-700 dark:peer-checked:bg-orange-900 dark:peer-checked:text-orange-300">
                 <FaCheckCircle className="text-sm" />
               </div>
 
@@ -277,7 +56,6 @@ const EstimateSummary = ({ control, register }) => {
                 <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">
                   देखाउने
                 </p>
-
                 <p className="mt-0.5 text-xs text-slate-400">
                   Show proof before printing
                 </p>
@@ -294,16 +72,15 @@ const EstimateSummary = ({ control, register }) => {
               className="peer sr-only"
             />
 
-            <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white dark:bg-slate-800 p-4 transition group-hover:border-orange-200 peer-checked:border-orange-500 peer-checked:bg-orange-50">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-100  text-slate-500">
+            <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 transition-all duration-200 group-hover:border-orange-300 peer-checked:border-orange-600 peer-checked:bg-orange-100 dark:bg-slate-800 dark:peer-checked:bg-orange-950/50 dark:peer-checked:border-orange-500">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-500 transition peer-checked:bg-orange-200 peer-checked:text-orange-700 dark:bg-slate-700 dark:peer-checked:bg-orange-900 dark:peer-checked:text-orange-300">
                 <FaFileAlt className="text-sm" />
               </div>
 
               <div>
-                <p className="text-sm font-semibold dark:text-slate-300 text-slate-700">
+                <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">
                   नमूना अनुसार
                 </p>
-
                 <p className="mt-0.5 text-xs text-slate-400">
                   Follow provided sample
                 </p>
@@ -320,8 +97,8 @@ const EstimateSummary = ({ control, register }) => {
               className="peer sr-only"
             />
 
-            <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white dark:bg-slate-800 p-4 transition group-hover:border-orange-200 peer-checked:border-orange-500 peer-checked:bg-orange-50">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-500">
+            <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 transition-all duration-200 group-hover:border-orange-300 peer-checked:border-orange-600 peer-checked:bg-orange-100 dark:bg-slate-800 dark:peer-checked:bg-orange-950/50 dark:peer-checked:border-orange-500">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-500 transition peer-checked:bg-orange-200 peer-checked:text-orange-700 dark:bg-slate-700 dark:peer-checked:bg-orange-900 dark:peer-checked:text-orange-300">
                 <FaFileAlt className="text-sm" />
               </div>
 
@@ -329,7 +106,6 @@ const EstimateSummary = ({ control, register }) => {
                 <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">
                   कम्प्युटरमा भएको
                 </p>
-
                 <p className="mt-0.5 text-xs text-slate-400">
                   Use existing computer file
                 </p>

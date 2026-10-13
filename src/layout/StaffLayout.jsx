@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
-import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
+import {
+  NavLink,
+  Outlet,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 
 import {
   FiBarChart2,
@@ -9,13 +14,12 @@ import {
   FiChevronRight,
   FiLogOut,
   FiUsers,
-  FiUser,
   FiMoon,
   FiSun,
-  FiBell,
   FiMenu,
   FiX,
 } from "react-icons/fi";
+
 import { IoSettingsOutline } from "react-icons/io5";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -29,24 +33,30 @@ const StaffLayout = () => {
   const location = useLocation();
   const dispatch = useDispatch();
 
-  // =====================================================
-  // SIDEBAR STATE
-  // =====================================================
-
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
+  const theme = useSelector((state) => state.theme.theme);
+
   // =====================================================
-  // CURRENT USER
+  // GET CURRENT LOGGED-IN STAFF
   // =====================================================
 
   const user = getCurrentUser();
 
-  // =====================================================
-  // THEME
-  // =====================================================
+  // Support different user object formats.
+  const staffName =
+    user?.full_name ||
+    user?.fullName ||
+    user?.name ||
+    [user?.first_name, user?.last_name].filter(Boolean).join(" ") ||
+    user?.username ||
+    user?.email ||
+    "Staff Member";
 
-  const theme = useSelector((state) => state.theme.theme);
+  const staffRole = user?.role || user?.user_type || "Staff";
+
+  const userInitial = staffName.trim().charAt(0).toUpperCase() || "S";
 
   // =====================================================
   // LOGOUT
@@ -61,7 +71,7 @@ const StaffLayout = () => {
   };
 
   // =====================================================
-  // NAVIGATION ITEMS
+  // NAVIGATION
   // =====================================================
 
   const navigation = [
@@ -94,7 +104,7 @@ const StaffLayout = () => {
   ];
 
   // =====================================================
-  // CLOSE MOBILE SIDEBAR ON ROUTE CHANGE
+  // CLOSE MOBILE SIDEBAR WHEN ROUTE CHANGES
   // =====================================================
 
   useEffect(() => {
@@ -102,7 +112,7 @@ const StaffLayout = () => {
   }, [location.pathname]);
 
   // =====================================================
-  // SIDEBAR NAVIGATION CLASS
+  // NAVIGATION STYLE
   // =====================================================
 
   const navClass = ({ isActive }) =>
@@ -114,111 +124,52 @@ const StaffLayout = () => {
         : "text-slate-600 hover:bg-orange-50 hover:text-orange-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-orange-400"
     }`;
 
-  // =====================================================
-  // USER INITIAL
-  // =====================================================
-
-  const userInitial = user?.name?.charAt(0)?.toUpperCase() || "S";
-
-  // =====================================================
-  // HANDLE NAVIGATION CLICK
-  // =====================================================
-
   const handleNavigation = () => {
     setMobileSidebarOpen(false);
   };
 
   return (
     <div className="flex min-h-screen overflow-x-hidden bg-[#f7f8fa] text-slate-800 dark:bg-slate-950 dark:text-slate-100">
-      {/* =====================================================
-          MOBILE OVERLAY
-      ====================================================== */}
-
+      {/* MOBILE OVERLAY */}
       {mobileSidebarOpen && (
         <button
           type="button"
           aria-label="Close sidebar"
           onClick={() => setMobileSidebarOpen(false)}
-          className="
-            fixed
-            inset-0
-            z-40
-            bg-slate-950/40
-            backdrop-blur-[2px]
-            lg:hidden
-          "
+          className="fixed inset-0 z-40 bg-slate-950/40 backdrop-blur-[2px] lg:hidden"
         />
       )}
 
-      {/* =====================================================
-          SIDEBAR
-      ====================================================== */}
-
+      {/* SIDEBAR */}
       <aside
         className={`
-          fixed
-          left-0
-          top-0
-          z-50
-
-          flex
-          h-screen
-          flex-col
-
-          border-r
-          border-slate-200
-          bg-white
-
-          transition-all
-          duration-300
-
-          dark:border-slate-800
-          dark:bg-slate-900
-
+          fixed left-0 top-0 z-50 flex h-screen flex-col
+          border-r border-slate-200 bg-white
+          transition-all duration-300
+          dark:border-slate-800 dark:bg-slate-900
           ${mobileSidebarOpen ? "translate-x-0" : "-translate-x-full"}
-
           lg:translate-x-0
-
           ${sidebarOpen ? "lg:w-64" : "lg:w-20"}
-
-          w-[280px]
-          max-w-[85vw]
+          w-[280px] max-w-[85vw]
         `}
       >
-        {/* =====================================================
-            LOGO / SIDEBAR HEADER
-        ====================================================== */}
-
+        {/* SIDEBAR HEADER */}
         <div
           className={`
-            flex
-            h-20
-            shrink-0
-            items-center
-            border-b
-            border-slate-100
-            dark:border-slate-800
-
+            flex h-20 shrink-0 items-center
+            border-b border-slate-100 dark:border-slate-800
             ${sidebarOpen ? "justify-between px-4" : "justify-center px-3"}
           `}
         >
-          {/* Logo + Brand */}
-
           <NavLink
             to="/staff"
             end
             title="Go to Staff Dashboard"
             onClick={handleNavigation}
-            className={`
-              flex
-              min-w-0
-              items-center
-
-              ${sidebarOpen ? "gap-3" : "justify-center"}
-            `}
+            className={`flex min-w-0 items-center ${
+              sidebarOpen ? "gap-3" : "justify-center"
+            }`}
           >
-            {/* Logo */}
-
             <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-orange-50 dark:bg-orange-500/10">
               <img
                 src={Logo}
@@ -226,8 +177,6 @@ const StaffLayout = () => {
                 className="h-9 w-9 object-contain"
               />
             </div>
-
-            {/* Brand */}
 
             {sidebarOpen && (
               <div className="min-w-0">
@@ -247,145 +196,48 @@ const StaffLayout = () => {
             )}
           </NavLink>
 
-          {/* Desktop Collapse Button */}
-
           {sidebarOpen && (
             <button
               type="button"
               onClick={() => setSidebarOpen(false)}
-              className="
-                ml-2
-                hidden
-                h-8
-                w-8
-                shrink-0
-                items-center
-                justify-center
-                rounded-lg
-
-                text-slate-400
-
-                transition
-
-                hover:bg-slate-100
-                hover:text-slate-700
-
-                dark:hover:bg-slate-800
-                dark:hover:text-slate-200
-
-                lg:flex
-              "
+              className="ml-2 hidden h-8 w-8 shrink-0 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200 lg:flex"
               title="Collapse sidebar"
+              aria-label="Collapse sidebar"
             >
               <FiChevronLeft size={18} />
             </button>
           )}
 
-          {/* Mobile Close Button */}
-
           <button
             type="button"
             onClick={() => setMobileSidebarOpen(false)}
-            className="
-              flex
-              h-9
-              w-9
-              shrink-0
-              items-center
-              justify-center
-              rounded-lg
-
-              text-slate-400
-
-              transition
-
-              hover:bg-slate-100
-              hover:text-slate-700
-
-              dark:hover:bg-slate-800
-              dark:hover:text-slate-200
-
-              lg:hidden
-            "
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200 lg:hidden"
             title="Close sidebar"
+            aria-label="Close sidebar"
           >
             <FiX size={20} />
           </button>
         </div>
 
-        {/* =====================================================
-            DESKTOP OPEN SIDEBAR BUTTON
-        ====================================================== */}
-
+        {/* EXPAND SIDEBAR */}
         {!sidebarOpen && (
-          <div
-            className="
-              hidden
-              justify-center
-              border-b
-              border-slate-100
-              py-3
-
-              dark:border-slate-800
-
-              lg:flex
-            "
-          >
+          <div className="hidden justify-center border-b border-slate-100 py-3 dark:border-slate-800 lg:flex">
             <button
               type="button"
               onClick={() => setSidebarOpen(true)}
-              className="
-                flex
-                h-9
-                w-9
-                items-center
-                justify-center
-                rounded-lg
-
-                text-slate-400
-
-                transition
-
-                hover:bg-orange-50
-                hover:text-orange-500
-
-                dark:hover:bg-slate-800
-              "
+              className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-400 transition hover:bg-orange-50 hover:text-orange-500 dark:hover:bg-slate-800"
               title="Open sidebar"
+              aria-label="Expand sidebar"
             >
               <FiChevronRight size={18} />
             </button>
           </div>
         )}
 
-        {/* =====================================================
-            NAVIGATION
-        ====================================================== */}
-
-        <nav
-          className="
-            flex-1
-            overflow-y-auto
-            overflow-x-hidden
-            px-3
-            py-5
-          "
-        >
-          {/* Workspace Label */}
-
+        {/* NAVIGATION */}
+        <nav className="flex-1 overflow-y-auto overflow-x-hidden px-3 py-5">
           {sidebarOpen && (
-            <p
-              className="
-                mb-3
-                px-3
-
-                text-[10px]
-                font-bold
-                uppercase
-                tracking-widest
-                text-slate-400
-              "
-            >
+            <p className="mb-3 px-3 text-[10px] font-bold uppercase tracking-widest text-slate-400">
               Workspace
             </p>
           )}
@@ -406,7 +258,9 @@ const StaffLayout = () => {
                   <Icon className="shrink-0" size={18} />
 
                   {sidebarOpen && (
-                    <span className="text-sm font-medium">{item.name}</span>
+                    <span className="text-sm font-medium">
+                      {item.name}
+                    </span>
                   )}
                 </NavLink>
               );
@@ -414,132 +268,62 @@ const StaffLayout = () => {
           </div>
         </nav>
 
-        {/* =====================================================
-            LOGOUT
-        ====================================================== */}
+        {/* STAFF PROFILE IN SIDEBAR */}
+        <div className="border-t border-slate-100 p-3 dark:border-slate-800">
+          {sidebarOpen && (
+            <div className="mb-3 flex min-w-0 items-center gap-3 rounded-xl bg-slate-50 p-3 dark:bg-slate-800/60">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-orange-100 text-sm font-bold text-orange-600 dark:bg-orange-500/10 dark:text-orange-400">
+                {userInitial}
+              </div>
 
-        <div
-          className="
-            shrink-0
-            border-t
-            border-slate-100
-            p-3
+              <div className="min-w-0 flex-1">
+                <p
+                  className="truncate text-sm font-semibold text-slate-800 dark:text-slate-100"
+                  title={staffName}
+                >
+                  {staffName}
+                </p>
 
-            dark:border-slate-800
-          "
-        >
+                <p className="truncate text-xs capitalize text-slate-400">
+                  {staffRole}
+                </p>
+              </div>
+            </div>
+          )}
+
           <button
             type="button"
             onClick={handleLogout}
             title={!sidebarOpen ? "Logout" : ""}
-            className={`
-              group
-              flex
-              w-full
-              items-center
-              rounded-xl
-
-              text-red-500
-
-              transition-all
-              duration-200
-
-              hover:bg-red-50
-              hover:text-red-600
-
-              dark:hover:bg-red-950/30
-
-              ${sidebarOpen ? "gap-3 px-3 py-3" : "justify-center px-2 py-3"}
-            `}
+            className={`group flex w-full items-center rounded-xl text-red-500 transition-all duration-200 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/30 ${
+              sidebarOpen
+                ? "gap-3 px-3 py-3"
+                : "justify-center px-2 py-3"
+            }`}
           >
             <FiLogOut className="shrink-0" size={18} />
 
-            {sidebarOpen && <span className="text-sm font-medium">Logout</span>}
+            {sidebarOpen && (
+              <span className="text-sm font-medium">Logout</span>
+            )}
           </button>
         </div>
       </aside>
 
-      {/* =====================================================
-          MAIN AREA
-      ====================================================== */}
-
+      {/* MAIN AREA */}
       <div
-        className={`
-          flex
-          min-h-screen
-          min-w-0
-          flex-1
-          flex-col
-
-          transition-all
-          duration-300
-
-          ${sidebarOpen ? "lg:ml-64" : "lg:ml-20"}
-        `}
+        className={`flex min-h-screen min-w-0 flex-1 flex-col transition-all duration-300 ${
+          sidebarOpen ? "lg:ml-64" : "lg:ml-20"
+        }`}
       >
-        {/* =====================================================
-            TOP HEADER
-        ====================================================== */}
-
-        <header
-          className="
-            sticky
-            top-0
-            z-30
-
-            flex
-            h-16
-            items-center
-            justify-between
-
-            border-b
-            border-slate-200
-
-            bg-white/95
-
-            px-4
-
-            backdrop-blur
-
-            sm:h-20
-            sm:px-5
-            md:px-8
-
-            dark:border-slate-800
-            dark:bg-slate-900/95
-          "
-        >
-          {/* =================================================
-              LEFT HEADER
-          ================================================== */}
-
+        {/* TOP HEADER */}
+        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-slate-200 bg-white/95 px-4 backdrop-blur sm:h-20 sm:px-5 md:px-8 dark:border-slate-800 dark:bg-slate-900/95">
+          {/* LEFT HEADER */}
           <div className="flex min-w-0 items-center gap-3">
-            {/* Mobile Menu */}
-
             <button
               type="button"
               onClick={() => setMobileSidebarOpen(true)}
-              className="
-                flex
-                h-9
-                w-9
-                shrink-0
-                items-center
-                justify-center
-                rounded-lg
-
-                text-slate-500
-
-                transition
-
-                hover:bg-orange-50
-                hover:text-orange-500
-
-                dark:text-slate-300
-                dark:hover:bg-slate-800
-
-                lg:hidden
-              "
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-slate-500 transition hover:bg-orange-50 hover:text-orange-500 dark:text-slate-300 dark:hover:bg-slate-800 lg:hidden"
               title="Open menu"
               aria-label="Open menu"
             >
@@ -547,65 +331,23 @@ const StaffLayout = () => {
             </button>
 
             <div className="min-w-0">
-              <p
-                className="
-                  truncate
-
-                  text-[10px]
-                  font-medium
-                  uppercase
-                  tracking-wider
-                  text-orange-500
-
-                  sm:text-xs
-                "
-              >
+              <p className="truncate text-[10px] font-medium uppercase tracking-wider text-orange-500 sm:text-xs">
                 Staff Workspace
               </p>
 
-              <p
-                className="
-                  mt-0.5
-                  hidden
-                  text-xs
-                  text-slate-400
-
-                  sm:block
-                "
-              >
-                Manage your daily work
+              <p className="mt-0.5 hidden text-xs text-slate-400 sm:block">
+                Welcome back, {staffName}
               </p>
             </div>
           </div>
 
-          {/* =================================================
-              RIGHT HEADER
-          ================================================== */}
-
+          {/* RIGHT HEADER */}
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* Theme Toggle */}
-
+            {/* THEME */}
             <button
               type="button"
               onClick={() => dispatch(toggleTheme())}
-              className="
-                rounded-xl mr-4
-                border
-                border-slate-200
-                p-2.5
-
-                text-slate-500
-
-                transition
-
-                hover:bg-slate-50
-                hover:text-orange-500
-
-                dark:border-slate-700
-                dark:text-slate-300
-                dark:hover:bg-slate-800
-                dark:hover:text-orange-400
-              "
+              className="mr-2 rounded-xl border border-slate-200 p-2.5 text-slate-500 transition hover:bg-slate-50 hover:text-orange-500 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-orange-400 sm:mr-3"
               aria-label="Toggle theme"
               title={
                 theme === "dark"
@@ -613,80 +355,36 @@ const StaffLayout = () => {
                   : "Switch to dark mode"
               }
             >
-              {theme === "dark" ? <FiSun size={19} /> : <FiMoon size={19} />}
+              {theme === "dark" ? (
+                <FiSun size={19} />
+              ) : (
+                <FiMoon size={19} />
+              )}
             </button>
 
-            {/* User Details */}
-
-            <div className="hidden text-right sm:block">
+            {/* REAL STAFF NAME */}
+            <div className="hidden max-w-44 text-right sm:block">
               <p
-                className="
-                  text-sm
-                  font-semibold
-                  text-slate-800
-
-                  dark:text-slate-100
-                "
+                className="truncate text-sm font-semibold text-slate-800 dark:text-slate-100"
+                title={staffName}
               >
-                {user?.name || "Staff"}
+                {staffName}
               </p>
 
               <p className="text-xs capitalize text-slate-400 dark:text-slate-500">
-                {user?.role || "staff"}
+                {staffRole}
               </p>
             </div>
 
-            {/* Avatar */}
-
-            <div
-              className="
-                flex
-                h-9
-                w-9
-                shrink-0
-
-                items-center
-                justify-center
-
-                rounded-full
-
-                bg-orange-100
-
-                text-sm
-                font-bold
-                text-orange-600
-
-                ring-4
-                ring-orange-50
-
-                dark:bg-orange-500/10
-                dark:text-orange-400
-                dark:ring-orange-500/5
-
-                sm:h-10
-                sm:w-10
-              "
-            >
+            {/* AVATAR */}
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-orange-100 text-sm font-bold text-orange-600 ring-4 ring-orange-50 dark:bg-orange-500/10 dark:text-orange-400 dark:ring-orange-500/5 sm:h-10 sm:w-10">
               {userInitial}
             </div>
           </div>
         </header>
 
-        {/* =====================================================
-            PAGE CONTENT
-        ====================================================== */}
-
-        <main
-          className="
-            min-w-0
-            flex-1
-
-            p-3
-
-            sm:p-4
-            md:p-6
-          "
-        >
+        {/* PAGE CONTENT */}
+        <main className="min-w-0 flex-1 p-3 sm:p-4 md:p-6">
           <Outlet />
         </main>
       </div>
