@@ -23,6 +23,10 @@ const addItems = async (data) => {
   const response = await api.post("/orderslipapi/slipitems/", data);
   return response.data;
 };
+const getItems = async () => {
+  const response = await api.get("/orderslipapi/slipitems/");
+  return response.data;
+};
 const createAmount = async (data) => {
   const response = await api.post(`/orderslipapi/invoices/`, data);
   return response.data;
@@ -38,6 +42,7 @@ export {
   updateProject,
   deleteProject,
   addItems,
+  getItems,
   createAmount,
   getPaymentStatus,
 };

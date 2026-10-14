@@ -17,40 +17,43 @@ const RegisterPage = () => {
     register,
     handleSubmit,
     watch,
+    getValues,
+    trigger,
     formState: { errors, isSubmitting },
   } = useForm();
 
   const password = watch("password");
 
   const onSubmit = async (data) => {
-  try {
-    const response = await Register({
-      username: data.username,
-      phone_no: data.phone_no,
-      email: data.email,
-      password: data.password,
-      confirm_password: data.confirm_password,
-    });
+    try {
+      const response = await Register({
+        username: data.username,
+        phone_no: data.phone_no,
+        email: data.email,
+        password: data.password,
+        confirm_password: data.confirm_password,
+      });
 
-    console.log("Registration successful:", response);
+      console.log("Registration successful:", response);
 
-    toast.success("Registration successful!");
+      toast.success("Registration successful!");
 
-    setTimeout(() => {
-      navigate("/setup");
-    }, 1000);
-  } catch (error) {
-    console.log("STATUS:", error.response?.status);
-    console.log("DATA:", error.response?.data);
-    console.log("FULL ERROR:", error);
+      setTimeout(() => {
+        navigate("/setup");
+      }, 1000);
+    } catch (error) {
+      console.log("STATUS:", error.response?.status);
+      console.log("DATA:", error.response?.data);
+      console.log("FULL ERROR:", error);
 
-    toast.error(
-      error.response?.data?.message ||
-        error.response?.data?.detail ||
-        "Registration failed. Please try again."
-    );
-  }
-};
+      toast.error(
+        error.response?.data?.message ||
+          error.response?.data?.detail ||
+          "Registration failed. Please try again.",
+      );
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#FDFBF7] flex items-center justify-center p-4 relative overflow-hidden">
       {/* Soft background decorative shapes */}
@@ -64,7 +67,7 @@ const RegisterPage = () => {
           {/* Top Brand Logo */}
           <div className="w-full flex justify-start">
             <div className="flex items-center gap-2">
-              <img src={Logo} className="h-7 w-7" />
+              <img src={Logo} alt="PrintTech logo" className="h-7 w-7" />
               <span className="text-lg font-bold text-slate-800">
                 Print<span className="text-[#FF7A00]">Tech</span>
               </span>
@@ -110,6 +113,11 @@ const RegisterPage = () => {
                   className="w-full rounded-lg border bg-white border-slate-200 px-3 py-2 text-xs text-slate-800 placeholder:text-slate-300 outline-none transition focus:border-[#FF7A00] focus:ring-1 focus:ring-[#FF7A00]"
                   {...register("username", {
                     required: "Username is required",
+                    onChange: () => {
+                      if (getValues("password")) {
+                        trigger("password");
+                      }
+                    },
                   })}
                 />
 
@@ -128,16 +136,27 @@ const RegisterPage = () => {
 
                 <input
                   type="tel"
+                  inputMode="numeric"
+                  maxLength={10}
                   placeholder="98XXXXXXXX"
                   className="w-full rounded-lg border border-slate-200 px-3 py-2 text-xs text-slate-800 placeholder:text-slate-300 outline-none transition focus:border-[#FF7A00] focus:ring-1 focus:ring-[#FF7A00]"
                   {...register("phone_no", {
                     required: "Phone is required",
+                    pattern: {
+                      value: /^[0-9]{10}$/,
+                      message: "Phone number must be exactly 10 digits",
+                    },
+                    onChange: (event) => {
+                      event.target.value = event.target.value
+                        .replace(/[^0-9]/g, "")
+                        .slice(0, 10);
+                    },
                   })}
                 />
 
-                {errors.phone && (
+                {errors.phone_no && (
                   <p className="text-[10px] text-red-500 mt-0.5">
-                    {errors.phone.message}
+                    {errors.phone_no.message}
                   </p>
                 )}
               </div>
@@ -187,6 +206,20 @@ const RegisterPage = () => {
                       minLength: {
                         value: 6,
                         message: "Min 6 chars",
+                      },
+                      validate: (value) => {
+                        const username = (getValues("username") || "")
+                          .trim()
+                          .toLowerCase();
+
+                        if (
+                          username &&
+                          value.toLowerCase().includes(username)
+                        ) {
+                          return "Password cannot contain your username";
+                        }
+
+                        return true;
                       },
                     })}
                   />
@@ -242,9 +275,9 @@ const RegisterPage = () => {
                   </button>
                 </div>
 
-                {errors.confirmPassword && (
+                {errors.confirm_password && (
                   <p className="text-[10px] text-red-500 mt-0.5">
-                    {errors.confirmPassword.message}
+                    {errors.confirm_password.message}
                   </p>
                 )}
               </div>
@@ -273,11 +306,17 @@ const RegisterPage = () => {
 
           {/* Social Login */}
           <div className="flex justify-center items-center gap-3">
-            <button className="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-blue-600 hover:bg-slate-50 transition shadow-sm">
+            <button
+              type="button"
+              className="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-blue-600 hover:bg-slate-50 transition shadow-sm"
+            >
               <FaFacebookF size={12} />
             </button>
 
-            <button className="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-red-500 hover:bg-slate-50 transition shadow-sm">
+            <button
+              type="button"
+              className="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-red-500 hover:bg-slate-50 transition shadow-sm"
+            >
               <FaGoogle size={12} />
             </button>
           </div>

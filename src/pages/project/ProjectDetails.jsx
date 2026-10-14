@@ -10,10 +10,11 @@ import {
   FiPrinter,
   FiTrash2,
   FiUser,
+  FiUsers,
 } from "react-icons/fi";
 
 import { FaMoneyBillWave } from "react-icons/fa";
-import { getProjects, deleteProject } from "../../api/project";
+import { getProjects, deleteProject, getItems } from "../../api/project";
 
 // ======================================================
 // HELPERS
@@ -25,7 +26,15 @@ const getRecords = (response) => {
   if (Array.isArray(data)) return data;
   if (Array.isArray(data?.results)) return data.results;
   if (Array.isArray(data?.orders)) return data.orders;
+  if (Array.isArray(data?.items)) return data.items;
+  if (Array.isArray(data?.slip_items)) return data.slip_items;
   if (Array.isArray(data?.data)) return data.data;
+
+  if (Array.isArray(data?.data?.results)) return data.data.results;
+  if (Array.isArray(data?.data?.items)) return data.data.items;
+  if (Array.isArray(data?.data?.slip_items)) {
+    return data.data.slip_items;
+  }
 
   return [];
 };
@@ -42,7 +51,7 @@ const formatDate = (date) => {
     /^\d{4}-\d{2}-\d{2}$/.test(String(date)) ? `${date}T00:00:00` : date,
   );
 
-  if (Number.isNaN(parsedDate.getTime())) return date;
+  if (Number.isNaN(parsedDate.getTime())) return String(date);
 
   return parsedDate.toLocaleDateString("en-GB", {
     day: "2-digit",
@@ -70,10 +79,66 @@ const getStatusStyle = (status) => {
 
   return "bg-amber-50 text-amber-600 border-amber-100 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20";
 };
+const getStaffName = (staff, details) => {
+  // Prefer the staff details returned by the API.
+  const person =
+    details || (typeof staff === "object" && staff !== null ? staff : null);
 
-const getProjectDetails = (project) => {
+  if (person) {
+    return (
+      person.full_name ||
+      person.name ||
+      person.username ||
+      [person.first_name, person.last_name].filter(Boolean).join(" ") ||
+      (person.id ? `Staff #${person.id}` : "Not assigned")
+    );
+  }
+
+  if (staff === null || staff === undefined || staff === "") {
+    return "Not assigned";
+  }
+
+  return `Staff #${staff}`;
+};
+
+const getOrderId = (item) => {
+  const order = item?.order;
+
+  if (order && typeof order === "object") {
+    return order.id ?? order.uuid ?? order.pk ?? "";
+  }
+
+  return order ?? "";
+};
+
+const normalizeItem = (item) => ({
+  ...item,
+
+  item_description:
+    item.item_description ||
+    item.description ||
+    item.name ||
+    item.item_name ||
+    "",
+
+  quantity: item.quantity ?? item.qty ?? 0,
+
+  paper_type: item.paper_type || item.paperType || "",
+
+  maso: item.maso || item.ink || item.color || "",
+
+  subtotal:
+    item.subtotal ??
+    item.total ??
+    item.total_amount ??
+    item.amount ??
+    Number(item.quantity ?? item.qty ?? 0) * Number(item.rate ?? 0),
+});
+
+const getProjectDetails = (project, fetchedItems = []) => {
   const totalAmount = Number(project.total_amount ?? 0);
   const paidAmount = Number(project.paid_amount ?? 0);
+
   const balance =
     project.balance !== undefined && project.balance !== null
       ? Number(project.balance)
@@ -81,34 +146,61 @@ const getProjectDetails = (project) => {
 
   const customer = project.customer_details || {};
 
+  // Prefer items returned by the separate items API.
+  // Fall back to nested items from the project response.
+  const nestedItems = Array.isArray(project.slip_items)
+    ? project.slip_items
+    : Array.isArray(project.items)
+      ? project.items
+      : [];
+
+  const rawItems = fetchedItems.length > 0 ? fetchedItems : nestedItems;
+
   return {
     ...project,
+
     name: project.project_name || "Untitled Project",
+
     estimateNo: `EST-${project.slip_no ?? "-"}`,
+
     customer: {
       name:
         customer.name ||
         project.customer_name ||
         "Customer information unavailable",
+
       phone: customer.contact_no || customer.phone || project.contact_no || "-",
+
       address: customer.address || project.customer_address || "-",
-      pan: customer.pan_no || project.pan_no || "-",
+
+      pan:
+        customer.pan_no ||
+        customer.pan ||
+        project.pan_no ||
+        project.customer_pan ||
+        "-",
     },
+
     date: project.slip_date || project.created_at || "",
+
     dueDate: project.delivery_date || "",
-    priority: project.priority || "Normal",
+
+    priority: project.priority || "normal",
+
     status: project.work_stage || "pending",
+
     totalAmount,
+
     advance: paidAmount,
+
     remaining: Math.max(balance, 0),
+
     paymentStatus: getPaymentStatus(paidAmount, balance),
-    items: Array.isArray(project.items)
-      ? project.items
-      : Array.isArray(project.slip_items)
-        ? project.slip_items
-        : [],
-    production: project.production || {},
-    description: project.description || project.notes || "",
+
+    items: rawItems.map(normalizeItem),
+
+    description:
+      project.print_details_full || project.description || project.notes || "",
   };
 };
 
@@ -121,6 +213,7 @@ const InfoItem = ({ label, value }) => (
     <p className="mb-1 text-xs font-medium uppercase tracking-wide text-slate-400 dark:text-slate-500">
       {label}
     </p>
+
     <p className="break-words text-sm font-semibold text-slate-800 dark:text-slate-200">
       {value || "-"}
     </p>
@@ -132,6 +225,7 @@ const SectionTitle = ({ icon: Icon, title }) => (
     <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-orange-50 text-orange-500 dark:bg-orange-500/10">
       <Icon size={17} />
     </div>
+
     <h2 className="text-base font-bold text-slate-800 dark:text-slate-100">
       {title}
     </h2>
@@ -159,20 +253,11 @@ const ProjectDetails = () => {
         setLoading(true);
         setError("");
 
-        const response = await getProjects();
+        // Load project records.
+        const projectsResponse = await getProjects();
+        const records = getRecords(projectsResponse);
 
-        console.log("Full backend response:", response);
-        console.log("Data sent by backend:", response?.data);
-
-        const records = getRecords(response);
-
-        console.log("First project:", records[0]);
-        console.log("Project description:", records[0]?.description);
-        console.log("Customer details:", records[0]?.customer_details);
-        console.log(
-          "Customer phone:",
-          records[0]?.customer_details?.contact_no,
-        );
+        console.log("Projects API response:", projectsResponse);
 
         const found = records.find(
           (item) =>
@@ -184,11 +269,55 @@ const ProjectDetails = () => {
 
         if (!found) {
           setProject(null);
-          setError("");
           return;
         }
 
-        setProject(getProjectDetails(found));
+        console.log("Selected project:", found);
+        console.log("Customer details:", found.customer_details);
+        console.log("Project description:", found.print_details_full);
+
+        // Load items using your existing items API.
+        let matchingItems = [];
+
+        try {
+          // Pass the project ID in case your API helper accepts an order ID.
+          const itemsResponse = await getItems(found.id);
+
+          if (!active) return;
+
+          const allItems = getRecords(itemsResponse);
+
+          console.log("Items API response:", itemsResponse);
+
+          // If the endpoint returns order IDs, filter to this project.
+          const itemsWithOrder = allItems.filter(
+            (item) => getOrderId(item) !== "",
+          );
+
+          if (itemsWithOrder.length > 0) {
+            matchingItems = itemsWithOrder.filter(
+              (item) =>
+                String(getOrderId(item)).toLowerCase() ===
+                String(found.id).toLowerCase(),
+            );
+          } else {
+            // Some item endpoints may already return only this order's items.
+            matchingItems = allItems;
+          }
+
+          console.log("Items matched to project:", matchingItems);
+        } catch (itemsError) {
+          console.error("Failed to fetch project items:", itemsError);
+
+          // Use nested items if the separate endpoint fails.
+          matchingItems = [];
+        }
+
+        if (!active) return;
+
+        const normalizedProject = getProjectDetails(found, matchingItems);
+
+        setProject(normalizedProject);
       } catch (err) {
         if (!active) return;
 
@@ -222,10 +351,14 @@ const ProjectDetails = () => {
 
     try {
       setDeleting(true);
+
       await deleteProject(project.id);
+
       navigate("/projects", {
         replace: true,
-        state: { message: "Project deleted successfully." },
+        state: {
+          message: "Project deleted successfully.",
+        },
       });
     } catch (err) {
       console.error("Failed to delete project:", err);
@@ -249,6 +382,7 @@ const ProjectDetails = () => {
       <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-950">
         <div className="text-center">
           <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-orange-100 border-t-orange-500" />
+
           <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">
             Loading project details...
           </p>
@@ -269,6 +403,7 @@ const ProjectDetails = () => {
             <h1 className="text-xl font-bold text-slate-800 dark:text-white">
               Could Not Load Project
             </h1>
+
             <p className="mt-3 text-sm text-red-500">{error}</p>
 
             <button
@@ -303,12 +438,15 @@ const ProjectDetails = () => {
 
           <div className="rounded-2xl border border-slate-200 bg-white p-10 text-center dark:border-slate-800 dark:bg-slate-900">
             <FiFileText size={28} className="mx-auto mb-4 text-orange-500" />
+
             <h1 className="text-xl font-bold text-slate-800 dark:text-white">
               Project Not Found
             </h1>
+
             <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
               No project was found with ID {id}.
             </p>
+
             <button
               type="button"
               onClick={() => navigate("/projects")}
@@ -323,7 +461,6 @@ const ProjectDetails = () => {
   }
 
   const customerName = project.customer.name;
-  const production = project.production;
 
   return (
     <div className="min-h-screen bg-slate-50 px-4 py-6 dark:bg-slate-950 sm:px-6 lg:px-8">
@@ -352,7 +489,9 @@ const ProjectDetails = () => {
 
                 <div className="mt-1 flex flex-wrap items-center gap-3 text-sm text-slate-500 dark:text-slate-400">
                   <span>Slip #{project.slip_no ?? "-"}</span>
+
                   <span className="text-slate-300 dark:text-slate-700">•</span>
+
                   <span>{project.estimateNo}</span>
                 </div>
               </div>
@@ -363,7 +502,7 @@ const ProjectDetails = () => {
                 type="button"
                 disabled={deleting}
                 onClick={handleDelete}
-                className="flex w-full items-center justify-center gap-2 rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-sm font-semibold text-red-500 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-red-500/20 dark:bg-red-500/10 dark:hover:bg-red-500/20 sm:w-auto"
+                className="flex w-full items-center justify-center gap-2 rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-sm font-semibold text-white transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-red-500/20 dark:bg-red-500/10 dark:hover:bg-red-500/20 sm:w-auto"
               >
                 <FiTrash2 size={16} />
                 {deleting ? "Deleting..." : "Delete Project"}
@@ -379,6 +518,7 @@ const ProjectDetails = () => {
             <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
               Total Amount
             </p>
+
             <p className="mt-2 text-xl font-bold text-slate-900 dark:text-white">
               {formatCurrency(project.totalAmount)}
             </p>
@@ -388,6 +528,7 @@ const ProjectDetails = () => {
             <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
               Advance Paid
             </p>
+
             <p className="mt-2 text-xl font-bold text-emerald-600 dark:text-emerald-400">
               {formatCurrency(project.advance)}
             </p>
@@ -397,6 +538,7 @@ const ProjectDetails = () => {
             <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
               Remaining
             </p>
+
             <p className="mt-2 text-xl font-bold text-orange-500">
               {formatCurrency(project.remaining)}
             </p>
@@ -414,8 +556,11 @@ const ProjectDetails = () => {
 
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                 <InfoItem label="Customer Name" value={customerName} />
+
                 <InfoItem label="Phone" value={project.customer.phone} />
+
                 <InfoItem label="Address" value={project.customer.address} />
+
                 <InfoItem label="PAN / VAT" value={project.customer.pan} />
               </div>
 
@@ -436,19 +581,24 @@ const ProjectDetails = () => {
 
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 <InfoItem label="Estimate No." value={project.estimateNo} />
+
                 <InfoItem
                   label="Project Date"
                   value={formatDate(project.date)}
                 />
+
                 <InfoItem
                   label="Due Date"
                   value={formatDate(project.dueDate)}
                 />
+
                 <InfoItem label="Priority" value={project.priority} />
+
                 <InfoItem
                   label="Work Stage"
                   value={String(project.status).replaceAll("_", " ")}
                 />
+
                 <InfoItem label="Payment" value={project.paymentStatus} />
               </div>
 
@@ -456,78 +606,114 @@ const ProjectDetails = () => {
                 <p className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-400">
                   Description
                 </p>
-                <p className="text-sm leading-6 text-slate-600 dark:text-slate-300">
+
+                <p className="whitespace-pre-wrap text-sm leading-6 text-slate-600 dark:text-slate-300">
                   {project.description ||
                     "No description available for this project."}
                 </p>
               </div>
             </section>
-
             {/* PRINTING ITEMS */}
 
             <section className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
               <SectionTitle icon={FiPrinter} title="Printing Items" />
 
               {project.items.length > 0 ? (
-                <div className="overflow-x-auto">
-                  <table className="w-full min-w-[650px] text-left">
-                    <thead>
-                      <tr className="border-b border-slate-100 dark:border-slate-800">
-                        {[
-                          "Description",
-                          "Qty",
-                          "Size",
-                          "Paper",
-                          "Ink",
-                          "Total",
-                        ].map((heading) => (
-                          <th
-                            key={heading}
-                            className="px-3 py-3 text-xs font-semibold uppercase tracking-wide text-slate-400"
-                          >
-                            {heading}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {project.items.map((item, index) => (
-                        <tr
-                          key={item.id || index}
-                          className="border-b border-slate-50 last:border-0 dark:border-slate-800"
-                        >
-                          <td className="px-3 py-4">
-                            <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-                              {item.description ||
-                                item.name ||
-                                item.item_name ||
-                                "-"}
+                <div className="mt-5 rounded-xl border border-slate-200 bg-slate-50/70 p-4 dark:border-slate-800 dark:bg-slate-950/40">
+                  <div className="mb-4 flex items-center justify-between">
+                    <div>
+                      <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+                        Item Details
+                      </h3>
+                      <p className="mt-1 text-xs text-slate-500">
+                        {project.items.length} printing{" "}
+                        {project.items.length === 1 ? "item" : "items"}
+                      </p>
+                    </div>
+
+                    <span className="rounded-md bg-orange-50 px-3 py-1 text-xs font-semibold text-orange-600 dark:bg-orange-500/10 dark:text-orange-400">
+                      {project.items.length} Items
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                    {project.items.map((item, index) => (
+                      <div
+                        key={item.id || index}
+                        className="rounded-lg border border-slate-200 bg-white p-4 transition-colors hover:border-orange-200 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-orange-500/40"
+                      >
+                        {/* Item Header */}
+                        <div className="flex items-start gap-3">
+                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-orange-50 text-orange-600 dark:bg-orange-500/10 dark:text-orange-400">
+                            <FiPrinter size={17} />
+                          </div>
+
+                          <div className="min-w-0 flex-1">
+                            <p className="break-words text-sm font-semibold text-slate-800 dark:text-slate-100">
+                              {item.item_description || "-"}
                             </p>
-                            <p className="mt-1 text-xs text-slate-400">
-                              {item.work_type || item.workType || "-"}
+
+                            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                              {item.work_type || "Printing"}
                             </p>
-                          </td>
-                          <td className="px-3 py-4 text-sm text-slate-600 dark:text-slate-300">
-                            {item.quantity ?? item.qty ?? "-"}
-                          </td>
-                          <td className="px-3 py-4 text-sm text-slate-600 dark:text-slate-300">
-                            {item.size || "-"}
-                          </td>
-                          <td className="px-3 py-4 text-sm text-slate-600 dark:text-slate-300">
-                            {item.paper_type || item.paperType || "-"}
-                          </td>
-                          <td className="px-3 py-4 text-sm text-slate-600 dark:text-slate-300">
-                            {item.ink || item.color || "-"}
-                          </td>
-                          <td className="px-3 py-4 text-sm font-semibold text-slate-800 dark:text-slate-200">
-                            {formatCurrency(
-                              item.total ?? item.total_amount ?? item.amount,
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                          </div>
+                        </div>
+
+                        {/* Item Information Grid */}
+                        <div className="mt-4 grid grid-cols-2 gap-3 border-t border-slate-100 pt-3 dark:border-slate-800">
+                          <div>
+                            <p className="text-xs text-slate-400">Quantity</p>
+                            <p className="mt-1 text-sm font-medium text-slate-700 dark:text-slate-200">
+                              {item.quantity ?? "-"}
+                            </p>
+                          </div>
+
+                          <div>
+                            <p className="text-xs text-slate-400">Size</p>
+                            <p className="mt-1 break-words text-sm font-medium text-slate-700 dark:text-slate-200">
+                              {item.size || "-"}
+                            </p>
+                          </div>
+
+                          <div>
+                            <p className="text-xs text-slate-400">Paper Type</p>
+                            <p className="mt-1 break-words text-sm font-medium text-slate-700 dark:text-slate-200">
+                              {item.paper_type || "-"}
+                            </p>
+                          </div>
+
+                          <div>
+                            <p className="text-xs text-slate-400">Ink / Maso</p>
+                            <p className="mt-1 break-words text-sm font-medium text-slate-700 dark:text-slate-200">
+                              {item.maso || "-"}
+                            </p>
+                          </div>
+
+                          {item.band_type && (
+                            <div className="col-span-2">
+                              <p className="text-xs text-slate-400">
+                                Band Type
+                              </p>
+                              <p className="mt-1 text-sm font-medium text-slate-700 dark:text-slate-200">
+                                {item.band_type}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Item Total */}
+                        <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 dark:border-slate-800">
+                          <span className="text-xs font-medium text-slate-500">
+                            Item Total
+                          </span>
+
+                          <span className="text-base font-bold text-orange-600 dark:text-orange-400">
+                            {formatCurrency(item.subtotal)}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               ) : (
                 <div className="rounded-lg border border-dashed border-slate-200 px-4 py-8 text-center dark:border-slate-700">
@@ -535,66 +721,74 @@ const ProjectDetails = () => {
                     className="mx-auto mb-2 text-slate-400"
                     size={23}
                   />
+
                   <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
-                    Item details are not included in this project response.
+                    No printing items were returned for this project.
                   </p>
+
                   <p className="mt-1 text-xs text-slate-400">
-                    Connect the slip-items API to display printing
-                    specifications here.
+                    Check the items API response and the item's order ID.
                   </p>
                 </div>
               )}
             </section>
-
-            {/* PRODUCTION TIMELINE */}
+            {/* STAFF ASSIGNMENTS */}
 
             <section className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
-              <SectionTitle icon={FiClock} title="Production Timeline" />
+              <SectionTitle icon={FiUsers} title="Staff Assignments" />
 
-              {[
-                {
-                  title: "Design",
-                  date: production.design_date || production.designDate,
-                  person: production.design_person || production.designPerson,
-                  color: "bg-orange-500 ring-orange-50 dark:ring-orange-500/10",
-                },
-                {
-                  title: "Printing",
-                  date: production.printing_date || production.printingDate,
-                  person:
-                    production.printing_person || production.printingPerson,
-                  color: "bg-blue-500 ring-blue-50 dark:ring-blue-500/10",
-                },
-                {
-                  title: "Binding / Finishing",
-                  date: production.binding_date || production.bindingDate,
-                  person: production.binding_person || production.bindingPerson,
-                  color:
-                    "bg-emerald-500 ring-emerald-50 dark:ring-emerald-500/10",
-                },
-              ].map((stage) => (
-                <div key={stage.title} className="mb-5 flex gap-4 last:mb-0">
-                  <div
-                    className={`mt-1 h-3 w-3 shrink-0 rounded-full ring-4 ${stage.color}`}
-                  />
-                  <div className="flex-1">
-                    <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-                      {stage.title}
-                    </p>
-                    <p className="mt-1 text-xs text-slate-400">
-                      {stage.date
-                        ? formatDate(stage.date)
-                        : "No date available"}
-                    </p>
-                    <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
-                      Responsible:{" "}
-                      <span className="font-medium text-slate-700 dark:text-slate-300">
-                        {stage.person || "Not assigned"}
-                      </span>
-                    </p>
-                  </div>
+              {project.items.length > 0 ? (
+                <div className="space-y-5">
+                  {project.items.map((item, index) => (
+                    <div
+                      key={item.id || index}
+                      className="rounded-lg border border-slate-100 p-4 dark:border-slate-800"
+                    >
+                      <div className="mb-4">
+                        <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+                          {item.item_description ||
+                            `Printing Item ${index + 1}`}
+                        </p>
+
+                        <p className="mt-1 text-xs text-slate-400">
+                          {item.work_type || "Printing work"}
+                        </p>
+                      </div>
+
+                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                        <InfoItem
+                          label="Designer"
+                          value={getStaffName(
+                            item.Designing_person ?? item.designing_person,
+                            item.designing_person_details,
+                          )}
+                        />
+
+                        <InfoItem
+                          label="Printer"
+                          value={getStaffName(
+                            item.printing_person ?? item.Printing_person,
+                            item.printing_person_details,
+                          )}
+                        />
+
+                        <InfoItem
+                          label="Binding"
+                          value={getStaffName(
+                            item.binding_person ?? item.Binding_person,
+                            item.binding_person_details,
+                          )}
+                        />
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              ) : (
+                <p className="text-sm text-slate-500 dark:text-slate-400">
+                  Staff assignments will appear here when the printing items are
+                  available.
+                </p>
+              )}
             </section>
           </div>
 
@@ -611,6 +805,7 @@ const ProjectDetails = () => {
                   <span className="text-sm text-slate-500 dark:text-slate-400">
                     Total Amount
                   </span>
+
                   <span className="text-right text-sm font-semibold text-slate-800 dark:text-slate-200">
                     {formatCurrency(project.totalAmount)}
                   </span>
@@ -620,6 +815,7 @@ const ProjectDetails = () => {
                   <span className="text-sm text-slate-500 dark:text-slate-400">
                     Advance
                   </span>
+
                   <span className="text-right text-sm font-semibold text-emerald-600 dark:text-emerald-400">
                     {formatCurrency(project.advance)}
                   </span>
@@ -630,6 +826,7 @@ const ProjectDetails = () => {
                     <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
                       Remaining
                     </span>
+
                     <span className="text-right text-base font-bold text-orange-500">
                       {formatCurrency(project.remaining)}
                     </span>
@@ -639,6 +836,7 @@ const ProjectDetails = () => {
 
               <div className="mt-5 rounded-lg bg-slate-50 p-4 dark:bg-slate-800/60">
                 <p className="text-xs text-slate-400">Payment Status</p>
+
                 <p className="mt-1 text-sm font-semibold text-slate-800 dark:text-slate-200">
                   {project.paymentStatus}
                 </p>
@@ -654,20 +852,24 @@ const ProjectDetails = () => {
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <p className="text-xs text-slate-400">Project Date</p>
+
                     <p className="mt-1 text-sm font-semibold text-slate-700 dark:text-slate-300">
                       {formatDate(project.date)}
                     </p>
                   </div>
+
                   <FiCalendar className="shrink-0 text-slate-400" />
                 </div>
 
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <p className="text-xs text-slate-400">Delivery Date</p>
+
                     <p className="mt-1 text-sm font-semibold text-orange-500">
                       {formatDate(project.dueDate)}
                     </p>
                   </div>
+
                   <FiClock className="shrink-0 text-orange-500" />
                 </div>
               </div>
@@ -687,11 +889,11 @@ const ProjectDetails = () => {
                   <p className="truncate text-sm font-bold text-slate-800 dark:text-slate-200">
                     {customerName}
                   </p>
+
                   <p className="mt-1 flex items-center gap-1 text-xs text-slate-400">
-                    {project.customer.phone !== "-" && (
-                      <span>{project.customer.phone}</span>
-                    )}
-                    {project.customer.phone === "-" && "Phone unavailable"}
+                    {project.customer.phone !== "-"
+                      ? project.customer.phone
+                      : "Phone unavailable"}
                   </p>
                 </div>
               </div>

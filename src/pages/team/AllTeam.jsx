@@ -54,6 +54,10 @@ const AllTeam = () => {
   // SEARCH + FILTER
   // =====================================================
 
+  const getMemberStatus = (member) => {
+    return member.status || "Active";
+  };
+
   const filteredMembers = useMemo(() => {
     return teamMembers.filter((member) => {
       const searchText = search.toLowerCase().trim();
@@ -75,9 +79,7 @@ const AllTeam = () => {
 
       const matchesStatus =
         statusFilter === "All" ||
-        String(member?.status || "").toLowerCase() ===
-          statusFilter.toLowerCase();
-
+        getMemberStatus(member).toLowerCase() === statusFilter.toLowerCase();
       return matchesSearch && matchesStatus;
     });
   }, [teamMembers, search, statusFilter]);
@@ -89,11 +91,11 @@ const AllTeam = () => {
   const totalMembers = teamMembers.length;
 
   const activeMembers = teamMembers.filter(
-    (member) => String(member?.status || "").toLowerCase() === "active",
+    (member) => getMemberStatus(member).toLowerCase() === "active",
   ).length;
 
   const invitedMembers = teamMembers.filter(
-    (member) => String(member?.status || "").toLowerCase() === "invited",
+    (member) => getMemberStatus(member).toLowerCase() === "invited",
   ).length;
 
   // =====================================================
@@ -317,6 +319,7 @@ const AllTeam = () => {
             <tbody>
               {filteredMembers.length > 0 ? (
                 filteredMembers.map((member) => {
+                  const status = getMemberStatus(member);
                   const memberUuid = member.uuid || member.id;
 
                   return (
@@ -363,16 +366,14 @@ const AllTeam = () => {
                       <td className="px-5 py-4">
                         <span
                           className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
-                            String(member.status || "").toLowerCase() ===
-                            "active"
+                            status.toLowerCase() === "active"
                               ? "bg-green-100 text-green-700"
-                              : String(member.status || "").toLowerCase() ===
-                                  "invited"
+                              : status.toLowerCase() === "invited"
                                 ? "bg-yellow-100 text-yellow-700"
                                 : "bg-red-100 text-red-700"
                           }`}
                         >
-                          {member.status || "Disabled"}
+                          {status}
                         </span>
                       </td>
 

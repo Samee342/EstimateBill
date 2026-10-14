@@ -261,6 +261,8 @@ const AddCustomer = () => {
 
                       <input
                         type="tel"
+                        inputMode="numeric"
+                        maxLength={10}
                         placeholder="98XXXXXXXX"
                         className={`w-full rounded-xl border bg-white py-3 pl-11 pr-4 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:ring-2 dark:bg-slate-700 dark:text-slate-300 ${
                           errors.contact_no
@@ -272,6 +274,11 @@ const AddCustomer = () => {
                           pattern: {
                             value: /^[0-9]{10}$/,
                             message: "Enter a valid 10-digit phone number",
+                          },
+                          onChange: (e) => {
+                            e.target.value = e.target.value
+                              .replace(/\D/g, "")
+                              .slice(0, 10);
                           },
                         })}
                       />
@@ -376,10 +383,24 @@ const AddCustomer = () => {
 
                       <input
                         type="text"
+                        inputMode="numeric"
+                        maxLength={20}
                         placeholder="Enter PAN number"
                         className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-11 pr-4 text-sm text-slate-700 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-300"
                         {...register("pan_no", {
                           required: "PAN number is required",
+                          pattern: {
+                            value: /^[0-9]+$/,
+                            message: "Please enter numbers only",
+                          },
+                          minLength: {
+                            value: 3,
+                            message: "PAN number must be at least 3 digits",
+                          },
+                          maxLength: {
+                            value: 20,
+                            message: "PAN number cannot exceed 20 digits",
+                          },
                         })}
                       />
                     </div>

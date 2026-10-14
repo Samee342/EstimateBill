@@ -53,18 +53,6 @@ const CustomerDetails = lazy(() => import("./pages/customers/CustomerDetails"));
 
 /* ================= TEAM ================= */
 
-/*
-  Team is Admin-side staff management.
-
-  Existing:
-  src/pages/staff/
-  is used for Staff-side pages.
-
-  New:
-  src/pages/team/
-  is used for Admin-side team management.
-*/
-
 const AllTeam = lazy(() => import("./pages/team/AllTeam"));
 
 const AddTeamMember = lazy(() => import("./pages/team/AddTeamMember"));
@@ -108,12 +96,6 @@ const StaffDashboard = lazy(() => import("./pages/staff/StaffDashboard"));
 const StaffTasks = lazy(() => import("./pages/staff/StaffTasks"));
 
 const StaffTaskDetails = lazy(() => import("./pages/staff/StaffTaskDetails"));
-
-/* ================= ORDERS ================= */
-
-const StaffOrders = lazy(() => import("./pages/staff/StaffOrders"));
-
-const StaffOrderDetails = lazy(() => import("./pages/staff/StaffOrderDetails"));
 
 /* ================= CUSTOMERS ================= */
 
@@ -382,15 +364,6 @@ function App() {
             <Route path="/staff/tasks" element={<StaffTasks />} />
 
             <Route path="/staff/tasks/:taskId" element={<StaffTaskDetails />} />
-
-            {/* ================= MY ORDERS ================= */}
-
-            <Route path="/staff/orders" element={<StaffOrders />} />
-
-            <Route
-              path="/staff/orders/:orderId"
-              element={<StaffOrderDetails />}
-            />
 
             {/* ================= STAFF CUSTOMERS ================= */}
 

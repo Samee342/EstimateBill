@@ -1,10 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  NavLink,
-  Outlet,
-  useLocation,
-  useNavigate,
-} from "react-router-dom";
+import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 
 import {
   FiBarChart2,
@@ -58,6 +53,13 @@ const StaffLayout = () => {
 
   const userInitial = staffName.trim().charAt(0).toUpperCase() || "S";
 
+  const pressName =
+    user?.tenant_details?.name ||
+    user?.tenant_name ||
+    user?.tenant_details?.business_name ||
+    user?.business_name ||
+    "staff panel";
+
   // =====================================================
   // LOGOUT
   // =====================================================
@@ -86,11 +88,7 @@ const StaffLayout = () => {
       path: "/staff/tasks",
       icon: FiCheckSquare,
     },
-    {
-      name: "My Orders",
-      path: "/staff/orders",
-      icon: FiBriefcase,
-    },
+
     {
       name: "Customers",
       path: "/staff/customers",
@@ -189,7 +187,7 @@ const StaffLayout = () => {
                   <span className="h-1.5 w-1.5 rounded-full bg-orange-500" />
 
                   <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
-                    Staff Panel
+                    {pressName}
                   </p>
                 </div>
               </div>
@@ -258,9 +256,7 @@ const StaffLayout = () => {
                   <Icon className="shrink-0" size={18} />
 
                   {sidebarOpen && (
-                    <span className="text-sm font-medium">
-                      {item.name}
-                    </span>
+                    <span className="text-sm font-medium">{item.name}</span>
                   )}
                 </NavLink>
               );
@@ -296,16 +292,12 @@ const StaffLayout = () => {
             onClick={handleLogout}
             title={!sidebarOpen ? "Logout" : ""}
             className={`group flex w-full items-center rounded-xl text-red-500 transition-all duration-200 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/30 ${
-              sidebarOpen
-                ? "gap-3 px-3 py-3"
-                : "justify-center px-2 py-3"
+              sidebarOpen ? "gap-3 px-3 py-3" : "justify-center px-2 py-3"
             }`}
           >
             <FiLogOut className="shrink-0" size={18} />
 
-            {sidebarOpen && (
-              <span className="text-sm font-medium">Logout</span>
-            )}
+            {sidebarOpen && <span className="text-sm font-medium">Logout</span>}
           </button>
         </div>
       </aside>
@@ -355,11 +347,7 @@ const StaffLayout = () => {
                   : "Switch to dark mode"
               }
             >
-              {theme === "dark" ? (
-                <FiSun size={19} />
-              ) : (
-                <FiMoon size={19} />
-              )}
+              {theme === "dark" ? <FiSun size={19} /> : <FiMoon size={19} />}
             </button>
 
             {/* REAL STAFF NAME */}

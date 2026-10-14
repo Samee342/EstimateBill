@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   FiCalendar,
   FiCheck,
@@ -12,141 +12,154 @@ import {
   FiX,
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
+import { assignedWork } from "../../api/staffWork";
 
 // =========================================================
-// SAMPLE TASK DATA
+// API RESPONSE NORMALIZER
 // =========================================================
 
-const initialTasks = [
-  {
-    id: "TASK-1001",
-    projectId: "PRJ-1001",
-    estimateId: "EST-10245",
-    projectName: "Business Card Printing",
-    customer: "Ram Sharma",
-    task: "Design",
-    workType: "Design",
-    dueDate: "2026-09-18",
-    priority: "High",
-    status: "Completed",
-    progress: 100,
-    quantity: 500,
-    startedAt: "2026-09-18T09:10:00",
-    completedAt: "2026-09-18T10:42:00",
-  },
-  {
-    id: "TASK-1002",
-    projectId: "PRJ-1001",
-    estimateId: "EST-10245",
-    projectName: "Business Card Printing",
-    customer: "Ram Sharma",
-    task: "Printing",
-    workType: "Offset Printing",
-    dueDate: "2026-09-18",
-    priority: "High",
-    status: "In Progress",
-    progress: 70,
-    quantity: 500,
-    startedAt: "2026-09-18T11:15:00",
-    completedAt: null,
-  },
-  {
-    id: "TASK-1003",
-    projectId: "PRJ-1001",
-    estimateId: "EST-10245",
-    projectName: "Business Card Printing",
-    customer: "Ram Sharma",
-    task: "Cutting",
-    workType: "Finishing",
-    dueDate: "2026-09-18",
-    priority: "Medium",
-    status: "Pending",
-    progress: 0,
-    quantity: 500,
-    startedAt: null,
-    completedAt: null,
-  },
-  {
-    id: "TASK-1004",
-    projectId: "PRJ-1002",
-    estimateId: "EST-10246",
-    projectName: "Wedding Invitation Cards",
-    customer: "Sita Karki",
-    task: "Printing",
-    workType: "Digital Printing",
-    dueDate: "2026-09-18",
-    priority: "Medium",
-    status: "Pending",
-    progress: 0,
-    quantity: 300,
-    startedAt: null,
-    completedAt: null,
-  },
-  {
-    id: "TASK-1005",
-    projectId: "PRJ-1002",
-    estimateId: "EST-10246",
-    projectName: "Wedding Invitation Cards",
-    customer: "Sita Karki",
-    task: "Lamination",
-    workType: "Lamination",
-    dueDate: "2026-09-19",
-    priority: "Low",
-    status: "Pending",
-    progress: 0,
-    quantity: 300,
-    startedAt: null,
-    completedAt: null,
-  },
-  {
-    id: "TASK-1006",
-    projectId: "PRJ-1003",
-    estimateId: "EST-10247",
-    projectName: "Restaurant Menu Printing",
-    customer: "Hari Thapa",
-    task: "Printing",
-    workType: "Offset Printing",
-    dueDate: "2026-09-18",
-    priority: "Urgent",
-    status: "In Progress",
-    progress: 45,
-    quantity: 1000,
-    startedAt: "2026-09-18T08:45:00",
-    completedAt: null,
-  },
-  {
-    id: "TASK-1007",
-    projectId: "PRJ-1003",
-    estimateId: "EST-10247",
-    projectName: "Restaurant Menu Printing",
-    customer: "Hari Thapa",
-    task: "Binding",
-    workType: "Finishing",
-    dueDate: "2026-09-18",
-    priority: "High",
-    status: "Pending",
-    progress: 0,
-    quantity: 1000,
-    startedAt: null,
-    completedAt: null,
-  },
-  {
-    id: "TASK-1008",
-    projectId: "PRJ-1004",
-    estimateId: "EST-10248",
-    projectName: "Flex Banner Design",
-    customer: "Aashish Gurung",
-    task: "Printing",
-    workType: "Flex Printing",
-    dueDate: "2026-09-18",
-    priority: "Urgent",
-    status: "Completed",
-    progress: 100,
-    quantity: 20,
-    startedAt: "2026-09-18T08:00:00",
-    completedAt: "2026-09-18T09:25:00",
-  },
-];
+const getArrayFromResponse = (response) => {
+  let data = response?.data ?? response;
+
+  for (let i = 0; i < 4; i++) {
+    if (Array.isArray(data)) return data;
+
+    if (!data || typeof data !== "object") return [];
+
+    if (Array.isArray(data.results)) return data.results;
+    if (Array.isArray(data.tasks)) return data.tasks;
+    if (Array.isArray(data.work)) return data.work;
+    if (Array.isArray(data.assigned_work)) return data.assigned_work;
+
+    if (data.data !== undefined) {
+      data = data.data;
+      continue;
+    }
+
+    break;
+  }
+
+  console.warn(
+    "[StaffTasks] Could not identify an array in the API response:",
+    response,
+  );
+
+  return [];
+};
+
+// =========================================================
+// NORMALIZE A TASK
+// =========================================================
+
+const normalizeTask = (item, index) => {
+  const order = item.order_details || {};
+  const customer = order.customer_details || item.customer_details || {};
+
+  const assignedStaff =
+    item.printing_person_details ||
+    item.designing_person_details ||
+    item.binding_person_details ||
+    null;
+
+  const rawStatus =
+    item.status || item.work_status || order.work_stage || "pending";
+
+  const statusMap = {
+    pending: "Pending",
+    printed: "In Progress",
+    "in progress": "In Progress",
+    completed: "Completed",
+  };
+
+  const rawPriority = order.priority || item.priority || "normal";
+
+  const priorityMap = {
+    urgent: "Urgent",
+    high: "High",
+    normal: "Medium",
+    medium: "Medium",
+    low: "Low",
+  };
+
+  return {
+    id: item.id || `task-${index}`,
+    projectId:
+      typeof item.order === "object"
+        ? item.order?.id || order.id || "—"
+        : item.order || item.order_id || order.id || "—",
+
+    projectName:
+      order.project_name || item.project_name || "Project details unavailable",
+
+    customer:
+      customer.name || item.customer_name || "Customer details unavailable",
+
+    estimateId:
+      order.slip_no != null
+        ? `EST-${order.slip_no}`
+        : item.estimate_number || item.estimate_id || "—",
+
+    task: item.item_description || "Production task",
+    workType: item.work_type || item.item_description || "Production",
+
+    status: statusMap[String(rawStatus).toLowerCase()] || "Pending",
+
+    priority: priorityMap[String(rawPriority).toLowerCase()] || "Medium",
+
+    quantity: Number(item.quantity ?? 0),
+
+    dueDate: item.due_date || item.delivery_date || order.delivery_date || "",
+
+    progress: Number(item.progress ?? 0),
+    startedAt: item.started_at || null,
+    completedAt: item.completed_at || null,
+    assignedStaff,
+  };
+};
+
+// =========================================================
+// DATE HELPERS
+// =========================================================
+
+const getToday = () => {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Kathmandu",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date());
+
+  const values = Object.fromEntries(
+    parts.map(({ type, value }) => [type, value]),
+  );
+
+  return `${values.year}-${values.month}-${values.day}`;
+};
+
+const formatDate = (date) => {
+  if (!date) return "";
+
+  const [year, month, day] = String(date).slice(0, 10).split("-");
+
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+
+  if (!year || !month || !day) return date;
+
+  return `${day} ${months[Number(month) - 1] ?? ""} ${year}`;
+};
 
 // =========================================================
 // MAIN COMPONENT
@@ -155,90 +168,144 @@ const initialTasks = [
 const StaffTasks = () => {
   const navigate = useNavigate();
 
-  const [tasks, setTasks] = useState(initialTasks);
+  const [tasks, setTasks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("All");
 
-  // -------------------------------------------------------
-  // DATE
-  // -------------------------------------------------------
+  const today = getToday();
 
-  const today = "2026-09-18";
+  // =======================================================
+  // FETCH REAL ASSIGNED WORK
+  // =======================================================
 
-  // -------------------------------------------------------
-  // START TASK
-  // -------------------------------------------------------
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchAssignedTasks = async () => {
+      setLoading(true);
+      setLoadError("");
+
+      try {
+        console.log("[StaffTasks] Fetching assigned work from backend...");
+
+        const response = await assignedWork();
+
+        console.log("[StaffTasks] Raw API response:", response);
+        console.log(
+          "[StaffTasks] HTTP status:",
+          response?.status ?? "Unavailable",
+        );
+        console.log("[StaffTasks] Response body:", response?.data ?? response);
+
+        const rawTasks = getArrayFromResponse(response);
+
+        console.log("[StaffTasks] Raw task records:", rawTasks);
+
+        const normalizedTasks = rawTasks.map(normalizeTask);
+
+        console.log("[StaffTasks] Normalized task records:", normalizedTasks);
+
+        if (isMounted) {
+          setTasks(normalizedTasks);
+        }
+      } catch (error) {
+        console.error("[StaffTasks] Failed to fetch assigned work:", error);
+        console.error("[StaffTasks] Error message:", error?.message);
+        console.error("[StaffTasks] HTTP status:", error?.response?.status);
+        console.error(
+          "[StaffTasks] Backend error response:",
+          error?.response?.data,
+        );
+        console.error(
+          "[StaffTasks] Response headers:",
+          error?.response?.headers,
+        );
+        console.error("[StaffTasks] Request URL:", error?.config?.url);
+        console.error("[StaffTasks] Request method:", error?.config?.method);
+
+        if (isMounted) {
+          setLoadError(
+            error?.response?.data?.detail ||
+              error?.response?.data?.message ||
+              error?.message ||
+              "Unable to load assigned tasks.",
+          );
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchAssignedTasks();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // =======================================================
+  // LOCAL STATUS ACTIONS
+  // NOTE: These currently update React state only.
+  // Backend persistence requires the corresponding API.
+  // =======================================================
 
   const startTask = (taskId) => {
     setTasks((previousTasks) =>
-      previousTasks.map((task) => {
-        if (task.id !== taskId) {
-          return task;
-        }
-
-        return {
-          ...task,
-          status: "In Progress",
-          progress: task.progress === 0 ? 10 : task.progress,
-          startedAt: task.startedAt || new Date().toISOString(),
-        };
-      }),
+      previousTasks.map((task) =>
+        task.id !== taskId
+          ? task
+          : {
+              ...task,
+              status: "In Progress",
+              progress: task.progress === 0 ? 10 : task.progress,
+              startedAt: task.startedAt || new Date().toISOString(),
+            },
+      ),
     );
   };
-
-  // -------------------------------------------------------
-  // COMPLETE TASK
-  // -------------------------------------------------------
 
   const completeTask = (taskId) => {
     setTasks((previousTasks) =>
-      previousTasks.map((task) => {
-        if (task.id !== taskId) {
-          return task;
-        }
-
-        return {
-          ...task,
-          status: "Completed",
-          progress: 100,
-          completedAt: new Date().toISOString(),
-        };
-      }),
+      previousTasks.map((task) =>
+        task.id !== taskId
+          ? task
+          : {
+              ...task,
+              status: "Completed",
+              progress: 100,
+              completedAt: new Date().toISOString(),
+            },
+      ),
     );
   };
-
-  // -------------------------------------------------------
-  // REOPEN TASK
-  // -------------------------------------------------------
 
   const reopenTask = (taskId) => {
     setTasks((previousTasks) =>
-      previousTasks.map((task) => {
-        if (task.id !== taskId) {
-          return task;
-        }
-
-        return {
-          ...task,
-          status: "In Progress",
-          progress: task.progress === 100 ? 50 : task.progress,
-          completedAt: null,
-        };
-      }),
+      previousTasks.map((task) =>
+        task.id !== taskId
+          ? task
+          : {
+              ...task,
+              status: "In Progress",
+              progress: task.progress === 100 ? 50 : task.progress,
+              completedAt: null,
+            },
+      ),
     );
   };
 
-  // -------------------------------------------------------
+  // =======================================================
   // TODAY'S TASKS
-  // -------------------------------------------------------
+  // =======================================================
 
-  const todayTasks = useMemo(() => {
-    return tasks.filter((task) => task.dueDate === today);
-  }, [tasks]);
-
-  // -------------------------------------------------------
-  // TODAY COUNTS
-  // -------------------------------------------------------
+  const todayTasks = useMemo(
+    () => tasks.filter((task) => task.dueDate === today),
+    [tasks, today],
+  );
 
   const todayPending = todayTasks.filter(
     (task) => task.status === "Pending",
@@ -252,9 +319,9 @@ const StaffTasks = () => {
     (task) => task.status === "Completed",
   ).length;
 
-  // -------------------------------------------------------
+  // =======================================================
   // SORT TODAY'S TASKS
-  // -------------------------------------------------------
+  // =======================================================
 
   const sortedTodayTasks = useMemo(() => {
     const priorityOrder = {
@@ -274,17 +341,15 @@ const StaffTasks = () => {
       const priorityDifference =
         priorityOrder[a.priority] - priorityOrder[b.priority];
 
-      if (priorityDifference !== 0) {
-        return priorityDifference;
-      }
+      if (priorityDifference !== 0) return priorityDifference;
 
       return statusOrder[a.status] - statusOrder[b.status];
     });
   }, [todayTasks]);
 
-  // -------------------------------------------------------
+  // =======================================================
   // SEARCH + FILTER
-  // -------------------------------------------------------
+  // =======================================================
 
   const filteredTasks = useMemo(() => {
     return tasks.filter((task) => {
@@ -308,33 +373,6 @@ const StaffTasks = () => {
     });
   }, [tasks, search, filter]);
 
-  // -------------------------------------------------------
-  // DATE FORMAT
-  // -------------------------------------------------------
-
-  const formatDate = (date) => {
-    if (!date) return "";
-
-    const [year, month, day] = date.split("-");
-
-    const months = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
-
-    return `${day} ${months[Number(month) - 1]} ${year}`;
-  };
-
   // =======================================================
   // RENDER
   // =======================================================
@@ -342,9 +380,7 @@ const StaffTasks = () => {
   return (
     <div className="min-h-screen bg-[#f7f8fa] text-slate-800 dark:bg-slate-950 dark:text-slate-100">
       <div className="p-5 md:p-8">
-        {/* =================================================
-            HEADER
-        ================================================== */}
+        {/* HEADER */}
 
         <div className="mb-7 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
@@ -370,17 +406,14 @@ const StaffTasks = () => {
 
             <div>
               <p className="text-[11px] text-slate-400">Work Date</p>
-
               <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
-                18 September 2026
+                {formatDate(today)}
               </p>
             </div>
           </div>
         </div>
 
-        {/* =================================================
-            SIMPLE SUMMARY
-        ================================================== */}
+        {/* SUMMARY */}
 
         <div className="mb-8 grid grid-cols-1 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm sm:grid-cols-3 dark:border-slate-800 dark:bg-slate-900">
           <SummaryItem
@@ -405,9 +438,7 @@ const StaffTasks = () => {
           />
         </div>
 
-        {/* =================================================
-            TODAY'S TASKS
-        ================================================== */}
+        {/* TODAY'S TASKS */}
 
         <section>
           <div className="mb-4">
@@ -426,24 +457,30 @@ const StaffTasks = () => {
             </p>
           </div>
 
-          <div className="space-y-3">
-            {sortedTodayTasks.map((task) => (
-              <TodayTask
-                key={task.id}
-                task={task}
-                onStart={startTask}
-                onComplete={completeTask}
-                onReopen={reopenTask}
-                onView={() => navigate(`/staff/tasks/${task.id}`)}
-                formatDate={formatDate}
-              />
-            ))}
-          </div>
+          {loading ? (
+            <LoadingState />
+          ) : loadError ? (
+            <ErrorState message={loadError} />
+          ) : sortedTodayTasks.length > 0 ? (
+            <div className="space-y-3">
+              {sortedTodayTasks.map((task) => (
+                <TodayTask
+                  key={task.id}
+                  task={task}
+                  onStart={startTask}
+                  onComplete={completeTask}
+                  onReopen={reopenTask}
+                  onView={() => navigate(`/staff/tasks/${task.id}`)}
+                  formatDate={formatDate}
+                />
+              ))}
+            </div>
+          ) : (
+            <EmptyTodayState />
+          )}
         </section>
 
-        {/* =================================================
-            ALL TASKS
-        ================================================== */}
+        {/* ALL TASKS */}
 
         <section className="mt-10">
           <div className="mb-4">
@@ -503,7 +540,11 @@ const StaffTasks = () => {
               </p>
             </div>
 
-            {filteredTasks.length > 0 ? (
+            {loading ? (
+              <LoadingState />
+            ) : loadError ? (
+              <ErrorState message={loadError} />
+            ) : filteredTasks.length > 0 ? (
               <div>
                 {filteredTasks.map((task, index) => (
                   <TaskListItem
@@ -535,6 +576,54 @@ const StaffTasks = () => {
 };
 
 // =========================================================
+// LOADING STATE
+// =========================================================
+
+const LoadingState = () => (
+  <div className="rounded-xl border border-slate-200 bg-white px-5 py-10 text-center text-sm text-slate-500 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400">
+    Loading your assigned tasks...
+  </div>
+);
+
+// =========================================================
+// ERROR STATE
+// =========================================================
+
+const ErrorState = ({ message }) => (
+  <div className="rounded-xl border border-red-200 bg-red-50 px-5 py-5 dark:border-red-500/20 dark:bg-red-500/10">
+    <p className="text-sm font-semibold text-red-700 dark:text-red-400">
+      Could not load assigned tasks
+    </p>
+
+    <p className="mt-1 text-sm text-red-600 dark:text-red-300">{message}</p>
+
+    <p className="mt-2 text-xs text-red-500">
+      Check the browser console for the complete API error response.
+    </p>
+  </div>
+);
+
+// =========================================================
+// EMPTY TODAY STATE
+// =========================================================
+
+const EmptyTodayState = () => (
+  <div className="rounded-xl border border-slate-200 bg-white px-5 py-10 text-center dark:border-slate-800 dark:bg-slate-900">
+    <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 text-slate-400 dark:bg-slate-800">
+      <FiCalendar size={20} />
+    </div>
+
+    <h3 className="mt-4 text-sm font-bold text-slate-800 dark:text-white">
+      No tasks due today
+    </h3>
+
+    <p className="mt-1 text-xs text-slate-400">
+      Your assigned tasks will appear here when they are due today.
+    </p>
+  </div>
+);
+
+// =========================================================
 // TODAY TASK
 // =========================================================
 
@@ -559,8 +648,6 @@ const TodayTask = ({
     >
       <div className="p-4 sm:p-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
-          {/* MAIN INFO */}
-
           <button
             type="button"
             onClick={onView}
@@ -572,7 +659,6 @@ const TodayTask = ({
               </span>
 
               <PriorityBadge priority={task.priority} />
-
               <StatusBadge status={task.status} />
             </div>
 
@@ -607,8 +693,6 @@ const TodayTask = ({
             </div>
           </button>
 
-          {/* PROGRESS */}
-
           <div className="w-full lg:w-44">
             <div className="mb-1.5 flex items-center justify-between">
               <span className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
@@ -625,14 +709,10 @@ const TodayTask = ({
                 className={`h-full rounded-full transition-all duration-500 ${
                   isCompleted ? "bg-green-500" : "bg-orange-500"
                 }`}
-                style={{
-                  width: `${task.progress}%`,
-                }}
+                style={{ width: `${task.progress}%` }}
               />
             </div>
           </div>
-
-          {/* ACTION */}
 
           <div className="flex shrink-0 items-center gap-2">
             {!isCompleted && (
@@ -696,135 +776,65 @@ const TaskListItem = ({
   onView,
   formatDate,
   isLast,
-}) => {
-  return (
-    <div
-      className={`group p-4 transition hover:bg-slate-50 sm:px-5 dark:hover:bg-slate-800/40 ${
-        !isLast ? "border-b border-slate-100 dark:border-slate-800" : ""
-      }`}
-    >
-      <div className="flex items-center gap-3 sm:gap-4">
-        {/* ICON */}
+}) => (
+  <div
+    className={`group p-4 transition hover:bg-slate-50 sm:px-5 dark:hover:bg-slate-800/40 ${
+      !isLast ? "border-b border-slate-100 dark:border-slate-800" : ""
+    }`}
+  >
+    <div className="flex items-center gap-3 sm:gap-4">
+      <button
+        type="button"
+        onClick={onView}
+        className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-500 transition hover:bg-orange-50 hover:text-orange-500 sm:flex dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-orange-500/10 dark:hover:text-orange-400"
+      >
+        <FiTool size={16} />
+      </button>
 
-        <button
-          type="button"
-          onClick={onView}
-          className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-500 transition hover:bg-orange-50 hover:text-orange-500 sm:flex dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-orange-500/10 dark:hover:text-orange-400"
-        >
-          <FiTool size={16} />
-        </button>
-
-        {/* DETAILS */}
-
-        <button
-          type="button"
-          onClick={onView}
-          className="min-w-0 flex-1 text-left"
-        >
-          <div className="flex flex-wrap items-center gap-2">
-            <p className="truncate text-sm font-semibold text-slate-800 transition group-hover:text-orange-500 dark:text-slate-100 dark:group-hover:text-orange-400">
-              {task.projectName}
-            </p>
-
-            <span className="text-[10px] font-bold text-orange-500">
-              {task.estimateId}
-            </span>
-          </div>
-
-          <p className="mt-1 truncate text-xs text-slate-400">
-            {task.task} · {task.customer}
-          </p>
-        </button>
-
-        {/* DUE */}
-
-        <div className="hidden w-28 shrink-0 lg:block">
-          <p className="text-[10px] uppercase tracking-wide text-slate-400">
-            Due
+      <button
+        type="button"
+        onClick={onView}
+        className="min-w-0 flex-1 text-left"
+      >
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="truncate text-sm font-semibold text-slate-800 transition group-hover:text-orange-500 dark:text-slate-100 dark:group-hover:text-orange-400">
+            {task.projectName}
           </p>
 
-          <p className="mt-1 text-xs font-medium text-slate-600 dark:text-slate-300">
-            {formatDate(task.dueDate)}
-          </p>
-        </div>
-
-        {/* PRIORITY */}
-
-        <div className="hidden shrink-0 sm:block">
-          <PriorityBadge priority={task.priority} />
-        </div>
-
-        {/* STATUS */}
-
-        <div className="shrink-0">
-          <StatusBadge status={task.status} />
-        </div>
-
-        {/* ACTION */}
-
-        <div className="hidden shrink-0 sm:block">
-          {task.status === "Pending" && (
-            <button
-              type="button"
-              onClick={() => onStart(task.id)}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-orange-500 px-3 py-2 text-xs font-bold text-white transition hover:bg-orange-600"
-            >
-              <FiPlay size={12} />
-              Start
-            </button>
-          )}
-
-          {task.status === "In Progress" && (
-            <button
-              type="button"
-              onClick={() => onComplete(task.id)}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-green-500 px-3 py-2 text-xs font-bold text-white transition hover:bg-green-600"
-            >
-              <FiCheck size={13} />
-              Complete
-            </button>
-          )}
-
-          {task.status === "Completed" && (
-            <button
-              type="button"
-              onClick={onView}
-              className="p-2 text-slate-400 transition hover:text-orange-500"
-              title="View task"
-            >
-              <FiChevronRight size={17} />
-            </button>
-          )}
-        </div>
-
-        {/* MOBILE VIEW */}
-
-        <button
-          type="button"
-          onClick={onView}
-          className="shrink-0 p-2 text-slate-400 sm:hidden"
-          aria-label="View task details"
-        >
-          <FiChevronRight size={17} />
-        </button>
-      </div>
-
-      {/* MOBILE ACTION */}
-
-      <div className="mt-3 flex items-center justify-between gap-3 sm:hidden">
-        <div className="flex items-center gap-2">
-          <PriorityBadge priority={task.priority} />
-
-          <span className="text-[11px] text-slate-400">
-            {formatDate(task.dueDate)}
+          <span className="text-[10px] font-bold text-orange-500">
+            {task.estimateId}
           </span>
         </div>
 
+        <p className="mt-1 truncate text-xs text-slate-400">
+          {task.task} · {task.customer}
+        </p>
+      </button>
+
+      <div className="hidden w-28 shrink-0 lg:block">
+        <p className="text-[10px] uppercase tracking-wide text-slate-400">
+          Due
+        </p>
+
+        <p className="mt-1 text-xs font-medium text-slate-600 dark:text-slate-300">
+          {formatDate(task.dueDate)}
+        </p>
+      </div>
+
+      <div className="hidden shrink-0 sm:block">
+        <PriorityBadge priority={task.priority} />
+      </div>
+
+      <div className="shrink-0">
+        <StatusBadge status={task.status} />
+      </div>
+
+      <div className="hidden shrink-0 sm:block">
         {task.status === "Pending" && (
           <button
             type="button"
             onClick={() => onStart(task.id)}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-orange-500 px-3 py-2 text-xs font-bold text-white"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-orange-500 px-3 py-2 text-xs font-bold text-white transition hover:bg-orange-600"
           >
             <FiPlay size={12} />
             Start
@@ -835,16 +845,68 @@ const TaskListItem = ({
           <button
             type="button"
             onClick={() => onComplete(task.id)}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-green-500 px-3 py-2 text-xs font-bold text-white"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-green-500 px-3 py-2 text-xs font-bold text-white transition hover:bg-green-600"
           >
             <FiCheck size={13} />
             Complete
           </button>
         )}
+
+        {task.status === "Completed" && (
+          <button
+            type="button"
+            onClick={onView}
+            className="p-2 text-slate-400 transition hover:text-orange-500"
+            title="View task"
+          >
+            <FiChevronRight size={17} />
+          </button>
+        )}
       </div>
+
+      <button
+        type="button"
+        onClick={onView}
+        className="shrink-0 p-2 text-slate-400 sm:hidden"
+        aria-label="View task details"
+      >
+        <FiChevronRight size={17} />
+      </button>
     </div>
-  );
-};
+
+    <div className="mt-3 flex items-center justify-between gap-3 sm:hidden">
+      <div className="flex items-center gap-2">
+        <PriorityBadge priority={task.priority} />
+
+        <span className="text-[11px] text-slate-400">
+          {formatDate(task.dueDate)}
+        </span>
+      </div>
+
+      {task.status === "Pending" && (
+        <button
+          type="button"
+          onClick={() => onStart(task.id)}
+          className="inline-flex items-center gap-1.5 rounded-lg bg-orange-500 px-3 py-2 text-xs font-bold text-white"
+        >
+          <FiPlay size={12} />
+          Start
+        </button>
+      )}
+
+      {task.status === "In Progress" && (
+        <button
+          type="button"
+          onClick={() => onComplete(task.id)}
+          className="inline-flex items-center gap-1.5 rounded-lg bg-green-500 px-3 py-2 text-xs font-bold text-white"
+        >
+          <FiCheck size={13} />
+          Complete
+        </button>
+      )}
+    </div>
+  </div>
+);
 
 // =========================================================
 // SUMMARY ITEM
@@ -893,17 +955,17 @@ const StatusBadge = ({ status }) => {
   const styles = {
     Pending:
       "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-400",
-
     "In Progress":
       "border-orange-200 bg-orange-50 text-orange-700 dark:border-orange-500/20 dark:bg-orange-500/10 dark:text-orange-400",
-
     Completed:
       "border-green-200 bg-green-50 text-green-700 dark:border-green-500/20 dark:bg-green-500/10 dark:text-green-400",
   };
 
   return (
     <span
-      className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-bold ${styles[status] || ""}`}
+      className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-bold ${
+        styles[status] || ""
+      }`}
     >
       {status === "Completed" && <FiCheck size={10} />}
 
@@ -928,18 +990,17 @@ const PriorityBadge = ({ priority }) => {
   const styles = {
     Urgent:
       "border-red-100 bg-red-50 text-red-600 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-400",
-
     High: "border-orange-100 bg-orange-50 text-orange-600 dark:border-orange-500/20 dark:bg-orange-500/10 dark:text-orange-400",
-
     Medium:
       "border-blue-100 bg-blue-50 text-blue-600 dark:border-blue-500/20 dark:bg-blue-500/10 dark:text-blue-400",
-
     Low: "border-slate-200 bg-slate-50 text-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400",
   };
 
   return (
     <span
-      className={`inline-flex rounded-full border px-2.5 py-1 text-[10px] font-bold ${styles[priority] || ""}`}
+      className={`inline-flex rounded-full border px-2.5 py-1 text-[10px] font-bold ${
+        styles[priority] || ""
+      }`}
     >
       {priority}
     </span>
@@ -950,33 +1011,31 @@ const PriorityBadge = ({ priority }) => {
 // EMPTY STATE
 // =========================================================
 
-const EmptyState = ({ search, filter, clear }) => {
-  return (
-    <div className="px-6 py-14 text-center">
-      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 text-slate-400 dark:bg-slate-800">
-        <FiSearch size={20} />
-      </div>
-
-      <h3 className="mt-4 text-sm font-bold text-slate-800 dark:text-white">
-        No tasks found
-      </h3>
-
-      <p className="mt-1 text-xs text-slate-400">
-        Try changing your search or status filter.
-      </p>
-
-      {(search || filter !== "All") && (
-        <button
-          type="button"
-          onClick={clear}
-          className="mt-4 inline-flex items-center gap-1.5 text-xs font-bold text-orange-500 transition hover:text-orange-600"
-        >
-          <FiX size={13} />
-          Clear filters
-        </button>
-      )}
+const EmptyState = ({ search, filter, clear }) => (
+  <div className="px-6 py-14 text-center">
+    <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 text-slate-400 dark:bg-slate-800">
+      <FiSearch size={20} />
     </div>
-  );
-};
+
+    <h3 className="mt-4 text-sm font-bold text-slate-800 dark:text-white">
+      No tasks found
+    </h3>
+
+    <p className="mt-1 text-xs text-slate-400">
+      Try changing your search or status filter.
+    </p>
+
+    {(search || filter !== "All") && (
+      <button
+        type="button"
+        onClick={clear}
+        className="mt-4 inline-flex items-center gap-1.5 text-xs font-bold text-orange-500 transition hover:text-orange-600"
+      >
+        <FiX size={13} />
+        Clear filters
+      </button>
+    )}
+  </div>
+);
 
 export default StaffTasks;

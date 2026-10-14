@@ -38,22 +38,35 @@ const EstimateHeader = ({ register, errors, setValue, slipNumber }) => {
 
         const response = await getCustomer();
 
-        const customerList = Array.isArray(response)
-          ? response
-          : Array.isArray(response?.data)
-            ? response.data
-            : Array.isArray(response?.data?.results)
-              ? response.data.results
-              : [];
+        console.log("Customer API response:", response);
+
+        // Support common Django REST Framework response formats.
+        const data = response?.data ?? response;
+
+        let customerList = [];
+
+        if (Array.isArray(data)) {
+          customerList = data;
+        } else if (Array.isArray(data?.results)) {
+          customerList = data.results;
+        } else if (Array.isArray(data?.customers)) {
+          customerList = data.customers;
+        } else if (Array.isArray(data?.data)) {
+          customerList = data.data;
+        } else if (Array.isArray(data?.data?.results)) {
+          customerList = data.data.results;
+        }
+
+        console.log("Customers loaded:", customerList);
+
         setCustomers(customerList);
       } catch (error) {
-        console.error("Create customer full error:", error?.response);
+        console.error("Failed to fetch customers:", error);
 
         toast.error(
-          error?.response?.data?.message ||
-            error?.response?.data?.detail ||
-            error?.response?.data?.error ||
-            "Server crashed while adding customer. Check backend terminal.",
+          error?.response?.data?.detail ||
+            error?.response?.data?.message ||
+            "Failed to load customers.",
         );
       } finally {
         setLoadingCustomers(false);
@@ -68,15 +81,25 @@ const EstimateHeader = ({ register, errors, setValue, slipNumber }) => {
   // ==========================================
 
   const filteredCustomers = customers.filter((customer) => {
-    const name = (customer.name || customer.customer_name || "").toLowerCase();
+    const searchTerm = search.trim().toLowerCase();
 
-    const phone = String(
-      customer.contact_no || customer.phone || customer.phone_no || "",
+    if (!searchTerm) return false;
+
+    const name = String(
+      customer.name ?? customer.customer_name ?? "",
     ).toLowerCase();
 
-    const searchTerm = search.toLowerCase();
+    const phone = String(
+      customer.contact_no ?? customer.phone_no ?? customer.phone ?? "",
+    ).toLowerCase();
 
-    return name.includes(searchTerm) || phone.includes(searchTerm);
+    const pan = String(customer.pan_no ?? customer.pan ?? "").toLowerCase();
+
+    return (
+      name.includes(searchTerm) ||
+      phone.includes(searchTerm) ||
+      pan.includes(searchTerm)
+    );
   });
 
   // ==========================================
@@ -116,6 +139,12 @@ const EstimateHeader = ({ register, errors, setValue, slipNumber }) => {
   const handleAddCustomer = async () => {
     if (!newCustomer.name.trim()) {
       toast.error("Customer name is required.");
+      return;
+    }
+
+    // Validate the contact number before creating the customer.
+    if (!/^[0-9]{10}$/.test(newCustomer.contact_no)) {
+      toast.error("Enter a valid 10-digit phone number.");
       return;
     }
 
@@ -317,7 +346,7 @@ const EstimateHeader = ({ register, errors, setValue, slipNumber }) => {
 
             {/* SEARCH RESULTS */}
 
-            {search && !selectedCustomer && (
+            {search.trim().length > 0 && !selectedCustomer && (
               <div className="absolute left-0 right-0 top-[52px] z-30 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl dark:border-slate-700 dark:bg-slate-800">
                 {loadingCustomers ? (
                   <div className="px-4 py-5 text-center text-sm text-slate-400">
@@ -431,6 +460,8 @@ const EstimateHeader = ({ register, errors, setValue, slipNumber }) => {
 
                 <input
                   type="text"
+                  inputMode="numeric"
+                  maxLength={20}
                   {...register("pan_no")}
                   readOnly={!!selectedCustomer}
                   placeholder="PAN number"
@@ -540,17 +571,35 @@ const EstimateHeader = ({ register, errors, setValue, slipNumber }) => {
                 </label>
 
                 <input
-                  type="text"
+                  type="tel"
+                  inputMode="numeric"
+                  maxLength={10}
                   value={newCustomer.contact_no}
-                  onChange={(e) =>
+                  onChange={(e) => {
+                    const phone = e.target.value
+                      .replace(/\D/g, "")
+                      .slice(0, 10);
+
                     setNewCustomer((previous) => ({
                       ...previous,
-                      contact_no: e.target.value,
-                    }))
-                  }
+                      contact_no: phone,
+                    }));
+                  }}
                   placeholder="98XXXXXXXX"
-                  className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 dark:border-slate-700 dark:bg-slate-900"
+                  className={`w-full rounded-xl border bg-white py-3 pl-11 pr-4 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:ring-2 dark:bg-slate-700 dark:text-slate-300 ${
+                    newCustomer.contact_no.length > 0 &&
+                    newCustomer.contact_no.length !== 10
+                      ? "border-red-400 focus:border-red-500 focus:ring-red-100"
+                      : "border-slate-200 focus:border-orange-500 focus:ring-orange-100"
+                  }`}
                 />
+
+                {newCustomer.contact_no.length > 0 &&
+                  newCustomer.contact_no.length !== 10 && (
+                    <p className="mt-1.5 text-xs text-red-500">
+                      Enter exactly 10 digits.
+                    </p>
+                  )}
               </div>
 
               <div>

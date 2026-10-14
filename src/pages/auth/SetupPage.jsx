@@ -232,10 +232,29 @@ const SetupPage = () => {
                 <input
                   id="phone"
                   type="tel"
+                  inputMode="numeric"
+                  maxLength={10}
                   placeholder="98XXXXXXXX"
                   className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-11 pr-4 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
-                  {...register("contact_phone")}
+                  {...register("contact_phone", {
+                    required: "Phone number is required",
+                    pattern: {
+                      value: /^[0-9]{10}$/,
+                      message: "Phone number must be exactly 10 digits",
+                    },
+                    onChange: (event) => {
+                      event.target.value = event.target.value
+                        .replace(/[^0-9]/g, "")
+                        .slice(0, 10);
+                    },
+                  })}
                 />
+
+                {errors.contact_phone && (
+                  <p className="mt-1 text-xs text-red-500">
+                    {errors.contact_phone.message}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -252,11 +271,26 @@ const SetupPage = () => {
                 <FiHash className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
 
                 <input
-                  id="panVatNumber"
                   type="text"
-                  placeholder="Enter PAN or VAT number"
-                  className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-11 pr-4 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
-                  {...register("pan_no")}
+                  inputMode="numeric"
+                  maxLength={20}
+                  placeholder="Enter PAN number"
+                  className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-11 pr-4 text-sm text-slate-700 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-300"
+                  {...register("pan_no", {
+                    required: "PAN number is required",
+                    pattern: {
+                      value: /^[0-9]+$/,
+                      message: "Please enter numbers only",
+                    },
+                    minLength: {
+                      value: 3,
+                      message: "PAN number must be at least 3 digits",
+                    },
+                    maxLength: {
+                      value: 20,
+                      message: "PAN number cannot exceed 10 digits",
+                    },
+                  })}
                 />
               </div>
             </div>

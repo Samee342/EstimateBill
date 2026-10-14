@@ -187,7 +187,7 @@ const CreateProject = () => {
         slip_date: data.slip_date,
         customer: data.customer,
         project_name: data.project_name.trim(),
-        description: data.description || "",
+        description: data.item_description || "",
         delivery_date: data.delivery_date || null,
         priority: data.priority || "normal",
         work_stage: String(data.work_status || "pending")
