@@ -15,11 +15,9 @@ import {
   FaSignOutAlt,
   FaRegTrashAlt,
 } from "react-icons/fa";
-
+import { FaPeopleGroup } from "react-icons/fa6";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
-
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-
 import Logo from "../assets/Logo.png";
 
 const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
@@ -740,7 +738,7 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
               `}
               title={!sideBarOpen ? "Team" : ""}
             >
-              <FaUsers size={17} className="shrink-0" />
+              <FaPeopleGroup size={17} className="shrink-0" />
 
               {sideBarOpen && (
                 <>

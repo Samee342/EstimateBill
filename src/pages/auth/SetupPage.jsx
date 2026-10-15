@@ -39,8 +39,15 @@ const SetupPage = () => {
         formData.append("logo", data.logo[0]);
       }
 
+      // Example fix inside onSubmit:
       const response = await createTenant(formData);
 
+      // Save the NEW token/user returned by createTenant
+      if (response.data.token) {
+        localStorage.setItem("token", response.data.token);
+        // Update your global auth state context/store here
+        // setAuthUser(response.data.user);
+      }
       console.log("Tenant created successfully:", response);
 
       toast.success("Business setup completed successfully!");
@@ -48,17 +55,33 @@ const SetupPage = () => {
       // Change this route if your dashboard route is different
       setTimeout(() => {
         navigate("/dashboard", { replace: true });
-      }, 1000);
+      }, 300);
     } catch (error) {
       console.log("STATUS:", error.response?.status);
       console.log("DATA:", error.response?.data);
       console.log("FULL ERROR:", error);
 
-      toast.error(
-        error.response?.data?.message ||
-          error.response?.data?.detail ||
-          "Failed to complete business setup.",
-      );
+      const errorData = error.response?.data;
+
+      // Handle duplicate PAN number errors
+      const errorMessage = JSON.stringify(errorData || {}).toLowerCase();
+
+      if (
+        errorMessage.includes("pan_no") &&
+        (errorMessage.includes("unique") ||
+          errorMessage.includes("already exists") ||
+          errorMessage.includes("duplicate"))
+      ) {
+        toast.error(
+          "This PAN number is already registered. Please enter a unique PAN number.",
+        );
+      } else {
+        toast.error(
+          errorData?.message ||
+            errorData?.detail ||
+            "Failed to complete business setup.",
+        );
+      }
     }
   };
 

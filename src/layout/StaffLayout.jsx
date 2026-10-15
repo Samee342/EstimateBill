@@ -54,11 +54,7 @@ const StaffLayout = () => {
   const userInitial = staffName.trim().charAt(0).toUpperCase() || "S";
 
   const pressName =
-    user?.tenant_details?.name ||
-    user?.tenant_name ||
-    user?.tenant_details?.business_name ||
-    user?.business_name ||
-    "staff panel";
+    user?.tenant_details?.name || user?.company_name || "Printing Press";
 
   // =====================================================
   // LOGOUT
@@ -168,7 +164,7 @@ const StaffLayout = () => {
               sidebarOpen ? "gap-3" : "justify-center"
             }`}
           >
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-orange-50 dark:bg-orange-500/10">
+            <div className="flex mt-3 h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-orange-50 dark:bg-orange-500/10">
               <img
                 src={Logo}
                 alt="PrintTech"
@@ -177,7 +173,7 @@ const StaffLayout = () => {
             </div>
 
             {sidebarOpen && (
-              <div className="min-w-0">
+              <div className="min-w-0 mt-10 mb-3">
                 <h1 className="text-[18px] font-bold leading-none tracking-tight text-slate-900 dark:text-white">
                   Print
                   <span className="text-orange-500">Tech</span>
@@ -186,7 +182,7 @@ const StaffLayout = () => {
                 <div className="mt-1.5 flex items-center gap-1.5">
                   <span className="h-1.5 w-1.5 rounded-full bg-orange-500" />
 
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
                     {pressName}
                   </p>
                 </div>
@@ -266,27 +262,6 @@ const StaffLayout = () => {
 
         {/* STAFF PROFILE IN SIDEBAR */}
         <div className="border-t border-slate-100 p-3 dark:border-slate-800">
-          {sidebarOpen && (
-            <div className="mb-3 flex min-w-0 items-center gap-3 rounded-xl bg-slate-50 p-3 dark:bg-slate-800/60">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-orange-100 text-sm font-bold text-orange-600 dark:bg-orange-500/10 dark:text-orange-400">
-                {userInitial}
-              </div>
-
-              <div className="min-w-0 flex-1">
-                <p
-                  className="truncate text-sm font-semibold text-slate-800 dark:text-slate-100"
-                  title={staffName}
-                >
-                  {staffName}
-                </p>
-
-                <p className="truncate text-xs capitalize text-slate-400">
-                  {staffRole}
-                </p>
-              </div>
-            </div>
-          )}
-
           <button
             type="button"
             onClick={handleLogout}

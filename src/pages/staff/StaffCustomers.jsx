@@ -14,6 +14,7 @@ import {
 
 import { useNavigate } from "react-router-dom";
 import { getCustomer } from "../../api/customer";
+import { getProjects } from "../../api/project";
 
 // Update the import path above to match your actual customer API file.
 
@@ -37,17 +38,12 @@ const normalizeCustomer = (customer, index) => {
     id: String(getCustomerId(customer) || `customer-${index + 1}`),
     name,
     phone: String(
-      customer?.phone || customer?.phone_number || customer?.mobile || "",
+      customer?.phone || customer?.contact_no || customer?.mobile || "",
     ),
     email: customer?.email || customer?.email_address || "",
     company: customer?.company || customer?.company_name || "",
     address: customer?.address || customer?.location || customer?.city || "",
-    projects: Number(
-      customer?.projects_count ??
-        customer?.total_projects ??
-        customer?.projects ??
-        0,
-    ),
+    projects: 0,
     status:
       rawStatus === "inactive" || rawStatus === "disabled"
         ? "Inactive"
@@ -86,34 +82,125 @@ const StaffCustomers = () => {
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [projects, setProjects] = useState([]);
 
   const navigate = useNavigate();
+
+  // Extract projects regardless of the common API response format.
+  const extractProjects = (response) => {
+    const data = response?.data?.data ?? response?.data ?? response;
+
+    if (Array.isArray(data)) return data;
+    if (Array.isArray(data?.results)) return data.results;
+    if (Array.isArray(data?.orders)) return data.orders;
+    if (Array.isArray(data?.projects)) return data.projects;
+
+    // Some APIs return one current order and a separate orders array.
+    if (data?.current_order) return [data.current_order];
+
+    return [];
+  };
+
+  // Extract the actual customer ID from a project/order.
+  const getProjectCustomerId = (project) => {
+    const customer =
+      project?.customer ??
+      project?.customer_details ??
+      project?.customer_id ??
+      project?.order?.customer;
+
+    if (customer && typeof customer === "object") {
+      return (
+        customer.id ??
+        customer.pk ??
+        customer.uuid ??
+        customer.customer_id ??
+        ""
+      );
+    }
+
+    return customer ?? "";
+  };
+
+  // Count projects using the same customer identifier.
+  const getCustomerProjectCount = (customer) => {
+    const customerIds = [
+      customer?.id,
+      customer?.pk,
+      customer?.customer_id,
+      customer?.uuid,
+    ]
+      .filter((id) => id !== undefined && id !== null && id !== "")
+      .map(String);
+
+    return projects.filter((project) => {
+      const projectCustomerId = String(getProjectCustomerId(project));
+
+      return (
+        projectCustomerId !== "" && customerIds.includes(projectCustomerId)
+      );
+    }).length;
+  };
 
   const fetchCustomers = useCallback(async () => {
     try {
       setLoading(true);
       setError("");
 
-      const response = await getCustomer();
-      const customerList = extractCustomers(response);
+      // Wait for both API calls to finish before calculating counts.
+      const [customerResponse, projectResponse] = await Promise.all([
+        getCustomer(),
+        getProjects(),
+      ]);
 
-      setCustomers(
-        customerList.map((customer, index) =>
-          normalizeCustomer(customer, index),
-        ),
-      );
+      const customerList = extractCustomers(customerResponse);
+      const projectList = extractProjects(projectResponse);
+
+      setProjects(projectList);
+
+      const normalizedCustomers = customerList.map((customer, index) => {
+        const normalized = normalizeCustomer(customer, index);
+
+        const customerIds = [
+          customer?.id,
+          customer?.pk,
+          customer?.customer_id,
+          customer?.uuid,
+        ]
+          .filter((id) => id !== undefined && id !== null && id !== "")
+          .map(String);
+
+        const projectCount = projectList.filter((project) => {
+          const projectCustomerId = String(getProjectCustomerId(project));
+
+          return (
+            projectCustomerId !== "" && customerIds.includes(projectCustomerId)
+          );
+        }).length;
+
+        return {
+          ...normalized,
+          projects: projectCount,
+        };
+      });
+
+      setCustomers(normalizedCustomers);
     } catch (err) {
-      console.error("Failed to fetch customers:", err);
+      console.error("Failed to fetch customers or projects:", err);
 
       setError(
         err?.response?.data?.detail ||
           err?.response?.data?.message ||
-          "Unable to load customers. Please check your connection and try again.",
+          "Unable to load customers and projects. Please try again.",
       );
     } finally {
       setLoading(false);
     }
   }, []);
+
+  useEffect(() => {
+    fetchCustomers();
+  }, [fetchCustomers]);
 
   useEffect(() => {
     fetchCustomers();
