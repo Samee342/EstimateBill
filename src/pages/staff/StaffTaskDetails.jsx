@@ -241,18 +241,21 @@ const mapTask = (item, user) => {
   const stageDefinitions = [
     {
       name: "Designing",
+      key: "designing",
       personField: "Designing_person",
       detailsField: "designing_person_details",
       statusField: "designing_status",
     },
     {
       name: "Printing",
+      key: "printing",
       personField: "printing_person",
       detailsField: "printing_person_details",
       statusField: "printing_status",
     },
     {
       name: "Binding",
+      key: "binding",
       personField: "binding_person",
       detailsField: "binding_person_details",
       statusField: "binding_status",
@@ -318,7 +321,9 @@ const mapTask = (item, user) => {
       return String(assignedPerson?.username || "").toLowerCase() === username;
     })
     .map((stage) => ({
+      key: stage.key,
       name: stage.name,
+      label: stage.name,
       personField: stage.personField,
       detailsField: stage.detailsField,
       statusField: stage.statusField,
@@ -870,7 +875,8 @@ const StaffTaskDetails = () => {
                 My Assigned Stages
               </h2>
               <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                Each production stage has its own status and controls.
+                Each stage shows its own progress. Start, complete, or reopen
+                stages you own.
               </p>
             </div>
 
@@ -902,7 +908,7 @@ const StaffTaskDetails = () => {
               {task.stages.map((stage, index) => (
                 <StageRow
                   key={stage.key}
-                  stage={stage}
+                  stage={{ ...stage, totalStages: task.totalStages }}
                   index={index}
                   updating={updatingStage === stage.key}
                   anyUpdating={Boolean(updatingStage)}
@@ -1092,11 +1098,31 @@ const StageRow = ({
   const completed = stage.status === "Completed";
   const inProgress = stage.status === "In Progress";
 
+  // Per-stage progress percentage
+  const progressPercent = completed ? 100 : inProgress ? 50 : 0;
+
+  const pipeColor = completed
+    ? "bg-green-500"
+    : inProgress
+      ? "bg-orange-500"
+      : "bg-slate-300 dark:bg-slate-600";
+
+  const statusText = completed
+    ? "Stage completed"
+    : inProgress
+      ? "Stage in progress"
+      : "Stage not started";
+
+  const stageKeyLabel = stage.key
+    ? stage.key.charAt(0).toUpperCase() + stage.key.slice(1)
+    : stage.label || "Stage";
+
   return (
-    <div className="flex flex-col gap-4 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-      <div className="flex min-w-0 items-start gap-3">
+    <div className="flex flex-col gap-5 px-5 py-6 sm:px-6">
+      {/* TOP: icon + name + badge */}
+      <div className="flex items-start gap-4">
         <div
-          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${
+          className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${
             completed
               ? "bg-green-50 text-green-600 dark:bg-green-500/10 dark:text-green-400"
               : inProgress
@@ -1105,42 +1131,63 @@ const StageRow = ({
           }`}
         >
           {completed ? (
-            <FiCheckCircle size={19} />
+            <FiCheckCircle size={22} />
           ) : inProgress ? (
-            <FiPlay size={18} />
+            <FiPlay size={20} />
           ) : (
-            <FiClock size={19} />
+            <FiClock size={22} />
           )}
         </div>
 
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+            <h3 className="text-base font-bold text-slate-900 dark:text-white">
               {stage.label}
             </h3>
             <StatusBadge status={stage.status} />
           </div>
 
-          <p className="mt-1 text-xs leading-5 text-slate-500 dark:text-slate-400">
-            Assigned production stage #{index + 1}
+          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+            {statusText} · {stageKeyLabel} stage · #{index + 1} of{" "}
+            {stage.totalStages || "—"}
           </p>
 
           {stage.assignedPerson && (
-            <p className="mt-2 flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+            <p className="mt-2 inline-flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
               <FiUser size={12} />
-              {stage.assignedPerson}
+              Assigned to {stage.assignedPerson}
             </p>
           )}
         </div>
       </div>
 
-      <div className="flex shrink-0 flex-wrap gap-2 sm:justify-end">
+      {/* PROGRESS PIPE */}
+      <div>
+        <div className="mb-1.5 flex items-center justify-between text-xs">
+          <span className="font-medium text-slate-500 dark:text-slate-400">
+            Stage progress
+          </span>
+          <span className="font-bold text-slate-700 dark:text-slate-200">
+            {progressPercent}%
+          </span>
+        </div>
+
+        <div className="h-2.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+          <div
+            className={`h-full rounded-full transition-all duration-500 ${pipeColor}`}
+            style={{ width: `${progressPercent}%` }}
+          />
+        </div>
+      </div>
+
+      {/* ACTION BUTTONS */}
+      <div className="flex flex-wrap gap-2">
         {stage.status === "Pending" && (
           <button
             type="button"
             onClick={onStart}
             disabled={anyUpdating}
-            className="inline-flex items-center justify-center gap-2 rounded-lg bg-orange-500 px-3.5 py-2.5 text-xs font-bold text-white transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-orange-500 px-4 py-2.5 text-xs font-bold text-white transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <FiPlay size={13} />
             {updating ? "Updating..." : "Start Stage"}
@@ -1152,7 +1199,7 @@ const StageRow = ({
             type="button"
             onClick={onComplete}
             disabled={anyUpdating}
-            className="inline-flex items-center justify-center gap-2 rounded-lg bg-green-600 px-3.5 py-2.5 text-xs font-bold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-2.5 text-xs font-bold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <FiCheck size={14} />
             {updating ? "Updating..." : "Mark Completed"}
@@ -1164,7 +1211,7 @@ const StageRow = ({
             type="button"
             onClick={onReopen}
             disabled={anyUpdating}
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 px-3.5 py-2.5 text-xs font-semibold text-slate-600 transition hover:border-orange-300 hover:text-orange-600 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:text-slate-300 dark:hover:border-orange-500/50 dark:hover:text-orange-400"
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 px-4 py-2.5 text-xs font-semibold text-slate-600 transition hover:border-orange-300 hover:text-orange-600 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:text-slate-300 dark:hover:border-orange-500/50 dark:hover:text-orange-400"
           >
             <FiRefreshCw size={13} />
             {updating ? "Updating..." : "Reopen Stage"}

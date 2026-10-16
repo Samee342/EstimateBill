@@ -146,13 +146,46 @@ PrintTech
     } catch (error) {
       console.log("STATUS:", error.response?.status);
       console.log("DATA:", error.response?.data);
-      console.log("USERNAME ERROR:", error.response?.data?.username);
-      console.log("EMAIL ERROR:", error.response?.data?.email);
       console.log("FULL ERROR:", error);
 
+      const backendError = error.response?.data;
+
+      // Check if backendError is a Django validation error object
+      if (backendError && typeof backendError === "object") {
+        const keys = Object.keys(backendError);
+
+        // Prioritize checking for phone, password, or other specific fields
+        const priorityKey = keys.find((k) => {
+          const lower = k.toLowerCase();
+          return (
+            lower.includes("phone") ||
+            lower.includes("password") ||
+            lower.includes("username") ||
+            lower.includes("email")
+          );
+        });
+
+        // Fall back to the first available error key if no priority key is matched
+        const targetKey = priorityKey || keys[0];
+
+        if (targetKey && targetKey !== "message" && targetKey !== "detail") {
+          const messages = backendError[targetKey];
+          const message = Array.isArray(messages) ? messages[0] : messages;
+
+          // Handle non_field_errors cleanly without showing the technical key name
+          if (targetKey === "non_field_errors") {
+            toast.error(message);
+          } else {
+            toast.error(`${targetKey.replace("_", " ")}: ${message}`);
+          }
+          return;
+        }
+      }
+
+      // Fallback to general message or defaults
       toast.error(
-        error?.response?.data?.message ||
-          error?.response?.data?.detail ||
+        backendError?.message ||
+          backendError?.detail ||
           "Failed to create team member. Please try again.",
       );
     } finally {
@@ -382,25 +415,31 @@ PrintTech
                   type="tel"
                   name="phone"
                   value={formData.phone}
-                  onChange={handleChange}
+                  onChange={(e) => {
+                    // Restrict input to numbers only and max length of 10
+                    const val = e.target.value.replace(/\D/g, "").slice(0, 10);
+                    handleChange({ target: { name: "phone", value: val } });
+                  }}
                   placeholder="98XXXXXXXX"
+                  maxLength={10}
+                  pattern="[0-9]{10}"
                   required
                   className="
-                    w-full rounded-xl
-                    border border-slate-200
-                    bg-slate-50
-                    py-3 pl-10 pr-4
-                    text-sm outline-none
-                    transition
-                    focus:border-orange-400
-                    focus:bg-white
-                    focus:ring-2
-                    focus:ring-orange-100
-                    dark:border-slate-700
-                    dark:bg-slate-800
-                    dark:text-white
-                    dark:focus:bg-slate-800
-                  "
+    w-full rounded-xl
+    border border-slate-200
+    bg-slate-50
+    py-3 pl-10 pr-4
+    text-sm outline-none
+    transition
+    focus:border-orange-400
+    focus:bg-white
+    focus:ring-2
+    focus:ring-orange-100
+    dark:border-slate-700
+    dark:bg-slate-800
+    dark:text-white
+    dark:focus:bg-slate-800
+  "
                 />
               </div>
             </div>

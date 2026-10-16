@@ -51,6 +51,8 @@ const AddCustomer = lazy(() => import("./pages/customers/AddCustomer"));
 
 const CustomerDetails = lazy(() => import("./pages/customers/CustomerDetails"));
 
+const CustomerPayments = lazy(() => import("./pages/customerPayment"));
+
 /* ================= TEAM ================= */
 
 const AllTeam = lazy(() => import("./pages/team/AllTeam"));
@@ -100,6 +102,13 @@ const StaffTaskDetails = lazy(() => import("./pages/staff/StaffTaskDetails"));
 /* ================= CUSTOMERS ================= */
 
 const StaffCustomers = lazy(() => import("./pages/staff/StaffCustomers"));
+const StaffAddCustomer = lazy(() => import("./pages/staff/AddCustomer"));
+const StaffEditCustomer = lazy(() => import("./pages/staff/AddCustomer"));
+
+// =================Projects===================
+const StaffProjects = lazy(() => import("./pages/staff/AllProject"));
+const StaffAddProject = lazy(() => import("./pages/staff/AddProjects"));
+const StaffEditProject = lazy(() => import("./pages/staff/AddProjects"));
 
 /* ================= PROFILE ================= */
 
@@ -301,6 +310,7 @@ function App() {
               path="/projects/create-project"
               element={<CreateProject />}
             />
+            <Route path="/projects/:id/edit" element={<CreateProject />} />
             <Route path="/projects/:id" element={<ProjectDetails />} />
 
             {/* ================= CUSTOMERS ================= */}
@@ -332,6 +342,9 @@ function App() {
             {/* ================= NOTIFICATIONS ================= */}
 
             <Route path="/notifications" element={<Notification />} />
+
+            {/* ==========Payment========= */}
+            <Route path="/payments" element={<CustomerPayments />} />
 
             {/* ================= SETTINGS ================= */}
 
@@ -372,6 +385,19 @@ function App() {
             <Route
               path="/staff/customers/:customerId"
               element={<CustomerDetails />}
+            />
+            <Route path="/staff/customers/add" element={<StaffAddCustomer />} />
+            <Route
+              path="/staff/customers/:id/edit"
+              element={<StaffEditCustomer />}
+            />
+            {/* =================Projects================= */}
+
+            <Route path="/staff/projects/add" element={<StaffAddProject />} />
+            <Route path="/staff/projects" element={<StaffProjects />} />
+            <Route
+              path="/staff/customers/:id/edit"
+              element={<StaffAddCustomer />}
             />
 
             {/* ================= STAFF PROFILE ================= */}

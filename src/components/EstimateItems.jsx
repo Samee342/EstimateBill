@@ -425,11 +425,23 @@ const EstimateItems = ({ control, register }) => {
 
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     {renderDraftField("Size", "size", "e.g. A4, A3, 12 × 18")}
-
                     {renderDraftField(
-                      "Ink / Maso",
+                      "Ink / Masi",
                       "maso",
                       "e.g. 1 color, 4 color",
+                      {
+                        validate: (value) => {
+                          // If the field is empty, let 'required' handle it instead
+                          if (!value) return true;
+
+                          // Check if the input is ONLY numbers (e.g., "1234")
+                          const isOnlyNumbers = /^\d+$/.test(value.trim());
+
+                          return (
+                            !isOnlyNumbers || "Only text values are allowed"
+                          );
+                        },
+                      },
                     )}
 
                     <div>
@@ -451,9 +463,9 @@ const EstimateItems = ({ control, register }) => {
                     </div>
 
                     {renderDraftField(
-                      "Band Type",
+                      "Bind Type",
                       "band_type",
-                      "Enter band type",
+                      "Enter bind type",
                     )}
                   </div>
                 </div>

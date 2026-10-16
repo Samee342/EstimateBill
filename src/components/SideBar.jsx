@@ -12,6 +12,7 @@ import {
   FaPlus,
   FaSlidersH,
   FaBroom,
+  FaMoneyBillWave,
   FaSignOutAlt,
   FaRegTrashAlt,
 } from "react-icons/fa";
@@ -347,8 +348,9 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
         z-50
 
         flex
-        h-screen
+        h-full         {/* Changed from h-screen to h-full */}
         flex-col
+        overflow-hidden {/* Prevents side-wide overflow */}
 
         border-r
         border-slate-200
@@ -502,7 +504,7 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
           NAVIGATION
       ====================================================== */}
 
-      <nav className="flex-1 overflow-visible px-3 py-5">
+      <nav className="flex-1 overflow-y-auto overflow-x-visible px-3 py-5">
         <div className="space-y-1 overflow-visible">
           {/* =================================================
               DASHBOARD
@@ -701,6 +703,24 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                 </NavLink>
               </div>
             )}
+          </div>
+
+          {/* =================================================
+    PAYMENTS
+================================================= */}
+
+          <div className="group relative overflow-visible">
+            <NavLink
+              to="/payments"
+              className={mainNavClass}
+              title={!sideBarOpen ? "Payments" : ""}
+            >
+              <FaMoneyBillWave size={17} className="shrink-0" />
+
+              {sideBarOpen && <span>Payments</span>}
+            </NavLink>
+
+            {!sideBarOpen && <CollapsedLabel>Payments</CollapsedLabel>}
           </div>
 
           {/* =================================================

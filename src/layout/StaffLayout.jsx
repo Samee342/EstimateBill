@@ -3,12 +3,14 @@ import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 
 import {
   FiBarChart2,
-  FiBriefcase,
   FiCheckSquare,
   FiChevronLeft,
   FiChevronRight,
+  FiChevronDown,
   FiLogOut,
   FiUsers,
+  FiFolder,
+  FiPlus,
   FiMoon,
   FiSun,
   FiMenu,
@@ -31,6 +33,10 @@ const StaffLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
+  // Dropdown open state
+  const [projectOpen, setProjectOpen] = useState(false);
+  const [customerOpen, setCustomerOpen] = useState(false);
+
   const theme = useSelector((state) => state.theme.theme);
 
   // =====================================================
@@ -39,7 +45,6 @@ const StaffLayout = () => {
 
   const user = getCurrentUser();
 
-  // Support different user object formats.
   const staffName =
     user?.full_name ||
     user?.fullName ||
@@ -57,45 +62,39 @@ const StaffLayout = () => {
     user?.tenant_details?.name || user?.company_name || "Printing Press";
 
   // =====================================================
+  // ACTIVE SECTIONS
+  // =====================================================
+
+  const isProjectSection = location.pathname.startsWith("/staff/projects");
+  const isCustomerSection = location.pathname.startsWith("/staff/customers");
+
+  // =====================================================
   // LOGOUT
   // =====================================================
 
   const handleLogout = () => {
     logoutUser();
-
-    navigate("/login", {
-      replace: true,
-    });
+    navigate("/login", { replace: true });
   };
 
   // =====================================================
-  // NAVIGATION
+  // AUTO-OPEN ACTIVE DROPDOWN
   // =====================================================
 
-  const navigation = [
-    {
-      name: "Dashboard",
-      path: "/staff",
-      icon: FiBarChart2,
-      end: true,
-    },
-    {
-      name: "My Tasks",
-      path: "/staff/tasks",
-      icon: FiCheckSquare,
-    },
+  useEffect(() => {
+    if (!sidebarOpen) return;
 
-    {
-      name: "Customers",
-      path: "/staff/customers",
-      icon: FiUsers,
-    },
-    {
-      name: "Setting",
-      path: "/staff/profile",
-      icon: IoSettingsOutline,
-    },
-  ];
+    if (isProjectSection) setProjectOpen(true);
+    if (isCustomerSection) setCustomerOpen(true);
+  }, [sidebarOpen, isProjectSection, isCustomerSection]);
+
+  // Close dropdowns when the sidebar collapses
+  useEffect(() => {
+    if (!sidebarOpen) {
+      setProjectOpen(false);
+      setCustomerOpen(false);
+    }
+  }, [sidebarOpen]);
 
   // =====================================================
   // CLOSE MOBILE SIDEBAR WHEN ROUTE CHANGES
@@ -106,7 +105,7 @@ const StaffLayout = () => {
   }, [location.pathname]);
 
   // =====================================================
-  // NAVIGATION STYLE
+  // NAV STYLES
   // =====================================================
 
   const navClass = ({ isActive }) =>
@@ -118,9 +117,76 @@ const StaffLayout = () => {
         : "text-slate-600 hover:bg-orange-50 hover:text-orange-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-orange-400"
     }`;
 
+  const subNavClass = ({ isActive }) =>
+    `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all duration-200 ${
+      isActive
+        ? "bg-orange-50 font-medium text-orange-600 dark:bg-orange-500/10 dark:text-orange-400"
+        : "text-slate-600 hover:bg-slate-50 hover:text-orange-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-orange-400"
+    }`;
+
   const handleNavigation = () => {
     setMobileSidebarOpen(false);
   };
+
+  // =====================================================
+  // COLLAPSED FLYOUT SUBMENU
+  // =====================================================
+
+  const CollapsedSubMenu = ({ children }) => (
+    <div
+      className="
+        absolute left-[68px] top-0 z-[9999]
+
+        invisible opacity-0
+
+        transition-all duration-150
+
+        group-hover:visible
+        group-hover:opacity-100
+
+        pointer-events-none
+        group-hover:pointer-events-auto
+      "
+    >
+      {/* Invisible bridge so the mouse can travel to the flyout */}
+      <div className="absolute -left-2 top-0 h-full w-2" />
+
+      <div
+        className="
+          min-w-[180px] rounded-lg border
+          border-slate-200 bg-white p-1.5 shadow-lg
+          dark:border-slate-700 dark:bg-slate-800
+        "
+      >
+        {children}
+      </div>
+    </div>
+  );
+
+  const CollapsedSubItem = ({ to, icon, children, end = false }) => (
+    <NavLink
+      to={to}
+      end={end}
+      className={({ isActive }) =>
+        `
+          flex items-center gap-2 whitespace-nowrap
+          rounded-md px-2.5 py-2
+          text-[11px] font-medium
+
+          transition-all duration-150
+
+          ${
+            isActive
+              ? "bg-orange-50 text-orange-600 dark:bg-orange-500/10 dark:text-orange-400"
+              : "text-slate-600 hover:bg-slate-50 hover:text-orange-600 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-orange-400"
+          }
+        `
+      }
+    >
+      {icon}
+      <span>{children}</span>
+    </NavLink>
+  );
 
   return (
     <div className="flex min-h-screen overflow-x-hidden bg-[#f7f8fa] text-slate-800 dark:bg-slate-950 dark:text-slate-100">
@@ -213,7 +279,7 @@ const StaffLayout = () => {
           </button>
         </div>
 
-        {/* EXPAND SIDEBAR */}
+        {/* EXPAND SIDEBAR BUTTON */}
         {!sidebarOpen && (
           <div className="hidden justify-center border-b border-slate-100 py-3 dark:border-slate-800 lg:flex">
             <button
@@ -237,30 +303,213 @@ const StaffLayout = () => {
           )}
 
           <div className="space-y-1.5">
-            {navigation.map((item) => {
-              const Icon = item.icon;
+            {/* DASHBOARD */}
+            <NavLink
+              to="/staff"
+              end
+              onClick={handleNavigation}
+              className={navClass}
+              title={!sidebarOpen ? "Dashboard" : ""}
+            >
+              <FiBarChart2 className="shrink-0" size={18} />
+              {sidebarOpen && (
+                <span className="text-sm font-medium">Dashboard</span>
+              )}
+            </NavLink>
 
-              return (
-                <NavLink
-                  key={item.path}
-                  to={item.path}
-                  end={item.end}
-                  onClick={handleNavigation}
-                  className={navClass}
-                  title={!sidebarOpen ? item.name : ""}
-                >
-                  <Icon className="shrink-0" size={18} />
+            {/* MY TASKS */}
+            <NavLink
+              to="/staff/tasks"
+              onClick={handleNavigation}
+              className={navClass}
+              title={!sidebarOpen ? "My Tasks" : ""}
+            >
+              <FiCheckSquare className="shrink-0" size={18} />
+              {sidebarOpen && (
+                <span className="text-sm font-medium">My Tasks</span>
+              )}
+            </NavLink>
 
-                  {sidebarOpen && (
-                    <span className="text-sm font-medium">{item.name}</span>
-                  )}
-                </NavLink>
-              );
-            })}
+            {/* ============================= */}
+            {/* PROJECTS (dropdown) */}
+            {/* ============================= */}
+            <div className="group relative overflow-visible">
+              <button
+                type="button"
+                onClick={() => {
+                  if (sidebarOpen) setProjectOpen((p) => !p);
+                }}
+                className={`
+                  flex w-full items-center rounded-xl transition-all duration-200
+                  ${
+                    isProjectSection
+                      ? "bg-orange-500 text-white shadow-sm shadow-orange-200 dark:shadow-none"
+                      : "text-slate-600 hover:bg-orange-50 hover:text-orange-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-orange-400"
+                  }
+                  ${sidebarOpen ? "gap-3 px-3 py-3" : "justify-center px-2 py-3"}
+                `}
+                title={!sidebarOpen ? "Projects" : ""}
+              >
+                <FiFolder className="shrink-0" size={18} />
+
+                {sidebarOpen && (
+                  <>
+                    <span className="flex-1 text-left text-sm font-medium">
+                      Projects
+                    </span>
+
+                    {projectOpen ? (
+                      <FiChevronDown size={14} />
+                    ) : (
+                      <FiChevronRight size={14} />
+                    )}
+                  </>
+                )}
+              </button>
+
+              {/* Collapsed flyout */}
+              {!sidebarOpen && (
+                <CollapsedSubMenu>
+                  <CollapsedSubItem
+                    to="/staff/projects"
+                    end
+                    icon={<FiFolder size={12} />}
+                  >
+                    All Projects
+                  </CollapsedSubItem>
+
+                  <CollapsedSubItem
+                    to="/staff/projects/add"
+                    icon={<FiPlus size={12} />}
+                  >
+                    Add Project
+                  </CollapsedSubItem>
+                </CollapsedSubMenu>
+              )}
+
+              {/* Expanded submenu */}
+              {sidebarOpen && projectOpen && (
+                <div className="mt-1 space-y-1 pl-7">
+                  <NavLink
+                    to="/staff/projects"
+                    end
+                    onClick={handleNavigation}
+                    className={subNavClass}
+                  >
+                    <FiFolder size={14} />
+                    <span>All Projects</span>
+                  </NavLink>
+
+                  <NavLink
+                    to="/staff/projects/add"
+                    onClick={handleNavigation}
+                    className={subNavClass}
+                  >
+                    <FiPlus size={14} />
+                    <span>Add Project</span>
+                  </NavLink>
+                </div>
+              )}
+            </div>
+
+            {/* ============================= */}
+            {/* CUSTOMERS (dropdown) */}
+            {/* ============================= */}
+            <div className="group relative overflow-visible">
+              <button
+                type="button"
+                onClick={() => {
+                  if (sidebarOpen) setCustomerOpen((p) => !p);
+                }}
+                className={`
+                  flex w-full items-center rounded-xl transition-all duration-200
+                  ${
+                    isCustomerSection
+                      ? "bg-orange-500 text-white shadow-sm shadow-orange-200 dark:shadow-none"
+                      : "text-slate-600 hover:bg-orange-50 hover:text-orange-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-orange-400"
+                  }
+                  ${sidebarOpen ? "gap-3 px-3 py-3" : "justify-center px-2 py-3"}
+                `}
+                title={!sidebarOpen ? "Customers" : ""}
+              >
+                <FiUsers className="shrink-0" size={18} />
+
+                {sidebarOpen && (
+                  <>
+                    <span className="flex-1 text-left text-sm font-medium">
+                      Customers
+                    </span>
+
+                    {customerOpen ? (
+                      <FiChevronDown size={14} />
+                    ) : (
+                      <FiChevronRight size={14} />
+                    )}
+                  </>
+                )}
+              </button>
+
+              {/* Collapsed flyout */}
+              {!sidebarOpen && (
+                <CollapsedSubMenu>
+                  <CollapsedSubItem
+                    to="/staff/customers"
+                    end
+                    icon={<FiUsers size={12} />}
+                  >
+                    All Customers
+                  </CollapsedSubItem>
+
+                  <CollapsedSubItem
+                    to="/staff/customers/add"
+                    icon={<FiPlus size={12} />}
+                  >
+                    Add Customer
+                  </CollapsedSubItem>
+                </CollapsedSubMenu>
+              )}
+
+              {/* Expanded submenu */}
+              {sidebarOpen && customerOpen && (
+                <div className="mt-1 space-y-1 pl-7">
+                  <NavLink
+                    to="/staff/customers"
+                    end
+                    onClick={handleNavigation}
+                    className={subNavClass}
+                  >
+                    <FiUsers size={14} />
+                    <span>All Customers</span>
+                  </NavLink>
+
+                  <NavLink
+                    to="/staff/customers/add"
+                    onClick={handleNavigation}
+                    className={subNavClass}
+                  >
+                    <FiPlus size={14} />
+                    <span>Add Customer</span>
+                  </NavLink>
+                </div>
+              )}
+            </div>
+
+            {/* SETTING */}
+            <NavLink
+              to="/staff/profile"
+              onClick={handleNavigation}
+              className={navClass}
+              title={!sidebarOpen ? "Setting" : ""}
+            >
+              <IoSettingsOutline className="shrink-0" size={18} />
+              {sidebarOpen && (
+                <span className="text-sm font-medium">Setting</span>
+              )}
+            </NavLink>
           </div>
         </nav>
 
-        {/* STAFF PROFILE IN SIDEBAR */}
+        {/* LOGOUT */}
         <div className="border-t border-slate-100 p-3 dark:border-slate-800">
           <button
             type="button"
@@ -271,7 +520,6 @@ const StaffLayout = () => {
             }`}
           >
             <FiLogOut className="shrink-0" size={18} />
-
             {sidebarOpen && <span className="text-sm font-medium">Logout</span>}
           </button>
         </div>
@@ -285,7 +533,6 @@ const StaffLayout = () => {
       >
         {/* TOP HEADER */}
         <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-slate-200 bg-white/95 px-4 backdrop-blur sm:h-20 sm:px-5 md:px-8 dark:border-slate-800 dark:bg-slate-900/95">
-          {/* LEFT HEADER */}
           <div className="flex min-w-0 items-center gap-3">
             <button
               type="button"
@@ -308,9 +555,7 @@ const StaffLayout = () => {
             </div>
           </div>
 
-          {/* RIGHT HEADER */}
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* THEME */}
             <button
               type="button"
               onClick={() => dispatch(toggleTheme())}
@@ -325,7 +570,6 @@ const StaffLayout = () => {
               {theme === "dark" ? <FiSun size={19} /> : <FiMoon size={19} />}
             </button>
 
-            {/* REAL STAFF NAME */}
             <div className="hidden max-w-44 text-right sm:block">
               <p
                 className="truncate text-sm font-semibold text-slate-800 dark:text-slate-100"
@@ -339,14 +583,12 @@ const StaffLayout = () => {
               </p>
             </div>
 
-            {/* AVATAR */}
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-orange-100 text-sm font-bold text-orange-600 ring-4 ring-orange-50 dark:bg-orange-500/10 dark:text-orange-400 dark:ring-orange-500/5 sm:h-10 sm:w-10">
               {userInitial}
             </div>
           </div>
         </header>
 
-        {/* PAGE CONTENT */}
         <main className="min-w-0 flex-1 p-3 sm:p-4 md:p-6">
           <Outlet />
         </main>

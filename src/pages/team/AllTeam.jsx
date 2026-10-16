@@ -299,10 +299,6 @@ const AllTeam = () => {
                 </th>
 
                 <th className="px-5 py-4 text-left text-sm font-semibold text-slate-600 dark:text-slate-400">
-                  Skill
-                </th>
-
-                <th className="px-5 py-4 text-left text-sm font-semibold text-slate-600 dark:text-slate-400">
                   Tasks
                 </th>
 
@@ -347,12 +343,6 @@ const AllTeam = () => {
 
                       <td className="px-5 py-4 text-sm text-slate-600 dark:text-slate-300">
                         {member.phone || member.phone_no || "-"}
-                      </td>
-
-                      {/* Skill */}
-
-                      <td className="px-5 py-4 text-sm text-slate-600 dark:text-slate-300">
-                        {member.skill || member.department || "-"}
                       </td>
 
                       {/* Tasks */}

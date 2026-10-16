@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   FiPrinter,
   FiUser,
@@ -15,7 +15,15 @@ import EstimateSummary from "../../components/EstimateSummary";
 import EstimateFooter from "../../components/EstimateFooter";
 
 import toast from "react-hot-toast";
-import { createProject, addItems, createAmount } from "../../api/project";
+import api from "../../api/api";
+import {
+  createProject,
+  getProjects,
+  updateProject,
+  addItems,
+  getItems,
+  createAmount,
+} from "../../api/project";
 
 const emptyItem = {
   item_description: "",
@@ -31,8 +39,38 @@ const emptyItem = {
   work_type: "",
 };
 
+const getList = (response) => {
+  const data = response?.data?.data ?? response?.data ?? response;
+
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data?.results)) return data.results;
+  if (Array.isArray(data?.orders)) return data.orders;
+  if (Array.isArray(data?.projects)) return data.projects;
+  if (Array.isArray(data?.items)) return data.items;
+  if (Array.isArray(data?.data)) return data.data;
+
+  return [];
+};
+
+const getRelatedId = (value) => {
+  if (value === null || value === undefined) return "";
+
+  if (typeof value === "object") {
+    return value.id ?? value.uuid ?? value.pk ?? "";
+  }
+
+  return value;
+};
+
 const CreateProject = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  const editId = searchParams.get("edit");
+  const isEditMode = Boolean(editId);
+
+  const [loadingExistingProject, setLoadingExistingProject] = useState(false);
+  const [existingItems, setExistingItems] = useState([]);
 
   const {
     register,
@@ -40,6 +78,7 @@ const CreateProject = () => {
     handleSubmit,
     watch,
     setValue,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
@@ -72,7 +111,10 @@ const CreateProject = () => {
   const formData = watch();
   const items = watch("items") || [];
 
-  // Calculate order total from item quantities and rates.
+  // --------------------------------------------------
+  // CALCULATE TOTALS
+  // --------------------------------------------------
+
   const totalAmount = items.reduce((total, item) => {
     const quantity = Number(item?.quantity) || 0;
     const rate = Number(item?.rate) || 0;
@@ -88,6 +130,10 @@ const CreateProject = () => {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     });
+
+  // --------------------------------------------------
+  // ERROR HANDLER
+  // --------------------------------------------------
 
   const getErrorMessage = (error) => {
     const backendError = error?.response?.data;
@@ -118,8 +164,12 @@ const CreateProject = () => {
         .join("\n");
     }
 
-    return error?.message || "Failed to create project.";
+    return error?.message || "Failed to save project.";
   };
+
+  // --------------------------------------------------
+  // RESPONSE HELPERS
+  // --------------------------------------------------
 
   const getProjectId = (response) => {
     const result = response?.data ?? response;
@@ -147,21 +197,154 @@ const CreateProject = () => {
     );
   };
 
+  // --------------------------------------------------
+  // LOAD EXISTING PROJECT FOR EDITING
+  // --------------------------------------------------
+
+  useEffect(() => {
+    if (!isEditMode) return;
+
+    let cancelled = false;
+
+    const loadExistingProject = async () => {
+      try {
+        setLoadingExistingProject(true);
+
+        const [projectsResponse, itemsResponse] = await Promise.all([
+          getProjects(),
+          getItems(),
+        ]);
+
+        if (cancelled) return;
+
+        const projects = getList(projectsResponse);
+        const allItems = getList(itemsResponse);
+
+        const project = projects.find(
+          (item) => String(item.id) === String(editId),
+        );
+
+        if (!project) {
+          toast.error("Project not found.");
+          navigate("/projects");
+          return;
+        }
+
+        const customer =
+          project.customer_details ??
+          project.customer ??
+          project.customer_info ??
+          {};
+
+        const customerId = getRelatedId(
+          project.customer_details?.id ??
+            project.customer_details?.uuid ??
+            project.customer,
+        );
+
+        const projectItems = allItems.filter((item) => {
+          const itemOrderId = getRelatedId(
+            item.order ?? item.order_id ?? item.orderslip,
+          );
+
+          return String(itemOrderId) === String(project.id);
+        });
+
+        const normalizedItems = projectItems.map((item) => ({
+          _apiId: item.id,
+          item_description: item.item_description ?? item.description ?? "",
+          quantity: Number(item.quantity) || 1,
+          rate: Number(item.rate) || 0,
+          size: item.size ?? "",
+          maso: item.maso ?? "",
+          paper_type: item.paper_type ?? "",
+          band_type: item.band_type ?? "",
+          Designing_person: getRelatedId(item.Designing_person) || "",
+          printing_person: getRelatedId(item.printing_person) || "",
+          binding_person: getRelatedId(item.binding_person) || "",
+          work_type: item.work_type ?? "",
+        }));
+
+        setExistingItems(normalizedItems);
+
+        reset({
+          slip_no: String(project.slip_no ?? project.slip_number ?? ""),
+          slip_date: String(project.slip_date ?? "").split("T")[0],
+
+          customer: customerId,
+          customerName:
+            customer?.name ??
+            project.customer_name ??
+            project.customerName ??
+            "",
+          panNumber: customer?.pan_no ?? project.pan_no ?? "",
+          address: customer?.address ?? project.address ?? "",
+          contactNumber: customer?.contact_no ?? project.contact_no ?? "",
+
+          project_name: project.project_name ?? project.name ?? "",
+          description: project.description ?? "",
+          delivery_date: String(project.delivery_date ?? "").split("T")[0],
+          priority: project.priority ?? "normal",
+          work_status:
+            project.work_stage ??
+            project.work_status ??
+            project.status ??
+            "pending",
+
+          items:
+            normalizedItems.length > 0 ? normalizedItems : [{ ...emptyItem }],
+
+          // Do not assume an invoice's advance amount from the order.
+          // The existing payment record needs its own API response.
+          advance: 0,
+          paymentDate: "",
+          paymentMethod: "Cash",
+          paymentStatus: "Unpaid",
+
+          printingDetails:
+            project.printingDetails ?? project.printing_details ?? "",
+        });
+
+        console.log("Loaded project for editing:", project);
+        console.log("Loaded project items:", normalizedItems);
+      } catch (error) {
+        console.error("Failed to load project for editing:", error);
+        toast.error(getErrorMessage(error));
+      } finally {
+        if (!cancelled) {
+          setLoadingExistingProject(false);
+        }
+      }
+    };
+
+    loadExistingProject();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [editId, isEditMode, navigate, reset]);
+
+  // --------------------------------------------------
+  // CREATE OR UPDATE PROJECT
+  // --------------------------------------------------
+
   const onSubmit = async (data) => {
-    let projectCreated = false;
+    console.log("=== onSubmit fired ===", { isEditMode, editId, data });
+    // ... rest
+
+    let projectSaved = false;
 
     try {
-      // 1. Validate items.
-      const itemsToCreate = (data.items || []).filter((item) => {
-        return String(item?.item_description || "").trim() !== "";
-      });
+      const itemsToSave = (data.items || []).filter(
+        (item) => String(item?.item_description || "").trim() !== "",
+      );
 
-      if (itemsToCreate.length === 0) {
+      if (itemsToSave.length === 0) {
         toast.error("Please add at least one printing item.");
         return;
       }
 
-      const calculatedTotal = itemsToCreate.reduce((total, item) => {
+      const calculatedTotal = itemsToSave.reduce((total, item) => {
         return total + (Number(item.quantity) || 0) * (Number(item.rate) || 0);
       }, 0);
 
@@ -182,12 +365,11 @@ const CreateProject = () => {
         return;
       }
 
-      // 2. Create project/order.
       const projectPayload = {
         slip_date: data.slip_date,
         customer: data.customer,
-        project_name: data.project_name.trim(),
-        description: data.item_description || "",
+        project_name: String(data.project_name || "").trim(),
+        description: data.description || "",
         delivery_date: data.delivery_date || null,
         priority: data.priority || "normal",
         work_stage: String(data.work_status || "pending")
@@ -195,12 +377,89 @@ const CreateProject = () => {
           .trim(),
       };
 
-      // Remove undefined and empty optional values.
       Object.keys(projectPayload).forEach((key) => {
         if (projectPayload[key] === undefined || projectPayload[key] === "") {
           delete projectPayload[key];
         }
       });
+
+      let projectId;
+
+      // ================================================
+      // EDIT EXISTING PROJECT
+      // ================================================
+
+      if (isEditMode) {
+        projectId = editId;
+
+        console.log("========== UPDATING PROJECT ==========");
+        console.log("PROJECT ID:", projectId);
+        console.log("PROJECT PAYLOAD:", projectPayload);
+
+        await updateProject(projectId, projectPayload);
+
+        projectSaved = true;
+
+        // Update existing items and create newly added items.
+        // Existing items are identified by their original API IDs.
+        const submittedExistingIds = itemsToSave
+          .map((item) => item._apiId)
+          .filter(Boolean)
+          .map(String);
+
+        const removedItems = existingItems.filter(
+          (item) => !submittedExistingIds.includes(String(item._apiId)),
+        );
+
+        for (const item of removedItems) {
+          await api.delete(`/orderslipapi/slipitems/${item._apiId}/`);
+        }
+
+        for (const item of itemsToSave) {
+          const quantity = Number(item.quantity);
+          const rate = Number(item.rate);
+
+          if (!Number.isFinite(quantity) || quantity <= 0) {
+            throw new Error(`Invalid quantity for "${item.item_description}".`);
+          }
+
+          if (!Number.isFinite(rate) || rate < 0) {
+            throw new Error(`Invalid rate for "${item.item_description}".`);
+          }
+
+          const itemPayload = {
+            order: projectId,
+            item_description: String(item.item_description).trim(),
+            quantity,
+            rate,
+            size: item.size || "",
+            maso: item.maso || "",
+            paper_type: item.paper_type || "",
+            band_type: item.band_type || "",
+            Designing_person: item.Designing_person || null,
+            printing_person: item.printing_person || null,
+            binding_person: item.binding_person || null,
+            work_type: item.work_type || "",
+          };
+
+          if (item._apiId) {
+            await api.patch(
+              `/orderslipapi/slipitems/${item._apiId}/`,
+              itemPayload,
+            );
+          } else {
+            await addItems(itemPayload);
+          }
+        }
+
+        toast.success("Project updated successfully.");
+        navigate("/projects");
+        return;
+      }
+
+      // ================================================
+      // CREATE NEW PROJECT
+      // ================================================
 
       console.log("========== CREATING PROJECT ==========");
       console.log("PROJECT PAYLOAD:", projectPayload);
@@ -209,7 +468,8 @@ const CreateProject = () => {
 
       console.log("PROJECT RESPONSE:", projectResponse);
 
-      const projectId = getProjectId(projectResponse);
+      projectId = getProjectId(projectResponse);
+
       const generatedSlipNumber = getSlipNumber(projectResponse);
 
       if (generatedSlipNumber !== "") {
@@ -222,12 +482,12 @@ const CreateProject = () => {
         );
       }
 
-      projectCreated = true;
+      projectSaved = true;
 
       console.log("CREATED PROJECT ID:", projectId);
 
-      // 3. Create each non-empty printing item.
-      for (const item of itemsToCreate) {
+      // Create printing items.
+      for (const item of itemsToSave) {
         const quantity = Number(item.quantity);
         const rate = Number(item.rate);
 
@@ -254,29 +514,11 @@ const CreateProject = () => {
           work_type: item.work_type || "",
         };
 
-        console.log("========== CREATING ITEM ==========");
-        console.log("ITEM PAYLOAD:", itemPayload);
-
-        try {
-          const itemResponse = await addItems(itemPayload);
-
-          console.log("ITEM CREATED:", itemResponse?.data ?? itemResponse);
-        } catch (itemError) {
-          console.error("ITEM API STATUS:", itemError?.response?.status);
-          console.error("ITEM API ERRORS:", itemError?.response?.data);
-
-          throw new Error(
-            `Project created, but item "${itemPayload.item_description}" failed: ${getErrorMessage(itemError)}`,
-          );
-        }
+        await addItems(itemPayload);
       }
 
-      // 4. Create payment record only when an advance amount is entered.
-      console.log("========== CREATING PAYMENT ==========");
-      console.log("CALCULATED ORDER TOTAL:", calculatedTotal);
-      console.log("ADVANCE PAYMENT:", paymentAdvance);
-      console.log("EXPECTED REMAINING:", calculatedTotal - paymentAdvance);
-
+      // Create a payment only during project creation.
+      // This prevents duplicate advance-payment records during edits.
       if (paymentAdvance > 0) {
         const amountPayload = {
           order: projectId,
@@ -299,57 +541,50 @@ const CreateProject = () => {
                     : "khalti",
         };
 
-        console.log("AMOUNT PAYLOAD:", amountPayload);
-
-        try {
-          const amountResponse = await createAmount(amountPayload);
-
-          console.log(
-            "AMOUNT CREATED:",
-            amountResponse?.data ?? amountResponse,
-          );
-        } catch (amountError) {
-          console.error("AMOUNT API STATUS:", amountError?.response?.status);
-          console.error("AMOUNT API ERRORS:", amountError?.response?.data);
-
-          throw new Error(
-            `Project and items were created, but the advance payment failed: ${getErrorMessage(amountError)}`,
-          );
-        }
-      } else {
-        console.log("No advance payment entered; skipping payment creation.");
+        await createAmount(amountPayload);
       }
-
-      // 5. Success.
-      console.log("========== CREATION COMPLETED ==========");
-      console.log("PROJECT ID:", projectId);
-      console.log("ORDER TOTAL FROM ITEMS:", calculatedTotal);
-      console.log("ADVANCE:", paymentAdvance);
-      console.log("EXPECTED BALANCE:", calculatedTotal - paymentAdvance);
 
       toast.success("Project and printing items created successfully.");
       navigate("/projects");
     } catch (error) {
-      console.error("========== CREATION FAILED ==========");
+      console.error("========== PROJECT SAVE FAILED ==========");
       console.error("STATUS:", error?.response?.status);
       console.error("BACKEND ERRORS:", error?.response?.data);
       console.error("ERROR:", error);
 
       const message = getErrorMessage(error);
 
-      if (projectCreated) {
-        toast.error(`The project may already exist. ${message}`, {
-          duration: 6000,
-        });
-      } else {
-        toast.error(message, { duration: 6000 });
-      }
+      toast.error(
+        projectSaved ? `The project may already be saved. ${message}` : message,
+        { duration: 6000 },
+      );
     }
   };
 
   const handlePrint = () => {
     window.print();
   };
+
+  // --------------------------------------------------
+  // LOADING STATE FOR EDIT MODE
+  // --------------------------------------------------
+
+  if (isEditMode && loadingExistingProject) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-700">
+        <div className="text-center">
+          <div className="mx-auto mb-3 h-8 w-8 animate-spin rounded-full border-4 border-orange-500 border-t-transparent" />
+          <p className="text-sm text-slate-500 dark:text-slate-300">
+            Loading project details...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // --------------------------------------------------
+  // UI
+  // --------------------------------------------------
 
   return (
     <>
@@ -358,10 +593,12 @@ const CreateProject = () => {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-200">
-                Create Project
+                {isEditMode ? "Edit Project" : "Create Project"}
               </h1>
               <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                Create customer order, estimate and payment details.
+                {isEditMode
+                  ? "Update customer order, printing items and project details."
+                  : "Create customer order, estimate and payment details."}
               </p>
             </div>
 
@@ -676,10 +913,16 @@ const CreateProject = () => {
             </button>
             <button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || loadingExistingProject}
               className="rounded-xl bg-orange-600 px-7 py-3 text-sm font-semibold text-white transition hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {isSubmitting ? "Creating..." : "Create Project"}
+              {isSubmitting
+                ? isEditMode
+                  ? "Updating..."
+                  : "Creating..."
+                : isEditMode
+                  ? "Update Project"
+                  : "Create Project"}
             </button>
           </div>
         </form>

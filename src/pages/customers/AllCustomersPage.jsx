@@ -77,7 +77,6 @@ const AllCustomers = () => {
     const matchesType =
       customerTypeFilter === "All" ||
       customer.customer_type === customerTypeFilter;
-
     return matchesSearch && matchesType;
   });
 
@@ -152,18 +151,19 @@ const AllCustomers = () => {
   // INDIVIDUAL CUSTOMERS
   // ========================================
 
-  const individualCustomers = customers.filter(
-    (customer) => customer.customer_type === "individual",
+  // Normalize once after fetching
+  const normalizedCustomers = customers.map((c) => ({
+    ...c,
+    customer_type: (c.customer_type || "").toString().trim().toLowerCase(),
+  }));
+
+  const individualCustomers = normalizedCustomers.filter(
+    (c) => c.customer_type === "individual",
   ).length;
 
-  // ========================================
-  // BUSINESS CUSTOMERS
-  // ========================================
-
-  const businessCustomers = customers.filter(
-    (customer) => customer.customer_type === "business",
+  const businessCustomers = normalizedCustomers.filter(
+    (c) => c.customer_type === "business",
   ).length;
-
   // ========================================
   // CUSTOMERS WITH EMAIL
   // ========================================
@@ -341,7 +341,7 @@ const AllCustomers = () => {
                         </p>
 
                         <p className="mt-1 text-xs text-slate-400">
-                          UID: {customer.uuid}
+                          Id: {customer.id}
                         </p>
                       </button>
                     </td>
@@ -368,7 +368,7 @@ const AllCustomers = () => {
                       <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
                         <FiBriefcase size={14} className="text-slate-400" />
 
-                        {customer.company || "—"}
+                        {customer.company_name || "—"}
                       </div>
                     </td>
 

@@ -8,32 +8,28 @@ import {
   FiClock,
   FiCheckCircle,
   FiPrinter,
-  FiX,
   FiLoader,
 } from "react-icons/fi";
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import DeleteModal from "../../modal/DeleteModal";
-import { getProjects, updateProject, deleteProject } from "../../api/project";
+import { getProjects, deleteProject, getItems } from "../../api/project";
 import toast from "react-hot-toast";
 
 const AllProject = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [projects, setProjects] = useState([]);
+  const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
-
-  const [statusModalOpen, setStatusModalOpen] = useState(false);
-  const [selectedWorkStatus, setSelectedWorkStatus] = useState("pending");
-  const [statusLoading, setStatusLoading] = useState(false);
-  const [statusError, setStatusError] = useState("");
 
   // --------------------------------------------------
   // NORMALIZE API RESPONSE
@@ -64,7 +60,6 @@ const AllProject = () => {
 
     console.log("Number of orders:", orders.length);
 
-    // Check exactly what the backend sends for amounts and status.
     console.table(
       orders.map((order) => ({
         id: order.id,
@@ -76,14 +71,30 @@ const AllProject = () => {
         total_amount: order.total_amount,
         balance: order.balance,
         paid_amount: order.paid_amount,
-        current_order_total: order.current_order?.total_amount,
-        current_order_balance: order.current_order?.balance,
       })),
     );
 
     console.log("==========================================");
 
     return orders;
+  }, []);
+
+  const normalizeItems = useCallback((response) => {
+    const data = response?.data?.data ?? response?.data ?? response;
+
+    let list = [];
+
+    if (Array.isArray(data)) {
+      list = data;
+    } else if (Array.isArray(data?.results)) {
+      list = data.results;
+    } else if (Array.isArray(data?.items)) {
+      list = data.items;
+    } else if (Array.isArray(data?.data)) {
+      list = data.data;
+    }
+
+    return list;
   }, []);
 
   // --------------------------------------------------
@@ -134,14 +145,73 @@ const AllProject = () => {
   );
 
   // --------------------------------------------------
+  // DERIVE ORDER STATUS FROM ITS SLIP ITEMS
+  // --------------------------------------------------
+
+  const getItemStatusesForOrder = useCallback(
+    (orderId) => {
+      if (orderId == null) return null;
+
+      const related = items.filter(
+        (it) => String(it.order ?? it.order_id) === String(orderId),
+      );
+
+      if (related.length === 0) return null;
+
+      const allStages = related.flatMap((it) => [
+        it.designing_status,
+        it.printing_status,
+        it.binding_status,
+      ]);
+
+      const total = allStages.length;
+      const completed = allStages.filter((s) => s === "completed").length;
+      const inProgress = allStages.filter((s) => s === "in_progress").length;
+
+      if (total > 0 && completed === total) return "completed";
+      if (completed > 0 || inProgress > 0) return "printed";
+      return "pending";
+    },
+    [items],
+  );
+
+  useEffect(() => {
+    console.log("=== STATUS DEBUG v2 ===");
+    console.log("items loaded:", items.length);
+
+    console.log("--- RAW ITEMS ---");
+    items.forEach((it) => {
+      console.log({
+        id: it.id,
+        order_raw: it.order,
+        order_type: typeof it.order,
+        order_id: it.order_id,
+        designing_status: it.designing_status,
+        printing_status: it.printing_status,
+        binding_status: it.binding_status,
+      });
+    });
+
+    console.log("--- ORDERS ---");
+    projects.forEach((p) => {
+      console.log({
+        slip_no: p.slip_no,
+        order_id: p.id,
+        derived: getItemStatusesForOrder(p.id),
+        raw_work_stage: p.work_stage,
+      });
+    });
+  }, [items, projects, getItemStatusesForOrder]);
+  // --------------------------------------------------
   // READ PROJECT STATUS
-  //
-  // work_stage is checked first because it is the field
-  // present in your API response.
   // --------------------------------------------------
 
   const readProjectStatus = useCallback(
     (project) => {
+      const derived = getItemStatusesForOrder(project?.id);
+
+      if (derived) return normalizeStatus(derived);
+
       return normalizeStatus(
         project?.work_stage ??
           project?.current_order?.work_stage ??
@@ -153,7 +223,7 @@ const AllProject = () => {
           project?.current_order?.status,
       );
     },
-    [normalizeStatus],
+    [getItemStatusesForOrder, normalizeStatus],
   );
 
   const getProjectStatus = useCallback(
@@ -212,9 +282,6 @@ const AllProject = () => {
 
   // --------------------------------------------------
   // PENDING AMOUNT
-  //
-  // Prefer the backend balance. If it is missing, calculate:
-  // total amount - paid amount.
   // --------------------------------------------------
 
   const getPendingAmount = useCallback(
@@ -257,7 +324,7 @@ const AllProject = () => {
   };
 
   // --------------------------------------------------
-  // FETCH PROJECTS
+  // FETCH PROJECTS + ITEMS
   // --------------------------------------------------
 
   const fetchProjects = useCallback(async () => {
@@ -269,6 +336,21 @@ const AllProject = () => {
     return orders;
   }, [normalizeList]);
 
+  const fetchItems = useCallback(async () => {
+    try {
+      const response = await getItems();
+      const list = normalizeItems(response);
+      setItems(list);
+      return list;
+    } catch (error) {
+      // Items are used only for deriving the correct order status.
+      // If this call fails, we still want the list to render.
+      console.warn("Could not load slip items for status derivation:", error);
+      setItems([]);
+      return [];
+    }
+  }, [normalizeItems]);
+
   // --------------------------------------------------
   // INITIAL PAGE LOAD
   // --------------------------------------------------
@@ -277,7 +359,7 @@ const AllProject = () => {
     setLoading(true);
 
     try {
-      await fetchProjects();
+      await Promise.all([fetchProjects(), fetchItems()]);
     } catch (error) {
       console.error("Failed to load projects:", {
         status: error?.response?.status,
@@ -289,11 +371,12 @@ const AllProject = () => {
     } finally {
       setLoading(false);
     }
-  }, [fetchProjects]);
+  }, [fetchProjects, fetchItems]);
 
+  // Refetch on every navigation to /projects.
   useEffect(() => {
     loadPageData();
-  }, [loadPageData]);
+  }, [loadPageData, location.key]);
 
   // --------------------------------------------------
   // STATUS STYLING
@@ -318,6 +401,19 @@ const AllProject = () => {
       default:
         return "bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300";
     }
+  };
+
+  // --------------------------------------------------
+  // EDIT PROJECT
+  // --------------------------------------------------
+
+  const handleEditProject = (project) => {
+    if (!project?.id) {
+      toast.error("Unable to edit this project: project ID is missing.");
+      return;
+    }
+
+    navigate(`/projects/create-project?edit=${project.id}`);
   };
 
   // --------------------------------------------------
@@ -373,125 +469,6 @@ const AllProject = () => {
   };
 
   // --------------------------------------------------
-  // OPEN STATUS MODAL
-  // --------------------------------------------------
-
-  const handleEditProject = (project) => {
-    setSelectedProject(project);
-    setSelectedWorkStatus(readProjectStatus(project) || "pending");
-    setStatusError("");
-    setStatusModalOpen(true);
-  };
-
-  const handleStatusModalClose = () => {
-    if (statusLoading) return;
-
-    setStatusModalOpen(false);
-    setSelectedProject(null);
-    setStatusError("");
-  };
-
-  // --------------------------------------------------
-  // UPDATE WORK STATUS
-  // --------------------------------------------------
-
-  const handleWorkStatusUpdate = async (event) => {
-    event.preventDefault();
-
-    if (!selectedProject?.id || statusLoading) return;
-
-    const projectId = selectedProject.id;
-    const newStatus = normalizeStatus(selectedWorkStatus);
-
-    try {
-      setStatusLoading(true);
-      setStatusError("");
-
-      // Your API response contains work_stage.
-      // Confirm that work_stage is writable in your Django serializer.
-      const payload = {
-        work_stage: newStatus,
-      };
-
-      console.log("========== UPDATE WORK STATUS ==========");
-      console.log("Project ID:", projectId);
-      console.log("Requested status:", newStatus);
-      console.log("Update payload:", payload);
-
-      const updateResponse = await updateProject(projectId, payload);
-
-      console.log("Backend update response:", updateResponse);
-
-      // IMPORTANT:
-      // Fetch the project list again to confirm what the backend saved.
-      const updatedOrders = await fetchProjects();
-
-      const updatedProject = updatedOrders.find(
-        (project) => String(project.id) === String(projectId),
-      );
-
-      console.log("Project after backend refresh:", updatedProject);
-      console.log(
-        "Status returned by backend:",
-        updatedProject
-          ? readProjectStatus(updatedProject)
-          : "Project not found",
-      );
-
-      console.log("========================================");
-
-      if (!updatedProject) {
-        throw new Error(
-          "The update request completed, but the project was not found in the refreshed list.",
-        );
-      }
-
-      const actualStatus = readProjectStatus(updatedProject);
-
-      if (actualStatus !== newStatus) {
-        console.warn("Requested status differs from saved status.", {
-          requested: newStatus,
-          backendStatus: actualStatus,
-          backendProject: updatedProject,
-        });
-
-        setStatusError(
-          `The backend still returns "${actualStatus || "unknown"}" after the update. Check the Django serializer and update endpoint.`,
-        );
-
-        toast.error("Status was not confirmed by the backend.");
-        return;
-      }
-
-      setStatusModalOpen(false);
-      setSelectedProject(null);
-
-      toast.success("Work status updated successfully!");
-    } catch (error) {
-      console.error("Update project status error:", error);
-      console.error("HTTP status:", error?.response?.status);
-      console.error("Backend error response:", error?.response?.data);
-
-      const errorData = error?.response?.data;
-
-      const message =
-        typeof errorData === "string"
-          ? errorData
-          : errorData?.detail ||
-            errorData?.message ||
-            (errorData && typeof errorData === "object"
-              ? JSON.stringify(errorData)
-              : error?.message) ||
-            "Failed to update project status.";
-
-      setStatusError(message);
-      toast.error(message);
-    } finally {
-      setStatusLoading(false);
-    }
-  };
-
-  // --------------------------------------------------
   // DATE HELPERS
   // --------------------------------------------------
 
@@ -529,9 +506,6 @@ const AllProject = () => {
     if (!date) return "";
     return String(date).split("T")[0];
   };
-
-  // NOTE: This currently updates the frontend only.
-  // A date-update API request is needed to persist changes.
 
   const updateProjectDate = (projectId, field, newDate) => {
     setProjects((previous) =>
@@ -911,7 +885,7 @@ const AllProject = () => {
                             <div className="flex items-center gap-1">
                               <button
                                 type="button"
-                                title="Edit work status"
+                                title="Edit project"
                                 onClick={() => handleEditProject(project)}
                                 className="rounded-lg p-2 text-yellow-600 transition hover:bg-yellow-100 hover:text-yellow-700 dark:hover:bg-yellow-500/10"
                               >
@@ -950,7 +924,8 @@ const AllProject = () => {
 
                         <button
                           type="button"
-                          aria-label="Edit work status"
+                          aria-label="Edit project"
+                          title="Edit project"
                           onClick={() => handleEditProject(project)}
                           className="shrink-0 rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
                         >
@@ -1031,7 +1006,7 @@ const AllProject = () => {
                           className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-slate-200 py-2 text-xs font-medium text-yellow-600 transition hover:bg-yellow-50 dark:border-slate-600 dark:hover:bg-yellow-500/10"
                         >
                           <FaEdit size={14} />
-                          Edit Status
+                          Edit Project
                         </button>
 
                         <button
@@ -1071,120 +1046,6 @@ const AllProject = () => {
           )}
         </div>
       </main>
-
-      {/* WORK STATUS MODAL */}
-      {statusModalOpen && selectedProject && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-[2px]"
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget) {
-              handleStatusModalClose();
-            }
-          }}
-        >
-          <div className="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-slate-800">
-            <div className="flex items-start justify-between border-b border-slate-100 px-5 py-4 dark:border-slate-700 sm:px-6">
-              <div>
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white">
-                  Update Work Status
-                </h3>
-
-                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                  {getProjectName(selectedProject)}
-                </p>
-              </div>
-
-              <button
-                type="button"
-                onClick={handleStatusModalClose}
-                disabled={statusLoading}
-                className="rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 disabled:opacity-50 dark:hover:bg-slate-700 dark:hover:text-white"
-                aria-label="Close modal"
-              >
-                <FiX size={20} />
-              </button>
-            </div>
-
-            <form onSubmit={handleWorkStatusUpdate} className="p-5 sm:p-6">
-              <div className="mb-5 rounded-xl bg-slate-50 p-4 dark:bg-slate-700/60">
-                <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
-                  Slip Number
-                </p>
-
-                <p className="mt-1 font-semibold text-slate-800 dark:text-slate-100">
-                  #{selectedProject.slip_no ?? "-"}
-                </p>
-
-                <div className="mt-3">
-                  <span
-                    className={`inline-flex rounded-full px-3 py-1.5 text-xs font-semibold ${getStatusStyle(getProjectStatus(selectedProject))}`}
-                  >
-                    Current: {getProjectStatus(selectedProject)}
-                  </span>
-                </div>
-              </div>
-
-              <label
-                htmlFor="workStatus"
-                className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200"
-              >
-                Work Status
-              </label>
-
-              <select
-                id="workStatus"
-                value={selectedWorkStatus}
-                onChange={(event) => setSelectedWorkStatus(event.target.value)}
-                disabled={statusLoading}
-                required
-                className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-800 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-100 disabled:opacity-60 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:focus:ring-orange-500/10"
-              >
-                <option value="pending">Pending</option>
-                <option value="printed">Printed</option>
-                <option value="completed">Completed</option>
-              </select>
-
-              {statusError && (
-                <p
-                  role="alert"
-                  className="mt-3 whitespace-pre-line rounded-lg border border-red-100 bg-red-50 px-3 py-2 text-sm text-red-600 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-400"
-                >
-                  {statusError}
-                </p>
-              )}
-
-              <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-                <button
-                  type="button"
-                  onClick={handleStatusModalClose}
-                  disabled={statusLoading}
-                  className="rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 disabled:opacity-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
-                >
-                  Cancel
-                </button>
-
-                <button
-                  type="submit"
-                  disabled={statusLoading}
-                  className="flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {statusLoading ? (
-                    <>
-                      <FiLoader className="animate-spin" size={16} />
-                      Saving...
-                    </>
-                  ) : (
-                    <>
-                      <FiCheckCircle size={16} />
-                      Save Status
-                    </>
-                  )}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
 
       {/* DELETE MODAL */}
       <DeleteModal

@@ -32,7 +32,7 @@ const AddCustomer = () => {
       name: "",
       contact_no: "",
       email: "",
-      company: "",
+      company_name: "",
       pan_no: "",
       customer_type: "individual",
       address: "",
@@ -56,7 +56,7 @@ const AddCustomer = () => {
           name: response.name || "",
           contact_no: response.contact_no || "",
           email: response.email || "",
-          company: response.company || "",
+          company: response.company_name || "",
           customer_type: response.customer_type || "individual",
           address: response.address || "",
         });
@@ -109,14 +109,19 @@ const AddCustomer = () => {
 
       // Django validation errors
       if (backendError && typeof backendError === "object") {
-        const firstError = Object.entries(backendError)[0];
+        // Check if there is a specific PAN-related error field
+        const panKey = Object.keys(backendError).find((key) =>
+          key.toLowerCase().includes("pan_no"),
+        );
 
-        if (firstError) {
-          const [field, messages] = firstError;
+        // Use the PAN key if found, otherwise fall back to the first error field
+        const targetKey = panKey || Object.keys(backendError)[0];
 
+        if (targetKey) {
+          const messages = backendError[targetKey];
           const message = Array.isArray(messages) ? messages[0] : messages;
 
-          toast.error(`${field}: ${message}`);
+          toast.error(`${targetKey}: ${message}`);
           return;
         }
       }
@@ -351,7 +356,7 @@ const AddCustomer = () => {
                         type="text"
                         placeholder="Company name"
                         className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-11 pr-4 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-orange-500 focus:ring-2 focus:ring-orange-100 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-300"
-                        {...register("company")}
+                        {...register("company_name")}
                       />
                     </div>
                   </div>
@@ -388,7 +393,6 @@ const AddCustomer = () => {
                         placeholder="Enter PAN number"
                         className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-11 pr-4 text-sm text-slate-700 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-300"
                         {...register("pan_no", {
-                          required: "PAN number is required",
                           pattern: {
                             value: /^[0-9]+$/,
                             message: "Please enter numbers only",
