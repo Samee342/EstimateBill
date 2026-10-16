@@ -34,33 +34,30 @@ const SetupPage = () => {
       formData.append("pan_no", data.pan_no || "");
       formData.append("address", data.address || "");
 
-      // data.logo is a FileList
       if (data.logo?.[0]) {
         formData.append("logo", data.logo[0]);
       }
 
       const response = await createTenant(formData);
 
-      // Save the NEW token/user returned by createTenant
-      if (response.data.token) {
-        localStorage.setItem("token", response.data.token);
-      }
-      console.log("Tenant created successfully:", response);
+      console.log("Tenant created:", response);
 
-      toast.success("Business setup completed successfully!");
+      toast.success(
+        "Business setup completed! Please log in with your account.",
+      );
 
-      setTimeout(() => {
-        navigate("/dashboard", { replace: true });
-      }, 300);
+      navigate("/login", { replace: true });
     } catch (error) {
-      console.log("STATUS:", error.response?.status);
-      console.log("DATA:", error.response?.data);
-      console.log("FULL ERROR:", error);
+      console.error("TENANT CREATE FAILED:", {
+        status: error?.response?.status,
+        data: error?.response?.data,
+        message: error?.message,
+      });
 
-      const errorData = error.response?.data;
+      const errorData = error?.response?.data;
       const errorMessage = JSON.stringify(errorData || {}).toLowerCase();
 
-      // Handle duplicate PAN number errors
+      // Duplicate PAN
       if (
         errorMessage.includes("pan_no") &&
         (errorMessage.includes("unique") ||
@@ -73,7 +70,7 @@ const SetupPage = () => {
         return;
       }
 
-      // Handle password validation errors
+      // Password rules
       if (errorMessage.includes("password")) {
         toast.error(
           "The password cannot contain only numbers. Please use a combination of text and numbers.",
@@ -81,11 +78,29 @@ const SetupPage = () => {
         return;
       }
 
-      // General fallback for any other errors
+      // Duplicate shop name / email
+      if (
+        errorMessage.includes("shop_name") ||
+        errorMessage.includes("email")
+      ) {
+        const field = errorMessage.includes("shop_name")
+          ? "shop name"
+          : "email";
+        if (
+          errorMessage.includes("unique") ||
+          errorMessage.includes("already exists") ||
+          errorMessage.includes("duplicate")
+        ) {
+          toast.error(`This ${field} is already registered.`);
+          return;
+        }
+      }
+
+      // Generic
       toast.error(
         errorData?.message ||
           errorData?.detail ||
-          "Failed to complete business setup.",
+          "Failed to complete business setup. Please try again.",
       );
     }
   };

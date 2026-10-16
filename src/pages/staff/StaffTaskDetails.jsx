@@ -388,9 +388,9 @@ const mapTask = (item, user) => {
     subtotal: item?.subtotal ?? "—",
     paper: item?.paper_type || "Not specified",
     size: item?.size || "Not specified",
-    ink: order?.maso || "Not specified",
+    ink: item?.maso || "Not specified",
     printing: item?.work_type || "Not specified",
-    finishing: item?.maso || "Not specified",
+    finishing: order?.finishing || "Not specified",
     bandType: item?.band_type || "Not specified",
 
     notes:

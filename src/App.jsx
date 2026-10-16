@@ -397,8 +397,12 @@ function App() {
             <Route path="/staff/projects" element={<StaffProjects />} />
             <Route
               path="/staff/customers/:id/edit"
-              element={<StaffAddCustomer />}
+              element={<StaffEditProject />}
             />
+
+            {/* ===================Payment=========== */}
+
+            <Route path="/staff/payment" element={<CustomerPayments />} />
 
             {/* ================= STAFF PROFILE ================= */}
 

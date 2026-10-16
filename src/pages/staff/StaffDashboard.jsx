@@ -503,12 +503,12 @@ const StaffDashboard = () => {
       link: "/staff/customers",
     },
     {
-      title: "My Profile",
+      title: "My Projects",
       description: "View your staff account information",
       icon: FiUser,
       iconBg: "bg-purple-50 dark:bg-purple-500/10",
       iconColor: "text-purple-500 dark:text-purple-400",
-      link: "/staff/profile",
+      link: "/staff/projects",
     },
   ];
 

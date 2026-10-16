@@ -16,6 +16,8 @@ import {
   FiMenu,
   FiX,
 } from "react-icons/fi";
+import { FaRegBell } from "react-icons/fa";
+import { FaRegMoneyBillAlt } from "react-icons/fa";
 
 import { IoSettingsOutline } from "react-icons/io5";
 
@@ -239,7 +241,7 @@ const StaffLayout = () => {
             </div>
 
             {sidebarOpen && (
-              <div className="min-w-0 mt-10 mb-3">
+              <div className="min-w-0 mt-10 mb-5">
                 <h1 className="text-[18px] font-bold leading-none tracking-tight text-slate-900 dark:text-white">
                   Print
                   <span className="text-orange-500">Tech</span>
@@ -248,7 +250,7 @@ const StaffLayout = () => {
                 <div className="mt-1.5 flex items-center gap-1.5">
                   <span className="h-1.5 w-1.5 rounded-full bg-orange-500" />
 
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                  <p className="text-[8px] font-semibold uppercase tracking-[0.14em] text-slate-500">
                     {pressName}
                   </p>
                 </div>
@@ -412,6 +414,18 @@ const StaffLayout = () => {
               )}
             </div>
 
+            <NavLink
+              to="/staff/payment"
+              onClick={handleNavigation}
+              className={navClass}
+              title={!sidebarOpen ? "payment" : ""}
+            >
+              <FaRegMoneyBillAlt className="shrink-0" size={18} />
+              {sidebarOpen && (
+                <span className="text-sm font-medium">Payment</span>
+              )}
+            </NavLink>
+
             {/* ============================= */}
             {/* CUSTOMERS (dropdown) */}
             {/* ============================= */}
@@ -556,6 +570,12 @@ const StaffLayout = () => {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
+            <button
+              type="button"
+              className="mr-2 rounded-xl border border-slate-200 p-2.5 text-slate-500 transition hover:bg-slate-50 hover:text-orange-500 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-orange-400 sm:mr-3"
+            >
+              <FaRegBell />
+            </button>
             <button
               type="button"
               onClick={() => dispatch(toggleTheme())}

@@ -46,11 +46,44 @@ const RegisterPage = () => {
       console.log("DATA:", error.response?.data);
       console.log("FULL ERROR:", error);
 
-      toast.error(
-        error.response?.data?.message ||
-          error.response?.data?.detail ||
-          "Registration failed. Please try again.",
-      );
+      const errorData = error.response?.data;
+      let errorMessage = "Registration failed. Please try again.";
+
+      if (errorData) {
+        const fieldKeys = Object.keys(errorData);
+
+        if (fieldKeys.length > 0) {
+          const firstField = fieldKeys[0]; // "username"
+          const fieldError = errorData[firstField];
+
+          // Extract message from array or string
+          const rawMessage = Array.isArray(fieldError)
+            ? fieldError[0]
+            : fieldError;
+
+          if (typeof rawMessage === "string") {
+            const readableField = firstField
+              .replace(/_/g, " ")
+              .replace(/^\w/, (c) => c.toUpperCase());
+
+            if (rawMessage.toLowerCase().includes("this field")) {
+              errorMessage = rawMessage.replace(/this field/gi, readableField);
+            } else if (
+              rawMessage.toLowerCase().includes(firstField.toLowerCase())
+            ) {
+              errorMessage =
+                rawMessage.charAt(0).toUpperCase() + rawMessage.slice(1);
+            } else {
+              // For sentences like "Enter a valid...", prepend with a clean format
+              errorMessage = `${readableField}: ${rawMessage}`;
+            }
+          } else if (errorData.message || errorData.detail) {
+            errorMessage = errorData.message || errorData.detail;
+          }
+        }
+      }
+
+      toast.error(errorMessage);
     }
   };
 
