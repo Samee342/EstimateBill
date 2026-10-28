@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
   FiBriefcase,
@@ -18,22 +18,64 @@ const SetupPage = () => {
   const navigate = useNavigate();
 
   const [logoPreview, setLogoPreview] = useState(null);
+  const [checkingAuth, setCheckingAuth] = useState(true);
 
   const {
     register,
     handleSubmit,
+    setValue,
+    resetField,
     formState: { errors, isSubmitting },
   } = useForm();
 
+  // =========================================================
+  // PREVENT LOGGED-IN USERS FROM ACCESSING SETUP PAGE
+  // =========================================================
+  useEffect(() => {
+    const checkAuthentication = () => {
+      try {
+        const storedUser = localStorage.getItem("user");
+
+        if (storedUser) {
+          const user = JSON.parse(storedUser);
+
+          if (user) {
+            const role = String(
+              user.role || user.user_type || user.user_role || "",
+            ).toLowerCase();
+
+            if (role === "staff") {
+              navigate("/staff", { replace: true });
+            } else {
+              navigate("/dashboard", { replace: true });
+            }
+
+            return;
+          }
+        }
+      } catch (error) {
+        console.error("Authentication check failed:", error);
+      }
+
+      setCheckingAuth(false);
+    };
+
+    checkAuthentication();
+  }, [navigate]);
+
+  // =========================================================
+  // SUBMIT BUSINESS SETUP
+  // =========================================================
   const onSubmit = async (data) => {
     try {
       const formData = new FormData();
 
-      formData.append("shop_name", data.shop_name);
+      formData.append("shop_name", data.shop_name.trim());
       formData.append("contact_phone", data.contact_phone || "");
       formData.append("pan_no", data.pan_no || "");
       formData.append("address", data.address || "");
 
+      // Send the actual image file to the backend.
       if (data.logo?.[0]) {
         formData.append("logo", data.logo[0]);
       }
@@ -86,6 +128,7 @@ const SetupPage = () => {
         const field = errorMessage.includes("shop_name")
           ? "shop name"
           : "email";
+
         if (
           errorMessage.includes("unique") ||
           errorMessage.includes("already exists") ||
@@ -96,7 +139,7 @@ const SetupPage = () => {
         }
       }
 
-      // Generic
+      // Generic error
       toast.error(
         errorData?.message ||
           errorData?.detail ||
@@ -105,25 +148,68 @@ const SetupPage = () => {
     }
   };
 
+  // =========================================================
+  // LOGO IMAGE VALIDATION AND PREVIEW
+  // =========================================================
   const handleLogoChange = (event) => {
-    const file = event.target.files[0];
+    const file = event.target.files?.[0];
 
     if (!file) return;
 
-    // 2MB validation
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error("Logo size must be less than 2MB.");
+    // Validate image type
+    const allowedTypes = ["image/png", "image/jpeg"];
+
+    if (!allowedTypes.includes(file.type)) {
+      toast.error("Please select a PNG, JPG or JPEG image.");
       event.target.value = "";
+      resetField("logo");
+      setLogoPreview(null);
       return;
     }
 
-    const previewUrl = URL.createObjectURL(file);
-    setLogoPreview(previewUrl);
+    // Maximum file size: 2 MB
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("Logo size must be less than 2MB.");
+      event.target.value = "";
+      resetField("logo");
+      setLogoPreview(null);
+      return;
+    }
+
+    setLogoPreview((previousPreview) => {
+      if (previousPreview) {
+        URL.revokeObjectURL(previousPreview);
+      }
+
+      return URL.createObjectURL(file);
+    });
   };
 
+  // =========================================================
+  // REMOVE SELECTED LOGO
+  // =========================================================
   const removeLogo = () => {
+    if (logoPreview) {
+      URL.revokeObjectURL(logoPreview);
+    }
+
     setLogoPreview(null);
+    resetField("logo");
   };
+
+  // Release the preview URL when the component unmounts.
+  useEffect(() => {
+    return () => {
+      if (logoPreview) {
+        URL.revokeObjectURL(logoPreview);
+      }
+    };
+  }, [logoPreview]);
+
+  // Avoid briefly showing the setup form while checking login.
+  if (checkingAuth) {
+    return null;
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-brand-bg px-4 py-10">
@@ -189,7 +275,7 @@ const SetupPage = () => {
                   <input
                     id="logo"
                     type="file"
-                    accept="image/png,image/jpeg,image/jpg"
+                    accept="image/png,image/jpeg,.jpg,.jpeg"
                     className="hidden"
                     {...register("logo", {
                       onChange: handleLogoChange,
@@ -249,6 +335,8 @@ const SetupPage = () => {
                   className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-11 pr-4 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
                   {...register("shop_name", {
                     required: "Shop name is required",
+                    validate: (value) =>
+                      value.trim().length > 0 || "Shop name is required",
                   })}
                 />
               </div>
@@ -314,6 +402,7 @@ const SetupPage = () => {
                 <FiHash className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
 
                 <input
+                  id="panVatNumber"
                   type="text"
                   inputMode="numeric"
                   maxLength={20}
@@ -332,6 +421,12 @@ const SetupPage = () => {
                   })}
                 />
               </div>
+
+              {errors.pan_no && (
+                <p className="mt-1.5 text-xs text-red-500">
+                  {errors.pan_no.message}
+                </p>
+              )}
             </div>
 
             {/* Address */}
