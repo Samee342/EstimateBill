@@ -9,13 +9,13 @@ import {
   FiCalendar,
 } from "react-icons/fi";
 
-import EstimateHeader from "../../components/EstimateHeader";
-import EstimateItems from "../../components/EstimateItems";
-import EstimateSummary from "../../components/EstimateSummary";
-import EstimateFooter from "../../components/EstimateFooter";
+import EstimateHeader from "../../../components/EstimateHeader";
+import EstimateItems from "../../../components/EstimateItems";
+import EstimateSummary from "../../../components/EstimateSummary";
+import EstimateFooter from "../../../components/EstimateFooter";
 
 import toast from "react-hot-toast";
-import api from "../../api/api";
+import api from "../../../api/api";
 import {
   createProject,
   getProjects,
@@ -23,7 +23,7 @@ import {
   addItems,
   getItems,
   createAmount,
-} from "../../api/project";
+} from "../../../api/project";
 
 const emptyItem = {
   item_description: "",
@@ -109,6 +109,31 @@ const CreateProject = () => {
   });
 
   const formData = watch();
+
+  const selectedCustomerId = watch("customer");
+
+  useEffect(() => {
+    if (!selectedCustomerId) {
+      setValue("customerName", "");
+      setValue("panNumber", "");
+      setValue("address", "");
+      setValue("contactNumber", "");
+      return;
+    }
+
+    api
+      .get(`/customerapi/customers/${selectedCustomerId}/`)
+      .then((res) => {
+        const c = res.data;
+        setValue("customerName", c.name || "");
+        setValue("panNumber", c.pan_no || "");
+        setValue("address", c.address || "");
+        setValue("contactNumber", c.contact_no || "");
+      })
+      .catch((err) => {
+        console.error("Customer load failed:", err);
+      });
+  }, [selectedCustomerId, setValue]);
   const items = watch("items") || [];
 
   // --------------------------------------------------
@@ -931,11 +956,8 @@ const CreateProject = () => {
       {/* PRINT VERSION */}
       <div className="print-estimate">
         <div className="print-header">
-          <div className="print-title-section">
-            <h1 className="text-center">ESTIMATE SLIP</h1>
-            <p>
-              PPP No: <strong>{formData.slip_no || "-"}</strong>
-            </p>
+          <div className="print-title-section mt-5 ">
+            <p>सीलीप नं:</p>
             <p>
               मिति: <strong>{formData.slip_date || "-"}</strong>
             </p>

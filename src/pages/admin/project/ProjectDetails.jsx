@@ -14,7 +14,7 @@ import {
 } from "react-icons/fi";
 
 import { FaMoneyBillWave } from "react-icons/fa";
-import { getProjects, deleteProject, getItems } from "../../api/project";
+import { getProjects, deleteProject, getItems } from "../../../api/project";
 
 // ======================================================
 // HELPERS

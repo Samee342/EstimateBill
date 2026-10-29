@@ -13,7 +13,7 @@ import {
 } from "react-icons/fi";
 import { FaMoneyBillWave } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import { getProjects, getPaymentStatus } from "../../api/project";
+import { getProjects, getPaymentStatus } from "../../../api/project";
 
 // Pasal ID you provided
 const PASAL_ID = "65d16227-4f26-4614-b943-ae378f1ca61f";

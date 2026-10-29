@@ -12,8 +12,8 @@ import {
   FiBriefcase,
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import { deleteCustomer, getCustomer } from "../../api/customer";
-import DeleteModal from "../../modal/DeleteModal";
+import { deleteCustomer, getCustomer } from "../../../api/customer";
+import DeleteModal from "../../../modal/DeleteModal";
 import { toast } from "react-hot-toast";
 
 const AllCustomers = () => {

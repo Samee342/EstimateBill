@@ -11,8 +11,12 @@ import {
   FiAlertCircle,
   FiX,
 } from "react-icons/fi";
-import { getCurrentUser, updateCurrentUser } from "../../utils/auth";
-import { updateTenant, changePasswordByTenant } from "../../api/admin";
+import { getCurrentUser, updateCurrentUser } from "../../../utils/auth";
+import {
+  updateTenant,
+  updateProfile,
+  changePasswordByTenant,
+} from "../../../api/admin";
 
 const STORAGE_KEY = "printing_press_studio_settings";
 
@@ -49,11 +53,10 @@ const StudioSettings = () => {
     const user = getCurrentUser();
     if (user?.tenant) {
       return {
-        profileName: user.username ?? "",
+        profileName: user.full_name ?? user.username ?? "",
         profileEmail: user.email ?? "",
         profilePhone: user.phone_no ?? "",
         businessName: user.tenant.shop_name ?? "",
-        ownerName: "",
         businessPhone: user.tenant.contact_phone ?? "",
         businessEmail: user.email ?? "",
         address: user.tenant.address ?? "",
@@ -126,26 +129,35 @@ const StudioSettings = () => {
         throw new Error("Your login session has expired. Please log in again.");
       }
 
-      const tenantId = user?.tenant?.id ?? user?.tenant_id;
+      const tenantId = user?.tenant?.id;
       if (!tenantId) {
         throw new Error("No tenant linked to this account.");
       }
 
+      // 1. PATCH Tenant (business fields)
       const tenantData = {
         shop_name: settings.businessName,
         address: settings.address,
         contact_phone: settings.businessPhone,
+        pan_no: settings.panVat,
       };
+      const tenantRes = await updateTenant(tenantId, tenantData);
 
-      const res = await updateTenant(tenantId, tenantData);
-
-      // Sync new tenant values into cached user
-      updateCurrentUser({
-        tenant: res,
-        company_name: res.shop_name,
+      // 2. PATCH User (profile fields)
+      const profileRes = await updateProfile({
+        full_name: settings.profileName,
+        email: settings.profileEmail,
+        phone_no: settings.profilePhone,
       });
 
-      // Persist local draft
+      // 3. Sync into localStorage (survives page reload)
+      updateCurrentUser({
+        ...profileRes.user,
+        tenant: tenantRes,
+        company_name: tenantRes.shop_name,
+      });
+
+      // 4. Persist local draft
       localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
 
       showToast("success", "Settings saved successfully.");
@@ -368,16 +380,7 @@ const StudioSettings = () => {
                     className={inputClass}
                   />
                 </div>
-                <div>
-                  <label className={labelClass}>Owner Name</label>
-                  <input
-                    type="text"
-                    name="ownerName"
-                    value={settings.ownerName ?? ""}
-                    onChange={handleChange}
-                    className={inputClass}
-                  />
-                </div>
+
                 <div>
                   <label className={labelClass}>Business Phone</label>
                   <input

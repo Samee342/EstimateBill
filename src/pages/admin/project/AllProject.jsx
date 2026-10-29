@@ -13,8 +13,8 @@ import {
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import { useLocation, useNavigate } from "react-router-dom";
-import DeleteModal from "../../modal/DeleteModal";
-import { getProjects, deleteProject, getItems } from "../../api/project";
+import DeleteModal from "../../../modal/DeleteModal";
+import { getProjects, deleteProject, getItems } from "../../../api/project";
 import toast from "react-hot-toast";
 
 const AllProject = () => {

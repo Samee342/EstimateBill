@@ -9,8 +9,8 @@ import {
 } from "react-icons/fi";
 import { FaMoneyBillWave } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { getCustomer } from "../../api/customer";
-import { getProjects } from "../../api/project";
+import { getCustomer } from "../../../api/customer";
+import { getProjects } from "../../../api/project";
 
 // ========================================
 // HELPERS

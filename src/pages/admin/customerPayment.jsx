@@ -13,8 +13,8 @@ import {
 import { MdOutlineReceipt } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import RecordPaymentModal from "../modal/RecordPaymentModal";
-import { getOrders, getInvoices } from "./../api/payment";
+import RecordPaymentModal from "../../modal/RecordPaymentModal";
+import { getOrders, getInvoices } from "./../../api/payment";
 
 // --------------------------------------------------
 // HELPERS

@@ -469,7 +469,7 @@ const AdminLayout = () => {
     dark:text-white
   "
                       >
-                        {user?.username || "Admin"}
+                        {user?.full_name || "Admin"}
                       </p>
 
                       <p

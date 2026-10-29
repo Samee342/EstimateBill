@@ -49,11 +49,8 @@ const StaffLayout = () => {
 
   const staffName =
     user?.full_name ||
-    user?.fullName ||
-    user?.name ||
     [user?.first_name, user?.last_name].filter(Boolean).join(" ") ||
     user?.username ||
-    user?.email ||
     "Staff Member";
 
   const staffRole = user?.role || user?.user_type || "Staff";

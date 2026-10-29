@@ -16,7 +16,7 @@ import {
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import { createTeam } from "../../api/team";
+import { createTeam } from "../../../api/team";
 
 const AddTeamMember = () => {
   const navigate = useNavigate();
@@ -122,74 +122,34 @@ PrintTech
     e.preventDefault();
 
     try {
-      setLoading(true);
-
-      // Convert full name into a valid Django username
-      const username = formData.name
+      // Generate username automatically from full name
+      const baseUsername = formData.name
         .trim()
         .toLowerCase()
         .replace(/\s+/g, "_")
         .replace(/[^a-z0-9_]/g, "");
 
+      const username = baseUsername || `staff_${Date.now()}`;
+
       const response = await createTeam({
         username,
-        phone_no: formData.phone,
-        email: formData.email,
+        full_name: formData.name.trim(),
+        phone_no: formData.phone.trim(),
+        email: formData.email.trim(),
         password: formData.password,
       });
 
-      console.log("Team member created:", response);
+      toast.success("Staff member added successfully!");
 
-      toast.success("Team member added successfully!");
-
-      navigate("/team");
+      // Keep your existing success/reset logic here
     } catch (error) {
-      console.log("STATUS:", error.response?.status);
-      console.log("DATA:", error.response?.data);
-      console.log("FULL ERROR:", error);
+      console.error("Create staff error:", error);
 
-      const backendError = error.response?.data;
-
-      // Check if backendError is a Django validation error object
-      if (backendError && typeof backendError === "object") {
-        const keys = Object.keys(backendError);
-
-        // Prioritize checking for phone, password, or other specific fields
-        const priorityKey = keys.find((k) => {
-          const lower = k.toLowerCase();
-          return (
-            lower.includes("phone") ||
-            lower.includes("password") ||
-            lower.includes("username") ||
-            lower.includes("email")
-          );
-        });
-
-        // Fall back to the first available error key if no priority key is matched
-        const targetKey = priorityKey || keys[0];
-
-        if (targetKey && targetKey !== "message" && targetKey !== "detail") {
-          const messages = backendError[targetKey];
-          const message = Array.isArray(messages) ? messages[0] : messages;
-
-          // Handle non_field_errors cleanly without showing the technical key name
-          if (targetKey === "non_field_errors") {
-            toast.error(message);
-          } else {
-            toast.error(`${targetKey.replace("_", " ")}: ${message}`);
-          }
-          return;
-        }
-      }
-
-      // Fallback to general message or defaults
       toast.error(
-        backendError?.message ||
-          backendError?.detail ||
-          "Failed to create team member. Please try again.",
+        error.response?.data?.username?.[0] ||
+          error.response?.data?.detail ||
+          "Failed to add staff member.",
       );
-    } finally {
-      setLoading(false);
     }
   };
 

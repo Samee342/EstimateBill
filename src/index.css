@@ -37,7 +37,6 @@
 /* =========================================================
    PRINT STYLES
 ========================================================= */
-
 @media print {
   /* A4 page */
   @page {
@@ -45,25 +44,37 @@
     margin: 10mm;
   }
 
-  /* Hide normal application ONLY while printing */
-  .no-print {
+  /* Only print the estimate — catch everything else */
+  body * {
+    visibility: hidden;
+  }
+
+  .print-estimate,
+  .print-estimate * {
+    visibility: visible;
+  }
+
+  .print-estimate {
+    display: block !important;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background: white !important;
+    color: black !important;
+    font-family: "Arial", "Noto Sans Devanagari", "Mangal", sans-serif;
+  }
+
+  /* Hide known app chrome */
+  .no-print,
+  .no-print * {
     display: none !important;
   }
 
-  /* Remove sidebar space */
   .print-main {
     margin-left: 0 !important;
     width: 100% !important;
     min-height: auto !important;
-  }
-
-  /* Show print layout */
-  .print-estimate {
-    display: block !important;
-    width: 100%;
-    background: white !important;
-    color: black !important;
-    font-family: Arial, sans-serif;
   }
 
   html,
@@ -75,10 +86,7 @@
     background: white !important;
   }
 
-  /* =====================================================
-     HEADER
-  ===================================================== */
-
+  /* ---- HEADER ---- */
   .print-header {
     display: flex;
     align-items: center;
@@ -108,10 +116,7 @@
     font-size: 12px;
   }
 
-  /* =====================================================
-     SECTIONS
-  ===================================================== */
-
+  /* ---- SECTIONS ---- */
   .print-section {
     margin-top: 14px;
   }
@@ -124,10 +129,7 @@
     font-weight: 700;
   }
 
-  /* =====================================================
-     CUSTOMER / PROJECT GRID
-  ===================================================== */
-
+  /* ---- CUSTOMER / PROJECT GRID ---- */
   .customer-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -141,15 +143,43 @@
     grid-column: span 2;
   }
 
-  /* =====================================================
-     TABLE
-  ===================================================== */
-
+  /* ---- TABLE ---- */
   .print-table {
     width: 100%;
     border-collapse: collapse;
     table-layout: fixed;
     font-size: 8.5px;
+  }
+
+  .print-table col:nth-child(1) {
+    width: 5%;
+  }
+  .print-table col:nth-child(2) {
+    width: 22%;
+  }
+  .print-table col:nth-child(3) {
+    width: 7%;
+  }
+  .print-table col:nth-child(4) {
+    width: 6%;
+  }
+  .print-table col:nth-child(5) {
+    width: 10%;
+  }
+  .print-table col:nth-child(6) {
+    width: 8%;
+  }
+  .print-table col:nth-child(7) {
+    width: 8%;
+  }
+  .print-table col:nth-child(8) {
+    width: 8%;
+  }
+  .print-table col:nth-child(9) {
+    width: 10%;
+  }
+  .print-table col:nth-child(10) {
+    width: 16%;
   }
 
   .print-table th,
@@ -175,18 +205,11 @@
     text-align: left;
   }
 
-  /* =====================================================
-     WORK SCHEDULE
-  ===================================================== */
-
   .schedule-table {
     font-size: 10px;
   }
 
-  /* =====================================================
-     PRINTING DESCRIPTION
-  ===================================================== */
-
+  /* ---- PRINTING DESCRIPTION ---- */
   .printing-description {
     min-height: 55px;
     border: 1px solid #000;
@@ -195,10 +218,7 @@
     line-height: 1.5;
   }
 
-  /* =====================================================
-     SUMMARY
-  ===================================================== */
-
+  /* ---- SUMMARY ---- */
   .print-summary-wrapper {
     display: flex;
     justify-content: flex-end;
@@ -224,10 +244,7 @@
     text-align: right;
   }
 
-  /* =====================================================
-     SIGNATURE
-  ===================================================== */
-
+  /* ---- SIGNATURE ---- */
   .print-signatures {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -249,10 +266,7 @@
     margin: 0;
   }
 
-  /* =====================================================
-     FOOTER
-  ===================================================== */
-
+  /* ---- FOOTER ---- */
   .print-footer {
     margin-top: 25px;
     padding-top: 8px;
@@ -265,15 +279,18 @@
     margin: 2px 0;
   }
 
-  /* =====================================================
-     PREVENT PAGE BREAKS
-  ===================================================== */
-
+  /* ---- PREVENT PAGE BREAKS ---- */
   .print-section,
   .print-table,
   .print-summary,
   .print-signatures {
     break-inside: avoid;
     page-break-inside: avoid;
+  }
+
+  /* Force colors to print */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 }

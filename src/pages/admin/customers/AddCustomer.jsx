@@ -14,7 +14,7 @@ import {
   createCustomer,
   getCustomer,
   updateCustomer,
-} from "../../api/customer";
+} from "../../../api/customer";
 import toast from "react-hot-toast";
 
 const AddCustomer = () => {

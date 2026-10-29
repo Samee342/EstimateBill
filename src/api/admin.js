@@ -39,14 +39,15 @@ const deleteTenant = async (id) => {
   return response.data;
 };
 
-// ==========================================
 // CHANGE PASSWORD
-// NOTE: Confirm the required payload keys
-// with your Django backend.
-// ==========================================
 const changePasswordByTenant = async (data) => {
   const response = await api.post("/api/change_password/", data);
 
+  return response.data;
+};
+
+const updateProfile = async (data) => {
+  const response = await api.patch("/api/me/", data);
   return response.data;
 };
 
@@ -55,5 +56,6 @@ export {
   getTenant,
   updateTenant,
   deleteTenant,
+  updateProfile,
   changePasswordByTenant,
 };

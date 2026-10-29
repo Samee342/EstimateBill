@@ -8,13 +8,21 @@ import {
   FiEye,
   FiEyeOff,
   FiCheck,
+  FiAlertCircle,
 } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
 import { setTheme } from "../../redux/slices/themeSlice";
+import { updateProfile } from "../../api/admin";
+import { changePasswordByTenant } from "../../api/admin";
+import { updateCurrentUser } from "../../utils/auth"; // top of file
+import { updateUser } from "../../redux/slices/authSlice"; // adjust path if different
 
 const StaffProfile = () => {
   const dispatch = useDispatch();
   const theme = useSelector((state) => state.theme.theme);
+
+  const currentUser = useSelector((state) => state.auth.user);
+  console.log("REDUX USER ON MOUNT:", currentUser); // ← add this
 
   // ========================================
   // STATE
@@ -22,11 +30,15 @@ const StaffProfile = () => {
 
   const [activeSection, setActiveSection] = useState("profile");
 
+  // Profile state — populated from Redux on mount, synced on change
   const [profile, setProfile] = useState({
-    name: "printtech staff",
-    email: "staff@printtech.com",
+    name: "",
+    email: "",
   });
 
+  const [savingProfile, setSavingProfile] = useState(false);
+
+  // Password state
   const [passwords, setPasswords] = useState({
     current: "",
     newPassword: "",
@@ -39,23 +51,35 @@ const StaffProfile = () => {
     confirmPassword: false,
   });
 
-  const [saved, setSaved] = useState(false);
+  const [changingPassword, setChangingPassword] = useState(false);
+
+  // Toast
+  const [toast, setToast] = useState(null);
 
   // ========================================
-  // LOAD PROFILE
+  // TOAST
   // ========================================
 
   useEffect(() => {
-    const storedProfile = localStorage.getItem("printtech_profile");
+    if (!toast) return;
+    const t = setTimeout(() => setToast(null), 3000);
+    return () => clearTimeout(t);
+  }, [toast]);
 
-    if (storedProfile) {
-      try {
-        setProfile(JSON.parse(storedProfile));
-      } catch (error) {
-        console.error("Failed to load profile:", error);
-      }
-    }
-  }, []);
+  const showToast = (type, message) => setToast({ type, message });
+
+  // ========================================
+  // LOAD PROFILE FROM REDUX
+  // ========================================
+
+  useEffect(() => {
+    if (!currentUser) return;
+
+    setProfile({
+      name: currentUser.full_name || currentUser.username || "",
+      email: currentUser.email ?? "",
+    });
+  }, [currentUser]);
 
   // ========================================
   // PROFILE CHANGE
@@ -63,11 +87,7 @@ const StaffProfile = () => {
 
   const handleProfileChange = (e) => {
     const { name, value } = e.target;
-
-    setProfile((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setProfile((prev) => ({ ...prev, [name]: value }));
   };
 
   // ========================================
@@ -76,69 +96,124 @@ const StaffProfile = () => {
 
   const handlePasswordChange = (e) => {
     const { name, value } = e.target;
-
-    setPasswords((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setPasswords((prev) => ({ ...prev, [name]: value }));
   };
 
   // ========================================
   // SAVE PROFILE
   // ========================================
 
-  const saveProfile = () => {
-    localStorage.setItem("printtech_profile", JSON.stringify(profile));
+  const saveProfile = async () => {
+    if (!currentUser?.id) {
+      showToast("error", "Your session has expired. Please log in again.");
+      return;
+    }
+    if (!profile.name.trim()) {
+      showToast("error", "Full name cannot be empty.");
+      return;
+    }
+    if (!profile.email.trim()) {
+      showToast("error", "Email cannot be empty.");
+      return;
+    }
 
-    showSavedMessage();
-  };
+    setSavingProfile(true);
+    try {
+      const res = await updateProfile({
+        full_name: profile.name,
+        email: profile.email,
+      });
 
-  // ========================================
-  // SAVED MESSAGE
-  // ========================================
+      if (res?.user) {
+        dispatch(updateUser(res.user));
+        updateCurrentUser(res.user); // sync localStorage
+      } else {
+        dispatch(updateUser({ full_name: profile.name, email: profile.email }));
+        updateCurrentUser({ full_name: profile.name, email: profile.email });
+      }
 
-  const showSavedMessage = () => {
-    setSaved(true);
-
-    setTimeout(() => {
-      setSaved(false);
-    }, 2500);
+      showToast("success", "Profile updated successfully.");
+    } catch (error) {
+      console.error("Profile update error:", error);
+      showToast(
+        "error",
+        error?.response?.data?.detail ||
+          error?.response?.data?.message ||
+          JSON.stringify(error?.response?.data?.errors) ||
+          error.message ||
+          "Failed to update profile.",
+      );
+    } finally {
+      setSavingProfile(false);
+    }
   };
 
   // ========================================
   // UPDATE PASSWORD
   // ========================================
 
-  const updatePassword = () => {
+  const updatePassword = async () => {
     if (
       !passwords.current ||
       !passwords.newPassword ||
       !passwords.confirmPassword
     ) {
-      alert("Please fill in all password fields.");
+      showToast("error", "Please fill in all password fields.");
       return;
     }
 
     if (passwords.newPassword.length < 6) {
-      alert("New password must be at least 6 characters.");
+      showToast("error", "New password must be at least 6 characters.");
       return;
     }
 
     if (passwords.newPassword !== passwords.confirmPassword) {
-      alert("New password and confirm password do not match.");
+      showToast("error", "New password and confirm password do not match.");
       return;
     }
 
-    // Frontend-only for now
-    alert("Password updated successfully.");
+    if (passwords.current === passwords.newPassword) {
+      showToast("error", "New password must be different from current.");
+      return;
+    }
 
-    setPasswords({
-      current: "",
-      newPassword: "",
-      confirmPassword: "",
-    });
+    setChangingPassword(true);
 
-    showSavedMessage();
+    try {
+      await changePasswordByTenant({
+        old_password: passwords.current,
+        new_password: passwords.newPassword,
+        confirm_password: passwords.confirmPassword,
+      });
+
+      showToast("success", "Password changed successfully.");
+
+      setPasswords({ current: "", newPassword: "", confirmPassword: "" });
+      setShowPasswords({
+        current: false,
+        newPassword: false,
+        confirmPassword: false,
+      });
+    } catch (error) {
+      console.error("Change password error:", error);
+      const data = error?.response?.data;
+      let msg = "Failed to change password. Please try again.";
+      if (data) {
+        if (typeof data === "string") msg = data;
+        else if (data.detail) msg = data.detail;
+        else if (data.message) msg = data.message;
+        else {
+          const firstKey = Object.keys(data)[0];
+          if (firstKey) {
+            const val = data[firstKey];
+            msg = Array.isArray(val) ? val[0] : String(val);
+          }
+        }
+      }
+      showToast("error", msg);
+    } finally {
+      setChangingPassword(false);
+    }
   };
 
   // ========================================
@@ -146,14 +221,11 @@ const StaffProfile = () => {
   // ========================================
 
   const togglePassword = (field) => {
-    setShowPasswords((prev) => ({
-      ...prev,
-      [field]: !prev[field],
-    }));
+    setShowPasswords((prev) => ({ ...prev, [field]: !prev[field] }));
   };
 
   // ========================================
-  // SETTINGS NAVIGATION
+  // SIDEBAR SECTIONS
   // ========================================
 
   const sections = [
@@ -171,62 +243,64 @@ const StaffProfile = () => {
     },
   ];
 
+  // Avatar letter from the profile name
+  const avatarLetter = profile.name?.trim()?.charAt(0).toUpperCase() || "S";
+
   // ========================================
   // UI
   // ========================================
 
   return (
     <div className="min-h-screen bg-slate-50 px-4 py-6 transition-colors dark:bg-slate-950 md:px-6">
-      <div className="mx-auto max-w-7xl">
-        {/* ========================================
-            HEADER
-        ======================================== */}
+      {/* TOAST */}
+      {toast && (
+        <div className="fixed top-5 right-5 z-[200]">
+          <div
+            className={`flex items-start gap-3 rounded-lg border px-4 py-3 shadow-lg ${
+              toast.type === "error"
+                ? "border-red-200 bg-red-50 text-red-700 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-300"
+                : "border-green-200 bg-green-50 text-green-700 dark:border-green-900/50 dark:bg-green-950/40 dark:text-green-300"
+            }`}
+          >
+            {toast.type === "error" ? (
+              <FiAlertCircle size={18} />
+            ) : (
+              <FiCheck size={18} />
+            )}
+            <span className="text-sm font-medium">{toast.message}</span>
+            <button
+              onClick={() => setToast(null)}
+              className="ml-2 opacity-60 hover:opacity-100"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
 
+      <div className="mx-auto max-w-7xl">
+        {/* HEADER */}
         <div className="mb-7">
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
             Settings
           </h1>
-
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-            Manage your PrintTech account and preferences.
+            Manage your account and preferences.
           </p>
         </div>
 
-        {/* ========================================
-            SAVED MESSAGE
-        ======================================== */}
-
-        {saved && (
-          <div className="mb-5 flex items-center gap-2 border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-700 dark:border-green-900 dark:bg-green-950/40 dark:text-green-400">
-            <FiCheck size={18} />
-
-            <span>Changes saved successfully.</span>
-          </div>
-        )}
-
-        {/* ========================================
-            MAIN LAYOUT
-        ======================================== */}
-
+        {/* MAIN LAYOUT */}
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[250px_1fr]">
-          {/* ========================================
-              SIDEBAR
-          ======================================== */}
-
+          {/* SIDEBAR */}
           <aside className="h-fit border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
-            {/* SIDEBAR HEADER */}
-
             <div className="border-b border-slate-200 px-5 py-5 dark:border-slate-800">
               <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                 Settings
               </p>
-
               <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                 Account preferences
               </p>
             </div>
-
-            {/* NAVIGATION */}
 
             <div className="p-2">
               {sections.map((section) => {
@@ -245,10 +319,8 @@ const StaffProfile = () => {
                     }`}
                   >
                     <Icon size={18} />
-
                     <div>
                       <p className="text-sm font-semibold">{section.label}</p>
-
                       <p
                         className={`text-xs ${
                           active
@@ -264,60 +336,50 @@ const StaffProfile = () => {
               })}
             </div>
 
-            {/* ACCOUNT TYPE */}
-
+            {/* ACCOUNT TYPE — real name from profile */}
             <div className="border-t border-slate-200 p-4 dark:border-slate-800">
               <div className="flex items-center gap-3">
                 <div className="flex h-9 w-9 items-center justify-center bg-orange-100 text-sm font-bold text-orange-600 dark:bg-orange-950/50 dark:text-orange-400">
-                  PS
+                  {avatarLetter}
                 </div>
-
                 <div className="min-w-0">
                   <p className="truncate text-sm font-semibold text-slate-800 dark:text-slate-200">
-                    PrintTech Staff
+                    {profile.name || "—"}
                   </p>
-
-                  <p className="text-xs text-slate-400">Staff Account</p>
+                  <p className="text-xs text-slate-400">
+                    {currentUser?.role
+                      ? currentUser.role.charAt(0).toUpperCase() +
+                        currentUser.role.slice(1) +
+                        " Account"
+                      : "Staff Account"}
+                  </p>
                 </div>
               </div>
             </div>
           </aside>
 
-          {/* ========================================
-              CONTENT
-          ======================================== */}
-
+          {/* CONTENT */}
           <main className="min-w-0">
-            {/* ========================================
-                PROFILE
-            ======================================== */}
-
+            {/* PROFILE */}
             {activeSection === "profile" && (
               <section className="space-y-6">
-                {/* PERSONAL INFORMATION */}
-
+                {/* PERSONAL INFO */}
                 <div className="border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
-                  {/* HEADER */}
-
                   <div className="border-b border-slate-200 px-6 py-5 dark:border-slate-800">
                     <div className="flex items-center gap-3">
                       <div className="flex h-10 w-10 items-center justify-center bg-orange-100 text-orange-600 dark:bg-orange-950/50 dark:text-orange-400">
                         <FiUser size={20} />
                       </div>
-
                       <div>
                         <h2 className="font-bold text-slate-900 dark:text-white">
                           My Profile
                         </h2>
-
                         <p className="text-sm text-slate-500 dark:text-slate-400">
                           Manage your personal account information.
                         </p>
                       </div>
                     </div>
                   </div>
-
-                  {/* FORM */}
 
                   <div className="space-y-5 p-6">
                     <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
@@ -327,7 +389,6 @@ const StaffProfile = () => {
                         value={profile.name}
                         onChange={handleProfileChange}
                       />
-
                       <Input
                         label="Email Address"
                         name="email"
@@ -338,37 +399,36 @@ const StaffProfile = () => {
                     </div>
 
                     <div className="flex justify-end border-t border-slate-100 pt-5 dark:border-slate-800">
-                      <SaveButton onClick={saveProfile} />
+                      <button
+                        type="button"
+                        onClick={saveProfile}
+                        disabled={savingProfile}
+                        className="flex items-center gap-2 bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        <FiSave size={16} />
+                        {savingProfile ? "Saving..." : "Save Changes"}
+                      </button>
                     </div>
                   </div>
                 </div>
 
-                {/* ========================================
-                    CHANGE PASSWORD
-                ======================================== */}
-
+                {/* CHANGE PASSWORD */}
                 <div className="border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
-                  {/* HEADER */}
-
                   <div className="border-b border-slate-200 px-6 py-5 dark:border-slate-800">
                     <div className="flex items-center gap-3">
                       <div className="flex h-10 w-10 items-center justify-center bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                         <FiLock size={19} />
                       </div>
-
                       <div>
                         <h2 className="font-bold text-slate-900 dark:text-white">
                           Change Password
                         </h2>
-
                         <p className="text-sm text-slate-500 dark:text-slate-400">
                           Update your account password.
                         </p>
                       </div>
                     </div>
                   </div>
-
-                  {/* PASSWORD FORM */}
 
                   <div className="space-y-5 p-6">
                     <PasswordInput
@@ -379,7 +439,6 @@ const StaffProfile = () => {
                       onChange={handlePasswordChange}
                       onToggle={() => togglePassword("current")}
                     />
-
                     <PasswordInput
                       label="New Password"
                       name="newPassword"
@@ -388,7 +447,6 @@ const StaffProfile = () => {
                       onChange={handlePasswordChange}
                       onToggle={() => togglePassword("newPassword")}
                     />
-
                     <PasswordInput
                       label="Confirm New Password"
                       name="confirmPassword"
@@ -402,10 +460,11 @@ const StaffProfile = () => {
                       <button
                         type="button"
                         onClick={updatePassword}
-                        className="flex items-center gap-2 bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-orange-600"
+                        disabled={changingPassword}
+                        className="flex items-center gap-2 bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
                       >
                         <FiLock size={16} />
-                        Update Password
+                        {changingPassword ? "Changing..." : "Update Password"}
                       </button>
                     </div>
                   </div>
@@ -413,14 +472,9 @@ const StaffProfile = () => {
               </section>
             )}
 
-            {/* ========================================
-                APPEARANCE
-            ======================================== */}
-
+            {/* APPEARANCE */}
             {activeSection === "appearance" && (
               <section className="border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
-                {/* HEADER */}
-
                 <div className="border-b border-slate-200 px-6 py-5 dark:border-slate-800">
                   <div className="flex items-center gap-3">
                     <div className="flex h-10 w-10 items-center justify-center bg-orange-100 text-orange-600 dark:bg-orange-950/50 dark:text-orange-400">
@@ -430,20 +484,16 @@ const StaffProfile = () => {
                         <FiSun size={20} />
                       )}
                     </div>
-
                     <div>
                       <h2 className="font-bold text-slate-900 dark:text-white">
                         Appearance
                       </h2>
-
                       <p className="text-sm text-slate-500 dark:text-slate-400">
-                        Choose how PrintTech looks on your device.
+                        Choose how the app looks on your device.
                       </p>
                     </div>
                   </div>
                 </div>
-
-                {/* THEME OPTIONS */}
 
                 <div className="p-6">
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -454,7 +504,6 @@ const StaffProfile = () => {
                       description="Use the standard light interface."
                       onClick={() => dispatch(setTheme("light"))}
                     />
-
                     <ThemeOption
                       active={theme === "dark"}
                       icon={FiMoon}
@@ -473,128 +522,82 @@ const StaffProfile = () => {
   );
 };
 
-/* ========================================
-   INPUT COMPONENT
-======================================== */
+/* ── INPUT ─────────────────────────────────── */
+const Input = ({ label, name, type = "text", value, onChange }) => (
+  <div>
+    <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+      {label}
+    </label>
+    <input
+      type={type}
+      name={name}
+      value={value}
+      onChange={onChange}
+      className="h-11 w-full border border-slate-300 bg-white px-3 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-orange-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200"
+    />
+  </div>
+);
 
-const Input = ({
-  label,
-  name,
-  type = "text",
-  value,
-  onChange,
-  placeholder,
-}) => {
-  return (
-    <div>
-      <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-        {label}
-      </label>
-
+/* ── PASSWORD INPUT ────────────────────────── */
+const PasswordInput = ({ label, name, value, show, onChange, onToggle }) => (
+  <div>
+    <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+      {label}
+    </label>
+    <div className="relative">
       <input
-        type={type}
+        type={show ? "text" : "password"}
         name={name}
         value={value}
         onChange={onChange}
-        placeholder={placeholder}
-        className="h-11 w-full border border-slate-300 bg-white px-3 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-orange-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:placeholder:text-slate-600"
+        className="h-11 w-full border border-slate-300 bg-white px-3 pr-11 text-sm text-slate-700 outline-none transition focus:border-orange-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200"
       />
+      <button
+        type="button"
+        onClick={onToggle}
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-600 dark:hover:text-slate-200"
+        aria-label={show ? "Hide password" : "Show password"}
+      >
+        {show ? <FiEyeOff size={17} /> : <FiEye size={17} />}
+      </button>
     </div>
-  );
-};
+  </div>
+);
 
-/* ========================================
-   PASSWORD INPUT
-======================================== */
-
-const PasswordInput = ({ label, name, value, show, onChange, onToggle }) => {
-  return (
-    <div>
-      <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-        {label}
-      </label>
-
-      <div className="relative">
-        <input
-          type={show ? "text" : "password"}
-          name={name}
-          value={value}
-          onChange={onChange}
-          className="h-11 w-full border border-slate-300 bg-white px-3 pr-11 text-sm text-slate-700 outline-none transition focus:border-orange-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200"
-        />
-
-        <button
-          type="button"
-          onClick={onToggle}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-600 dark:hover:text-slate-200"
-          aria-label={show ? "Hide password" : "Show password"}
-        >
-          {show ? <FiEyeOff size={17} /> : <FiEye size={17} />}
-        </button>
+/* ── THEME OPTION ──────────────────────────── */
+const ThemeOption = ({ active, icon: Icon, title, description, onClick }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    className={`border p-5 text-left transition ${
+      active
+        ? "border-orange-500 bg-orange-50 dark:border-orange-500 dark:bg-orange-950/20"
+        : "border-slate-200 hover:border-slate-300 dark:border-slate-800 dark:hover:border-slate-700"
+    }`}
+  >
+    <div className="flex items-start justify-between">
+      <div
+        className={`flex h-10 w-10 items-center justify-center ${
+          active
+            ? "bg-orange-500 text-white"
+            : "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400"
+        }`}
+      >
+        <Icon size={19} />
       </div>
-    </div>
-  );
-};
-
-/* ========================================
-   SAVE BUTTON
-======================================== */
-
-const SaveButton = ({ onClick }) => {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="flex items-center gap-2 bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-orange-600"
-    >
-      <FiSave size={16} />
-      Save Changes
-    </button>
-  );
-};
-
-/* ========================================
-   THEME OPTION
-======================================== */
-
-const ThemeOption = ({ active, icon: Icon, title, description, onClick }) => {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`border p-5 text-left transition ${
-        active
-          ? "border-orange-500 bg-orange-50 dark:border-orange-500 dark:bg-orange-950/20"
-          : "border-slate-200 hover:border-slate-300 dark:border-slate-800 dark:hover:border-slate-700"
-      }`}
-    >
-      <div className="flex items-start justify-between">
-        <div
-          className={`flex h-10 w-10 items-center justify-center ${
-            active
-              ? "bg-orange-500 text-white"
-              : "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400"
-          }`}
-        >
-          <Icon size={19} />
+      {active && (
+        <div className="flex h-5 w-5 items-center justify-center rounded-full bg-orange-500 text-white">
+          <FiCheck size={13} />
         </div>
-
-        {active && (
-          <div className="flex h-5 w-5 items-center justify-center rounded-full bg-orange-500 text-white">
-            <FiCheck size={13} />
-          </div>
-        )}
-      </div>
-
-      <h3 className="mt-4 text-sm font-bold text-slate-900 dark:text-white">
-        {title}
-      </h3>
-
-      <p className="mt-1 text-xs leading-5 text-slate-500 dark:text-slate-400">
-        {description}
-      </p>
-    </button>
-  );
-};
+      )}
+    </div>
+    <h3 className="mt-4 text-sm font-bold text-slate-900 dark:text-white">
+      {title}
+    </h3>
+    <p className="mt-1 text-xs leading-5 text-slate-500 dark:text-slate-400">
+      {description}
+    </p>
+  </button>
+);
 
 export default StaffProfile;

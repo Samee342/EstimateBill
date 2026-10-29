@@ -16,8 +16,8 @@ import {
 import { FaMoneyBillWave, FaWhatsapp } from "react-icons/fa";
 import { MdPeopleOutline } from "react-icons/md";
 
-import { getProjects } from "../api/project";
-import { getCustomer } from "../api/customer";
+import { getProjects } from "../../api/project";
+import { getCustomer } from "../../api/customer";
 
 // =====================================================
 // HELPER FUNCTIONS

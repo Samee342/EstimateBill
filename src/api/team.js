@@ -16,4 +16,8 @@ const deleteTeam = async (id) => {
   const response = await api.delete(`/api/staff/${id}/`);
   return response.data;
 };
-export {createTeam,getTeam,updateTeam,deleteTeam}
+const getWorkList = async () => {
+  const response = await api.get(`/api/worklist/`);
+  return response.data;
+};
+export { createTeam, getTeam, updateTeam, deleteTeam, getWorkList };

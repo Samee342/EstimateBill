@@ -346,15 +346,11 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
         left-0
         top-0
         z-50
-
         flex
         h-full         {/* Changed from h-screen to h-full */}
         flex-col
-        overflow-hidden {/* Prevents side-wide overflow */}
-
         border-r
         border-slate-200
-
         bg-white
         shadow-sm
 
@@ -1014,24 +1010,6 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
                 </NavLink>
               </div>
             )}
-          </div>
-
-          {/* =================================================
-              TRASH
-          ================================================= */}
-
-          <div className="group relative overflow-visible">
-            <NavLink
-              to="/trash"
-              className={mainNavClass}
-              title={!sideBarOpen ? "Trash" : ""}
-            >
-              <FaRegTrashAlt size={17} className="shrink-0" />
-
-              {sideBarOpen && <span>Trash</span>}
-            </NavLink>
-
-            {!sideBarOpen && <CollapsedLabel>Trash</CollapsedLabel>}
           </div>
         </div>
       </nav>

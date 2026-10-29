@@ -33,57 +33,67 @@ const StaffLayout = lazy(() => import("./layout/StaffLayout"));
 
 /* ================= DASHBOARD ================= */
 
-const Home = lazy(() => import("./pages/HomePage"));
+const Home = lazy(() => import("./pages/admin/HomePage"));
 
 /* ================= PROJECTS ================= */
 
-const ProjectPage = lazy(() => import("./pages/project/AllProject"));
+const ProjectPage = lazy(() => import("./pages/admin/project/AllProject"));
 
-const CreateProject = lazy(() => import("./pages/project/CreateProject"));
+const CreateProject = lazy(() => import("./pages/admin/project/CreateProject"));
 
-const ProjectDetails = lazy(() => import("./pages/project/ProjectDetails"));
+const ProjectDetails = lazy(
+  () => import("./pages/admin/project/ProjectDetails"),
+);
 
 /* ================= CUSTOMERS ================= */
 
-const AllCustomers = lazy(() => import("./pages/customers/AllCustomersPage"));
+const AllCustomers = lazy(
+  () => import("./pages/admin/customers/AllCustomersPage"),
+);
 
-const AddCustomer = lazy(() => import("./pages/customers/AddCustomer"));
+const AddCustomer = lazy(() => import("./pages/admin/customers/AddCustomer"));
 
-const CustomerDetails = lazy(() => import("./pages/customers/CustomerDetails"));
+const CustomerDetails = lazy(
+  () => import("./pages/admin/customers/CustomerDetails"),
+);
 
-const CustomerPayments = lazy(() => import("./pages/customerPayment"));
+const CustomerPayments = lazy(() => import("./pages/admin/customerPayment"));
 
 /* ================= TEAM ================= */
 
-const AllTeam = lazy(() => import("./pages/team/AllTeam"));
+const AllTeam = lazy(() => import("./pages/admin/team/AllTeam"));
 
-const AddTeamMember = lazy(() => import("./pages/team/AddTeamMember"));
+const AddTeamMember = lazy(() => import("./pages/admin/team/AddTeamMember"));
 
-const TeamDetails = lazy(() => import("./pages/team/TeamDetails"));
+const TeamDetails = lazy(() => import("./pages/admin/team/TeamDetails"));
 
 /* ================= REPORTS ================= */
 
-const SalesReport = lazy(() => import("./pages/Reports/SalesReport"));
+const SalesReport = lazy(() => import("./pages/admin/Reports/SalesReport"));
 
-const CustomerReport = lazy(() => import("./pages/Reports/CustomerReport"));
+const CustomerReport = lazy(
+  () => import("./pages/admin/Reports/CustomerReport"),
+);
 
-const PaymentReport = lazy(() => import("./pages/Reports/PaymentReport"));
+const PaymentReport = lazy(() => import("./pages/admin/Reports/PaymentReport"));
 
-const InvoiceDetails = lazy(() => import("./pages/Reports/InvoiceDetails"));
+const InvoiceDetails = lazy(
+  () => import("./pages/admin/Reports/InvoiceDetails"),
+);
 
 /* ================= NOTIFICATIONS ================= */
 
-const Notification = lazy(() => import("./pages/Notification/Notification"));
+const Notification = lazy(
+  () => import("./pages/admin/Notification/Notification"),
+);
 
 /* ================= SETTINGS ================= */
 
-const ResetCleanup = lazy(() => import("./pages/settings/ResetCleanup"));
+const ResetCleanup = lazy(() => import("./pages/admin/settings/ResetCleanup"));
 
-const StudioSettings = lazy(() => import("./pages/settings/StudioSettings"));
-
-/* ================= TRASH ================= */
-
-const Trash = lazy(() => import("./pages/Trash/trash"));
+const StudioSettings = lazy(
+  () => import("./pages/admin/settings/StudioSettings"),
+);
 
 /* ======================================================
    STAFF PAGES
@@ -353,8 +363,6 @@ function App() {
             <Route path="/settings/reset-cleanup" element={<ResetCleanup />} />
 
             {/* ================= TRASH ================= */}
-
-            <Route path="/trash" element={<Trash />} />
           </Route>
 
           {/* ==================================================
