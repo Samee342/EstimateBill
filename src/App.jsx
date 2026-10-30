@@ -15,6 +15,8 @@ const Login = lazy(() => import("./pages/auth/LoginPage"));
 
 const Register = lazy(() => import("./pages/auth/RegisterPage"));
 
+const StaffRegister = lazy(() => import("./pages/auth/StaffRegister"));
+
 const ForgotPassword = lazy(() => import("./pages/auth/ForgotPasswordPage"));
 
 const SetupPage = lazy(() => import("./pages/auth/SetupPage"));
@@ -286,6 +288,8 @@ function App() {
           <Route path="/login" element={<Login />} />
 
           <Route path="/register" element={<Register />} />
+
+          <Route path="/register/staff/:token" element={<StaffRegister />} />
 
           <Route path="/forgot-password" element={<ForgotPassword />} />
 

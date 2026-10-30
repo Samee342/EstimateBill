@@ -20,4 +20,20 @@ const getWorkList = async () => {
   const response = await api.get(`/api/worklist/`);
   return response.data;
 };
-export { createTeam, getTeam, updateTeam, deleteTeam, getWorkList };
+const inviteTeam = async (data) => {
+  const response = await api.post(`/invitation/create/`, data);
+  return response.data;
+};
+const sendToken = async (id) => {
+  const response = await api.post(`/invitation/validation/${id}`);
+  return response.data;
+};
+export {
+  createTeam,
+  getTeam,
+  updateTeam,
+  deleteTeam,
+  getWorkList,
+  inviteTeam,
+  sendToken,
+};

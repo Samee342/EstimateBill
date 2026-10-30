@@ -17,8 +17,7 @@ import {
   FiCheck,
 } from "react-icons/fi";
 
-import api from "../../../api/api";
-
+import { resetDataByAdmin } from "../../../api/admin";
 // ======================================================
 // TOAST
 // ======================================================
@@ -121,7 +120,7 @@ const cleanupItems = [
       "Remove customer records stored in your printing press account.",
     icon: FiUsers,
     color: "purple",
-    endpoint: "/customerapi/customers/clear/",
+    endpoint: resetDataByAdmin,
     countLabel: "Total customers",
     buttonLabel: "Clear all customers",
 

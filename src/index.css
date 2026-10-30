@@ -26,6 +26,21 @@
   /* Error */
   --color-error: #ef4444;
 }
+
+.due-date-picker {
+  width: 100%;
+  min-width: 0;
+}
+
+.due-date-picker .ndc-calendar {
+  max-width: 100%;
+}
+
+.due-date-picker input {
+  width: 100% !important;
+  min-width: 0;
+  box-sizing: border-box;
+}
 /* =========================================================
    PRINT ESTIMATE
 ========================================================= */
@@ -100,10 +115,27 @@
     max-height: 75px;
     object-fit: contain;
   }
+.print-title-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 20px;
+}
 
-  .print-title-section {
-    text-align: right;
-  }
+.print-title-section p {
+  margin: 2px 0;
+  font-size: 12px;
+}
+
+.print-title-section p:first-child {
+  text-align: left;
+}
+
+.print-title-section p:last-child {
+  text-align: right;
+}
+
 
   .print-title-section h1 {
     margin: 0 0 5px;

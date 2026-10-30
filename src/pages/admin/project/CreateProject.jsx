@@ -1,19 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import {
-  FiPrinter,
-  FiUser,
-  FiBriefcase,
-  FiCreditCard,
-  FiCalendar,
-} from "react-icons/fi";
-
+import { FiUser, FiBriefcase, FiCreditCard, FiCalendar } from "react-icons/fi";
 import EstimateHeader from "../../../components/EstimateHeader";
 import EstimateItems from "../../../components/EstimateItems";
 import EstimateSummary from "../../../components/EstimateSummary";
 import EstimateFooter from "../../../components/EstimateFooter";
-
+import { Controller } from "react-hook-form";
+import {
+  NepaliDatePicker,
+  makeDualDateValueFromAd,
+} from "@etpl/nepali-datepicker";
 import toast from "react-hot-toast";
 import api from "../../../api/api";
 import {
@@ -62,6 +59,14 @@ const getRelatedId = (value) => {
   return value;
 };
 
+// Safely turn a delivery_date value into a display string.
+// Handles DualDateValue objects, ISO strings, and null/undefined.
+const formatDueDateForDisplay = (value) => {
+  if (!value) return "-";
+  if (typeof value === "string") return value;
+  return value?.formatted?.ad || value?.formatted?.bs || "-";
+};
+
 const CreateProject = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -71,6 +76,8 @@ const CreateProject = () => {
 
   const [loadingExistingProject, setLoadingExistingProject] = useState(false);
   const [existingItems, setExistingItems] = useState([]);
+  const [savedProjectId, setSavedProjectId] = useState(null);
+  const [justCreated, setJustCreated] = useState(false);
 
   const {
     register,
@@ -93,7 +100,7 @@ const CreateProject = () => {
 
       project_name: "",
       description: "",
-      delivery_date: "",
+      delivery_date: null,
       priority: "normal",
       work_status: "pending",
 
@@ -109,31 +116,7 @@ const CreateProject = () => {
   });
 
   const formData = watch();
-
   const selectedCustomerId = watch("customer");
-
-  useEffect(() => {
-    if (!selectedCustomerId) {
-      setValue("customerName", "");
-      setValue("panNumber", "");
-      setValue("address", "");
-      setValue("contactNumber", "");
-      return;
-    }
-
-    api
-      .get(`/customerapi/customers/${selectedCustomerId}/`)
-      .then((res) => {
-        const c = res.data;
-        setValue("customerName", c.name || "");
-        setValue("panNumber", c.pan_no || "");
-        setValue("address", c.address || "");
-        setValue("contactNumber", c.contact_no || "");
-      })
-      .catch((err) => {
-        console.error("Customer load failed:", err);
-      });
-  }, [selectedCustomerId, setValue]);
   const items = watch("items") || [];
 
   // --------------------------------------------------
@@ -308,7 +291,9 @@ const CreateProject = () => {
 
           project_name: project.project_name ?? project.name ?? "",
           description: project.description ?? "",
-          delivery_date: String(project.delivery_date ?? "").split("T")[0],
+          delivery_date: project.delivery_date
+            ? makeDualDateValueFromAd(new Date(project.delivery_date))
+            : null,
           priority: project.priority ?? "normal",
           work_status:
             project.work_stage ??
@@ -319,8 +304,6 @@ const CreateProject = () => {
           items:
             normalizedItems.length > 0 ? normalizedItems : [{ ...emptyItem }],
 
-          // Do not assume an invoice's advance amount from the order.
-          // The existing payment record needs its own API response.
           advance: 0,
           paymentDate: "",
           paymentMethod: "Cash",
@@ -354,9 +337,6 @@ const CreateProject = () => {
   // --------------------------------------------------
 
   const onSubmit = async (data) => {
-    console.log("=== onSubmit fired ===", { isEditMode, editId, data });
-    // ... rest
-
     let projectSaved = false;
 
     try {
@@ -395,7 +375,7 @@ const CreateProject = () => {
         customer: data.customer,
         project_name: String(data.project_name || "").trim(),
         description: data.description || "",
-        delivery_date: data.delivery_date || null,
+        delivery_date: data.delivery_date?.formatted?.ad || null,
         priority: data.priority || "normal",
         work_stage: String(data.work_status || "pending")
           .toLowerCase()
@@ -417,16 +397,10 @@ const CreateProject = () => {
       if (isEditMode) {
         projectId = editId;
 
-        console.log("========== UPDATING PROJECT ==========");
-        console.log("PROJECT ID:", projectId);
-        console.log("PROJECT PAYLOAD:", projectPayload);
-
         await updateProject(projectId, projectPayload);
 
         projectSaved = true;
 
-        // Update existing items and create newly added items.
-        // Existing items are identified by their original API IDs.
         const submittedExistingIds = itemsToSave
           .map((item) => item._apiId)
           .filter(Boolean)
@@ -486,12 +460,7 @@ const CreateProject = () => {
       // CREATE NEW PROJECT
       // ================================================
 
-      console.log("========== CREATING PROJECT ==========");
-      console.log("PROJECT PAYLOAD:", projectPayload);
-
       const projectResponse = await createProject(projectPayload);
-
-      console.log("PROJECT RESPONSE:", projectResponse);
 
       projectId = getProjectId(projectResponse);
 
@@ -509,9 +478,6 @@ const CreateProject = () => {
 
       projectSaved = true;
 
-      console.log("CREATED PROJECT ID:", projectId);
-
-      // Create printing items.
       for (const item of itemsToSave) {
         const quantity = Number(item.quantity);
         const rate = Number(item.rate);
@@ -542,8 +508,6 @@ const CreateProject = () => {
         await addItems(itemPayload);
       }
 
-      // Create a payment only during project creation.
-      // This prevents duplicate advance-payment records during edits.
       if (paymentAdvance > 0) {
         const amountPayload = {
           order: projectId,
@@ -569,8 +533,9 @@ const CreateProject = () => {
         await createAmount(amountPayload);
       }
 
-      toast.success("Project and printing items created successfully.");
-      navigate("/projects");
+      toast.success("Project created successfully. Printing estimate...");
+      setSavedProjectId(projectId);
+      setJustCreated(true);
     } catch (error) {
       console.error("========== PROJECT SAVE FAILED ==========");
       console.error("STATUS:", error?.response?.status);
@@ -586,9 +551,17 @@ const CreateProject = () => {
     }
   };
 
-  const handlePrint = () => {
-    window.print();
-  };
+  useEffect(() => {
+    if (!justCreated) return;
+
+    const timer = setTimeout(() => {
+      window.print();
+      setJustCreated(false);
+      navigate("/projects");
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [justCreated, navigate]);
 
   // --------------------------------------------------
   // LOADING STATE FOR EDIT MODE
@@ -606,6 +579,8 @@ const CreateProject = () => {
       </div>
     );
   }
+
+  const dueDateDisplay = formatDueDateForDisplay(formData.delivery_date);
 
   // --------------------------------------------------
   // UI
@@ -626,15 +601,6 @@ const CreateProject = () => {
                   : "Create customer order, estimate and payment details."}
               </p>
             </div>
-
-            <button
-              type="button"
-              onClick={handlePrint}
-              className="flex w-fit items-center gap-2 rounded-lg bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-orange-600"
-            >
-              <FiPrinter size={17} />
-              Print Estimate
-            </button>
           </div>
         </div>
 
@@ -665,7 +631,7 @@ const CreateProject = () => {
           </div>
 
           {/* 02. PROJECT / ORDER INFORMATION */}
-          <div className="mb-6 overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800">
+          <div className="mb-6 rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800">
             <div className="border-b border-slate-100 px-6 py-5 dark:border-slate-700">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50">
@@ -707,11 +673,32 @@ const CreateProject = () => {
                   <FiCalendar size={15} />
                   Due Date
                 </label>
-                <input
-                  type="date"
-                  {...register("delivery_date")}
-                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
-                />
+
+                <div className="due-date-picker relative w-full min-w-0">
+                  <Controller
+                    name="delivery_date"
+                    control={control}
+                    rules={{ required: "Due date is required." }}
+                    render={({ field }) => (
+                      <NepaliDatePicker
+                        calendarSystem="BS"
+                        language="ne"
+                        format="YYYY-MM-DD"
+                        value={field.value || null}
+                        onChange={(selectedDate) => {
+                          field.onChange(selectedDate);
+                        }}
+                        placeholder="मिति छान्नुहोस्"
+                      />
+                    )}
+                  />
+                </div>
+
+                {errors.delivery_date && (
+                  <p className="mt-1 text-xs text-red-500">
+                    {errors.delivery_date.message}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -928,26 +915,17 @@ const CreateProject = () => {
             >
               Cancel
             </button>
-            <button
-              type="button"
-              onClick={handlePrint}
-              className="flex items-center justify-center gap-2 rounded-xl border border-orange-200 bg-orange-50 px-6 py-3 text-sm font-semibold text-orange-600 transition hover:bg-orange-100"
-            >
-              <FiPrinter size={16} />
-              Print Estimate
-            </button>
+
             <button
               type="submit"
               disabled={isSubmitting || loadingExistingProject}
               className="rounded-xl bg-orange-600 px-7 py-3 text-sm font-semibold text-white transition hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isSubmitting
-                ? isEditMode
-                  ? "Updating..."
-                  : "Creating..."
+                ? "Creating..."
                 : isEditMode
                   ? "Update Project"
-                  : "Create Project"}
+                  : "Create & Print Estimate"}
             </button>
           </div>
         </form>
@@ -956,8 +934,10 @@ const CreateProject = () => {
       {/* PRINT VERSION */}
       <div className="print-estimate">
         <div className="print-header">
-          <div className="print-title-section mt-5 ">
-            <p>सीलीप नं:</p>
+          <div className="print-title-section">
+            <p>
+              सीलीप नं: <strong>{formData.slip_no || "-"}</strong>
+            </p>
             <p>
               मिति: <strong>{formData.slip_date || "-"}</strong>
             </p>
@@ -971,11 +951,9 @@ const CreateProject = () => {
               <strong>Customer Name:</strong> {formData.customerName || "-"}
             </div>
             <div>
-              <strong>Contact:</strong> {formData.contactNumber || "-"}
+              <strong>Contact:</strong> {formData.contact_no || "-"}
             </div>
-            <div>
-              <strong>PAN/VAT No:</strong> {formData.panNumber || "-"}
-            </div>
+
             <div>
               <strong>Project:</strong> {formData.project_name || "-"}
             </div>
@@ -992,19 +970,10 @@ const CreateProject = () => {
               <strong>Project Name:</strong> {formData.project_name || "-"}
             </div>
             <div>
-              <strong>Priority:</strong> {formData.priority || "-"}
-            </div>
-            <div>
-              <strong>Work Stage:</strong> {formData.work_status || "pending"}
-            </div>
-            <div>
-              <strong>Due Date:</strong> {formData.delivery_date || "-"}
+              <strong>Due Date:</strong> {dueDateDisplay}
             </div>
             <div>
               <strong>Customer:</strong> {formData.customerName || "-"}
-            </div>
-            <div className="full-width">
-              <strong>Description:</strong> {formData.description || "-"}
             </div>
           </div>
         </div>
@@ -1075,7 +1044,7 @@ const CreateProject = () => {
               <strong>Payment Date:</strong> {formData.paymentDate || "-"}
             </div>
             <div>
-              <strong>Due Date:</strong> {formData.delivery_date || "-"}
+              <strong>Due Date:</strong> {dueDateDisplay}
             </div>
           </div>
         </div>
@@ -1105,14 +1074,13 @@ const CreateProject = () => {
               </tr>
               <tr>
                 <td>सामान दिने मिति</td>
-                <td>{formData.delivery_date || "-"}</td>
+                <td>{dueDateDisplay}</td>
               </tr>
             </tbody>
           </table>
         </div>
 
         <div className="print-footer">
-          <p>PrintTech Printing Press</p>
           <p>Thank you for your business.</p>
         </div>
       </div>

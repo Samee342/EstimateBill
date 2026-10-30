@@ -16,6 +16,24 @@ import { useLocation, useNavigate } from "react-router-dom";
 import DeleteModal from "../../../modal/DeleteModal";
 import { getProjects, deleteProject, getItems } from "../../../api/project";
 import toast from "react-hot-toast";
+import NepaliDate from "nepali-date-converter";
+
+const formatNepaliDate = (adDate) => {
+  if (!adDate) return null;
+
+  try {
+    const parsed = new Date(adDate);
+    if (Number.isNaN(parsed.getTime())) return null;
+
+    const nd = new NepaliDate(parsed);
+
+    // Full Nepali month name (Baisakh, Jestha, ...) + day + year + BS
+    return nd.format("MMMM D, YYYY", "np") + " BS";
+  } catch (error) {
+    console.error("Nepali date conversion failed:", error);
+    return null;
+  }
+};
 
 const AllProject = () => {
   const navigate = useNavigate();
@@ -609,39 +627,50 @@ const AllProject = () => {
   // DATE FIELD
   // --------------------------------------------------
 
-  const DateField = ({ project, field, labelColor = "default" }) => (
-    <div className="flex items-center gap-2">
-      <span
-        className={`whitespace-nowrap text-sm ${
-          labelColor === "orange"
-            ? "font-medium text-orange-600 dark:text-orange-400"
-            : "text-slate-500 dark:text-slate-400"
-        }`}
-      >
-        {formatDate(project[field])}
-      </span>
+  const DateField = ({ project, field, labelColor = "default" }) => {
+    const englishDate = formatDate(project[field]);
+    const nepaliDate = formatNepaliDate(project[field]);
 
-      <label
-        className={`relative flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-lg transition ${
-          labelColor === "orange"
-            ? "text-orange-400 hover:bg-orange-50 hover:text-orange-600 dark:hover:bg-orange-500/10"
-            : "text-slate-400 hover:bg-slate-100 hover:text-orange-500 dark:hover:bg-slate-700"
-        }`}
-        title={`Change ${field === "slip_date" ? "project date" : "due date"}`}
-      >
-        <FiCalendar size={17} />
+    return (
+      <div className="flex items-center gap-2">
+        <div className="min-w-0">
+          {nepaliDate && (
+            <p
+              className={`whitespace-nowrap text-sm font-medium ${
+                labelColor === "orange"
+                  ? "text-orange-600 dark:text-orange-400"
+                  : "text-slate-700 dark:text-slate-300"
+              }`}
+            >
+              {nepaliDate}
+            </p>
+          )}
+          <p className="whitespace-nowrap text-xs text-slate-400">
+            ({englishDate})
+          </p>
+        </div>
 
-        <input
-          type="date"
-          value={getDateInputValue(project[field])}
-          onChange={(event) =>
-            updateProjectDate(project.id, field, event.target.value)
-          }
-          className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-        />
-      </label>
-    </div>
-  );
+        <label
+          className={`relative flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-lg transition ${
+            labelColor === "orange"
+              ? "text-orange-400 hover:bg-orange-50 hover:text-orange-600 dark:hover:bg-orange-500/10"
+              : "text-slate-400 hover:bg-slate-100 hover:text-orange-500 dark:hover:bg-slate-700"
+          }`}
+          title={`Change ${field === "slip_date" ? "project date" : "due date"}`}
+        >
+          <FiCalendar size={17} />
+          <input
+            type="date"
+            value={getDateInputValue(project[field])}
+            onChange={(event) =>
+              updateProjectDate(project.id, field, event.target.value)
+            }
+            className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+          />
+        </label>
+      </div>
+    );
+  };
 
   // --------------------------------------------------
   // UI
@@ -650,8 +679,8 @@ const AllProject = () => {
   return (
     <div className="min-h-screen overflow-x-hidden bg-[#f7f8fa] text-slate-800 dark:bg-slate-700 dark:text-slate-200">
       {/* HEADER */}
-      <header className="border-b border-slate-200 bg-white dark:border-slate-600 dark:bg-slate-700">
-        <div className="flex min-h-20 flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 md:px-8">
+      <header className=" border-slate-200 bg-slate-50 dark:border-slate-600 dark:bg-slate-700">
+        <div className="flex min-h-20 flex-row items-center justify-between gap-3 px-4 py-4">
           <div>
             <h2 className="text-xl font-bold text-slate-900 dark:text-white sm:text-2xl">
               All Projects
@@ -661,11 +690,10 @@ const AllProject = () => {
               Manage and track your printing projects
             </p>
           </div>
-
           <button
             type="button"
             onClick={() => navigate("/projects/create-project")}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-orange-600 sm:w-auto"
+            className="flex w-20 items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-orange-600 sm:w-auto"
           >
             <FiPlus size={18} />
             New Project

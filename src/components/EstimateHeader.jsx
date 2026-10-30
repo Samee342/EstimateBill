@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   FaPlus,
   FaSearch,
@@ -20,6 +20,8 @@ const EstimateHeader = ({ register, errors, setValue, slipNumber }) => {
   const [loadingCustomers, setLoadingCustomers] = useState(false);
   const [creatingCustomer, setCreatingCustomer] = useState(false);
 
+  const searchRef = useRef(null);
+
   const [newCustomer, setNewCustomer] = useState({
     name: "",
     pan_no: "",
@@ -37,12 +39,9 @@ const EstimateHeader = ({ register, errors, setValue, slipNumber }) => {
         setLoadingCustomers(true);
 
         const response = await getCustomer();
-
         console.log("Customer API response:", response);
 
-        // Support common Django REST Framework response formats.
         const data = response?.data ?? response;
-
         let customerList = [];
 
         if (Array.isArray(data)) {
@@ -57,12 +56,9 @@ const EstimateHeader = ({ register, errors, setValue, slipNumber }) => {
           customerList = data.data.results;
         }
 
-        console.log("Customers loaded:", customerList);
-
         setCustomers(customerList);
       } catch (error) {
         console.error("Failed to fetch customers:", error);
-
         toast.error(
           error?.response?.data?.detail ||
             error?.response?.data?.message ||
@@ -77,12 +73,26 @@ const EstimateHeader = ({ register, errors, setValue, slipNumber }) => {
   }, []);
 
   // ==========================================
+  // CLOSE DROPDOWN ON OUTSIDE CLICK
+  // ==========================================
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (searchRef.current && !searchRef.current.contains(e.target)) {
+        setSearch("");
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // ==========================================
   // SEARCH CUSTOMERS
   // ==========================================
 
   const filteredCustomers = customers.filter((customer) => {
     const searchTerm = search.trim().toLowerCase();
-
     if (!searchTerm) return false;
 
     const name = String(
@@ -109,7 +119,6 @@ const EstimateHeader = ({ register, errors, setValue, slipNumber }) => {
   const handleSelectCustomer = (customer) => {
     setSelectedCustomer(customer);
 
-    // Store the customer ID for the project API.
     setValue("customer", customer.id ?? customer.uuid ?? "", {
       shouldValidate: true,
       shouldDirty: true,
@@ -121,12 +130,10 @@ const EstimateHeader = ({ register, errors, setValue, slipNumber }) => {
     });
 
     setValue("pan_no", customer.pan_no || customer.pan || "");
-
     setValue(
       "contact_no",
       customer.contact_no || customer.phone_no || customer.phone || "",
     );
-
     setValue("address", customer.address || "");
 
     setSearch("");
@@ -142,7 +149,6 @@ const EstimateHeader = ({ register, errors, setValue, slipNumber }) => {
       return;
     }
 
-    // Validate the contact number before creating the customer.
     if (!/^[0-9]{10}$/.test(newCustomer.contact_no)) {
       toast.error("Enter a valid 10-digit phone number.");
       return;
@@ -178,7 +184,6 @@ const EstimateHeader = ({ register, errors, setValue, slipNumber }) => {
       }
 
       setCustomers((previous) => [...previous, createdCustomer]);
-
       handleSelectCustomer(createdCustomer);
 
       setNewCustomer({
@@ -189,11 +194,9 @@ const EstimateHeader = ({ register, errors, setValue, slipNumber }) => {
       });
 
       setShowCustomerModal(false);
-
       toast.success("Customer added successfully!");
     } catch (error) {
       console.error("Create customer error:", error);
-
       toast.error(
         error?.response?.data?.message ||
           error?.response?.data?.detail ||
@@ -232,41 +235,33 @@ const EstimateHeader = ({ register, errors, setValue, slipNumber }) => {
     <>
       <div className="w-full p-6 text-sm text-slate-700 dark:text-slate-200">
         {/* TOP ROW */}
-
         <div className="mb-7 flex flex-col gap-5 border-b border-slate-100 pb-6 md:flex-row md:items-center md:justify-between dark:border-slate-700">
           {/* SLIP NUMBER */}
-
           <div className="flex items-center gap-2">
             <label className="font-semibold text-slate-600 dark:text-slate-300">
-              सीलीप नं:
+              सीलीप नं :
             </label>
-
             <input
               type="text"
               value={slipNumber ?? ""}
               readOnly
-              placeholder="Generated with project"
-              className="w-36 cursor-not-allowed border-b border-dashed border-slate-400 bg-slate-50 px-1 py-1 text-slate-600 outline-none dark:bg-slate-800 dark:text-slate-200"
+              className="w-36 cursor-not-allowed  bg-slate-50 px-1 py-1 text-slate-600 outline-none dark:bg-slate-800 dark:text-slate-200"
             />
           </div>
 
           {/* TITLE */}
-
           <div className="text-center">
             <h1 className="text-xl font-bold text-slate-900 dark:text-white">
               Estimate Slip
             </h1>
-
             <p className="mt-1 text-xs text-slate-400">Printing Estimate</p>
           </div>
 
           {/* DATE */}
-
           <div className="flex items-center gap-2">
             <label className="font-semibold text-slate-600 dark:text-slate-300">
               मिति:
             </label>
-
             <input
               type="date"
               {...register("slip_date", {
@@ -284,19 +279,16 @@ const EstimateHeader = ({ register, errors, setValue, slipNumber }) => {
         )}
 
         {/* CUSTOMER SECTION */}
-
         <div>
           <div className="mb-5 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-50 text-orange-600">
                 <FaUser className="text-sm" />
               </div>
-
               <div>
                 <h2 className="font-semibold text-slate-800 dark:text-slate-200">
                   Customer Information
                 </h2>
-
                 <p className="text-xs text-slate-400">
                   Select an existing customer or add a new one.
                 </p>
@@ -315,12 +307,10 @@ const EstimateHeader = ({ register, errors, setValue, slipNumber }) => {
           </div>
 
           {/* CUSTOMER SEARCH */}
-
-          <div className="relative mb-6">
+          <div className="relative mb-6" ref={searchRef}>
             <div className="flex gap-2">
               <div className="relative flex-1">
                 <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-xs text-slate-400" />
-
                 <input
                   type="text"
                   value={search}
@@ -345,7 +335,6 @@ const EstimateHeader = ({ register, errors, setValue, slipNumber }) => {
             </div>
 
             {/* SEARCH RESULTS */}
-
             {search.trim().length > 0 && !selectedCustomer && (
               <div className="absolute left-0 right-0 top-[52px] z-30 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl dark:border-slate-700 dark:bg-slate-800">
                 {loadingCustomers ? (
@@ -353,52 +342,51 @@ const EstimateHeader = ({ register, errors, setValue, slipNumber }) => {
                     Loading customers...
                   </div>
                 ) : filteredCustomers.length > 0 ? (
-                  filteredCustomers.map((customer, index) => {
-                    const customerName =
-                      customer.name ||
-                      customer.customer_name ||
-                      "Unnamed Customer";
+                  <div className="max-h-72 overflow-y-auto">
+                    {filteredCustomers.map((customer, index) => {
+                      const customerName =
+                        customer.name ||
+                        customer.customer_name ||
+                        "Unnamed Customer";
 
-                    const customerPhone =
-                      customer.contact_no ||
-                      customer.phone ||
-                      customer.phone_no ||
-                      "";
+                      const customerPhone =
+                        customer.contact_no ||
+                        customer.phone ||
+                        customer.phone_no ||
+                        "";
 
-                    const customerId =
-                      customer.uuid ??
-                      customer.id ??
-                      `${customerName}-${index}`;
+                      const customerId =
+                        customer.uuid ??
+                        customer.id ??
+                        `${customerName}-${index}`;
 
-                    return (
-                      <button
-                        type="button"
-                        key={customerId}
-                        onClick={() => handleSelectCustomer(customer)}
-                        className="flex w-full items-center gap-3 border-b border-slate-100 px-4 py-3 text-left transition last:border-b-0 hover:bg-orange-50 dark:border-slate-700 dark:hover:bg-slate-700"
-                      >
-                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-500 dark:bg-slate-600">
-                          <FaUser className="text-xs" />
-                        </div>
-
-                        <div>
-                          <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
-                            {customerName}
-                          </p>
-
-                          <p className="text-xs text-slate-400">
-                            {customerPhone}
-                          </p>
-                        </div>
-                      </button>
-                    );
-                  })
+                      return (
+                        <button
+                          type="button"
+                          key={customerId}
+                          onClick={() => handleSelectCustomer(customer)}
+                          className="flex w-full items-center gap-3 border-b border-slate-100 px-4 py-3 text-left transition last:border-b-0 hover:bg-orange-50 dark:border-slate-700 dark:hover:bg-slate-700"
+                        >
+                          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-500 dark:bg-slate-600">
+                            <FaUser className="text-xs" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+                              {customerName}
+                            </p>
+                            <p className="text-xs text-slate-400">
+                              {customerPhone}
+                            </p>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
                 ) : (
                   <div className="px-4 py-5 text-center">
                     <p className="text-sm text-slate-500 dark:text-slate-300">
                       No customer found.
                     </p>
-
                     <button
                       type="button"
                       onClick={() => setShowCustomerModal(true)}
@@ -413,19 +401,15 @@ const EstimateHeader = ({ register, errors, setValue, slipNumber }) => {
           </div>
 
           {/* CUSTOMER DETAILS */}
-
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
             {/* NAME */}
-
             <div>
               <label className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-300">
                 नाम
                 <span className="ml-1 text-orange-500">*</span>
               </label>
-
               <div className="relative">
                 <FaUser className="absolute left-4 top-1/2 -translate-y-1/2 text-xs text-slate-400" />
-
                 <input
                   type="text"
                   {...register("customerName", {
@@ -440,7 +424,6 @@ const EstimateHeader = ({ register, errors, setValue, slipNumber }) => {
                   placeholder="Customer name"
                 />
               </div>
-
               {errors?.customerName && (
                 <p className="mt-1.5 text-xs text-red-500">
                   {errors.customerName.message}
@@ -449,15 +432,12 @@ const EstimateHeader = ({ register, errors, setValue, slipNumber }) => {
             </div>
 
             {/* PAN */}
-
             <div>
               <label className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-300">
                 पान नं
               </label>
-
               <div className="relative">
                 <FaIdCard className="absolute left-4 top-1/2 -translate-y-1/2 text-xs text-slate-400" />
-
                 <input
                   type="text"
                   inputMode="numeric"
@@ -471,15 +451,12 @@ const EstimateHeader = ({ register, errors, setValue, slipNumber }) => {
             </div>
 
             {/* CONTACT */}
-
             <div>
               <label className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-300">
                 सम्पर्क नं
               </label>
-
               <div className="relative">
                 <FaPhone className="absolute left-4 top-1/2 -translate-y-1/2 text-xs text-slate-400" />
-
                 <input
                   type="text"
                   {...register("contact_no")}
@@ -491,15 +468,12 @@ const EstimateHeader = ({ register, errors, setValue, slipNumber }) => {
             </div>
 
             {/* ADDRESS */}
-
             <div>
               <label className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-300">
                 ठेगाना
               </label>
-
               <div className="relative">
                 <FaMapMarkerAlt className="absolute left-4 top-1/2 -translate-y-1/2 text-xs text-slate-400" />
-
                 <input
                   type="text"
                   {...register("address")}
@@ -514,23 +488,19 @@ const EstimateHeader = ({ register, errors, setValue, slipNumber }) => {
       </div>
 
       {/* ADD CUSTOMER MODAL */}
-
       {showCustomerModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 px-4 backdrop-blur-sm">
           <div className="w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-slate-800">
             {/* MODAL HEADER */}
-
             <div className="flex items-center justify-between border-b border-slate-100 px-6 py-5 dark:border-slate-700">
               <div>
                 <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">
                   Add New Customer
                 </h2>
-
                 <p className="mt-1 text-xs text-slate-400">
                   Add a customer without leaving this estimate.
                 </p>
               </div>
-
               <button
                 type="button"
                 onClick={() => setShowCustomerModal(false)}
@@ -543,14 +513,12 @@ const EstimateHeader = ({ register, errors, setValue, slipNumber }) => {
             </div>
 
             {/* MODAL BODY */}
-
             <div className="space-y-5 p-6">
               <div>
                 <label className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-300">
                   Customer Name
                   <span className="ml-1 text-orange-500">*</span>
                 </label>
-
                 <input
                   type="text"
                   value={newCustomer.name}
@@ -569,7 +537,6 @@ const EstimateHeader = ({ register, errors, setValue, slipNumber }) => {
                 <label className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-300">
                   Contact Number
                 </label>
-
                 <input
                   type="tel"
                   inputMode="numeric"
@@ -579,7 +546,6 @@ const EstimateHeader = ({ register, errors, setValue, slipNumber }) => {
                     const phone = e.target.value
                       .replace(/\D/g, "")
                       .slice(0, 10);
-
                     setNewCustomer((previous) => ({
                       ...previous,
                       contact_no: phone,
@@ -593,7 +559,6 @@ const EstimateHeader = ({ register, errors, setValue, slipNumber }) => {
                       : "border-slate-200 focus:border-orange-500 focus:ring-orange-100"
                   }`}
                 />
-
                 {newCustomer.contact_no.length > 0 &&
                   newCustomer.contact_no.length !== 10 && (
                     <p className="mt-1.5 text-xs text-red-500">
@@ -606,7 +571,6 @@ const EstimateHeader = ({ register, errors, setValue, slipNumber }) => {
                 <label className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-300">
                   PAN Number
                 </label>
-
                 <input
                   type="text"
                   value={newCustomer.pan_no}
@@ -625,7 +589,6 @@ const EstimateHeader = ({ register, errors, setValue, slipNumber }) => {
                 <label className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-300">
                   Address
                 </label>
-
                 <input
                   type="text"
                   value={newCustomer.address}
@@ -642,7 +605,6 @@ const EstimateHeader = ({ register, errors, setValue, slipNumber }) => {
             </div>
 
             {/* MODAL FOOTER */}
-
             <div className="flex justify-end gap-3 border-t border-slate-100 bg-slate-50 px-6 py-4 dark:border-slate-700 dark:bg-slate-900">
               <button
                 type="button"
@@ -652,7 +614,6 @@ const EstimateHeader = ({ register, errors, setValue, slipNumber }) => {
               >
                 Cancel
               </button>
-
               <button
                 type="button"
                 onClick={handleAddCustomer}

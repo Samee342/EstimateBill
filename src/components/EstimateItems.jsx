@@ -403,10 +403,7 @@ const EstimateItems = ({ control, register }) => {
             >
               <span className="flex items-center gap-2 text-sm font-semibold text-slate-800 dark:text-slate-200">
                 <FaTools className="text-orange-600" />
-                Printing Specifications & Work Assignment
-                <span className="hidden text-xs font-medium text-slate-600 sm:inline dark:text-slate-400">
-                  (Optional)
-                </span>
+                Printing Specifications & Work Assignment:
               </span>
 
               {detailsOpen ? (

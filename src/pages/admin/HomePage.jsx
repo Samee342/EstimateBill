@@ -525,7 +525,7 @@ const HomePage = () => {
             <button
               type="button"
               onClick={() => navigate("/projects/create-project")}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-orange-600 sm:w-auto"
+              className="flex w-20 items-center justify-center gap-2 rounded-lg bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-orange-600 sm:w-auto"
             >
               <FiPlus size={17} />
               New Project

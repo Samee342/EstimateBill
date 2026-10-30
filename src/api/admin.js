@@ -51,6 +51,11 @@ const updateProfile = async (data) => {
   return response.data;
 };
 
+const resetDataByAdmin = async () => {
+  const response = await api.post("/customerapi/customers/clear");
+  return response.data;
+};
+
 export {
   createTenant,
   getTenant,
@@ -58,4 +63,5 @@ export {
   deleteTenant,
   updateProfile,
   changePasswordByTenant,
+  resetDataByAdmin,
 };
