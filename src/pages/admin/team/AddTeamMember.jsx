@@ -373,9 +373,6 @@ const AddTeamMember = () => {
             <div>
               <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
                 Email
-                <span className="ml-1 text-xs font-normal text-slate-400">
-                  Optional
-                </span>
               </label>
               <div className="relative">
                 <FaEnvelope className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -394,7 +391,7 @@ const AddTeamMember = () => {
             {mode === "manual" && (
               <div className="md:col-span-2">
                 <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                  Temporary Password
+                  Password
                 </label>
                 <div className="relative">
                   <FaLock className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />

@@ -1178,16 +1178,6 @@ const AllProject = () => {
             <div className="print-center-title">
               <h1>ESTIMATE</h1>
             </div>
-
-            <div className="print-title-section print-title-right">
-              <p>
-                ग्राहक: <strong>{getCustomerName(printingProject)}</strong>
-              </p>
-              <p>
-                फोन:{" "}
-                <strong>{getCustomerContact(printingProject) || "-"}</strong>
-              </p>
-            </div>
           </div>
 
           {/* CUSTOMER INFORMATION */}
@@ -1206,9 +1196,7 @@ const AllProject = () => {
                 <strong>PAN No:</strong>{" "}
                 {getCustomerPan(printingProject) || "-"}
               </div>
-              <div>
-                <strong>Project:</strong> {getProjectName(printingProject)}
-              </div>
+
               <div className="full-width">
                 <strong>Address:</strong>{" "}
                 {getCustomerAddress(printingProject) || "-"}
@@ -1226,12 +1214,6 @@ const AllProject = () => {
               <div>
                 <strong>Due Date:</strong>{" "}
                 {formatDate(printingProject.delivery_date) || "-"}
-              </div>
-              <div>
-                <strong>Priority:</strong> {getPriority(printingProject)}
-              </div>
-              <div>
-                <strong>Work Stage:</strong> {getProjectStatus(printingProject)}
               </div>
             </div>
           </div>
@@ -1301,14 +1283,6 @@ const AllProject = () => {
             </table>
           </div>
 
-          {/* PRINTING DESCRIPTION */}
-          <div className="print-section">
-            <h2>छपाइको पुर्ण बीवरण :</h2>
-            <div className="printing-description">
-              {getPrintingDetails(printingProject) || "-"}
-            </div>
-          </div>
-
           {/* PAYMENT INFORMATION */}
           <div className="print-section">
             <h2>PAYMENT INFORMATION</h2>
@@ -1321,9 +1295,7 @@ const AllProject = () => {
                 <strong>Payment Status:</strong>{" "}
                 {getPaymentStatus(printingProject)}
               </div>
-              <div>
-                <strong>Payment Date:</strong> {getPaymentDate(printingProject)}
-              </div>
+
               <div>
                 <strong>Due Date:</strong>{" "}
                 {formatDate(printingProject.delivery_date) || "-"}
@@ -1351,10 +1323,7 @@ const AllProject = () => {
                   <td>Payment Method</td>
                   <td>{getPaymentMethod(printingProject)}</td>
                 </tr>
-                <tr>
-                  <td>Payment Status</td>
-                  <td>{getPaymentStatus(printingProject)}</td>
-                </tr>
+
                 <tr>
                   <td>सामान दिने मिति</td>
                   <td>{formatDate(printingProject.delivery_date) || "-"}</td>

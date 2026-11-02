@@ -29,35 +29,44 @@ const SetupPage = () => {
   } = useForm();
 
   // =========================================================
-  // PREVENT LOGGED-IN USERS FROM ACCESSING SETUP PAGE
+  // AUTH GUARD
+  // - no user or no token  → /login
+  // - user WITH tenant     → /dashboard or /staff
+  // - user WITHOUT tenant  → show this form
   // =========================================================
   useEffect(() => {
     const checkAuthentication = () => {
       try {
         const storedUser = localStorage.getItem("user");
+        const token = localStorage.getItem("accessToken");
 
-        if (storedUser) {
-          const user = JSON.parse(storedUser);
-
-          if (user) {
-            const role = String(
-              user.role || user.user_type || user.user_role || "",
-            ).toLowerCase();
-
-            if (role === "staff") {
-              navigate("/staff", { replace: true });
-            } else {
-              navigate("/dashboard", { replace: true });
-            }
-
-            return;
-          }
+        if (!storedUser || storedUser === "undefined" || !token) {
+          navigate("/login", { replace: true });
+          return;
         }
+
+        const user = JSON.parse(storedUser);
+
+        const tenantId =
+          user?.tenant_id ?? user?.tenant?.id ?? user?.tenant ?? null;
+
+        if (tenantId) {
+          const role = String(
+            user.role || user.user_type || user.user_role || "",
+          ).toLowerCase();
+
+          navigate(role === "staff" ? "/staff" : "/dashboard", {
+            replace: true,
+          });
+          return;
+        }
+
+        // Logged in but no tenant — that's who setup is for.
+        setCheckingAuth(false);
       } catch (error) {
         console.error("Authentication check failed:", error);
+        navigate("/login", { replace: true });
       }
-
-      setCheckingAuth(false);
     };
 
     checkAuthentication();
@@ -75,7 +84,6 @@ const SetupPage = () => {
       formData.append("pan_no", data.pan_no || "");
       formData.append("address", data.address || "");
 
-      // Send the actual image file to the backend.
       if (data.logo?.[0]) {
         formData.append("logo", data.logo[0]);
       }
@@ -84,11 +92,50 @@ const SetupPage = () => {
 
       console.log("Tenant created:", response);
 
-      toast.success(
-        "Business setup completed! Please log in with your account.",
-      );
+      // Extract the tenant from the response, whatever the wrapper is.
+      const newTenant =
+        response?.data?.tenant ??
+        response?.tenant ??
+        response?.data ??
+        response;
 
-      navigate("/login", { replace: true });
+      // Merge the new tenant into the stored user so getCurrentUser()
+      // returns a user that is "fully set up" on the next route.
+      try {
+        const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+
+        const updatedUser = {
+          ...storedUser,
+          tenant: newTenant,
+          tenant_id:
+            newTenant?.id ??
+            newTenant?.pk ??
+            newTenant?.tenant_id ??
+            storedUser.tenant_id,
+        };
+
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+
+        // Notify same-tab listeners (sidebar, nav, guards)
+        window.dispatchEvent(
+          new CustomEvent("auth:user-updated", { detail: updatedUser }),
+        );
+      } catch (storageError) {
+        console.error(
+          "Failed to update stored user after setup:",
+          storageError,
+        );
+      }
+
+      toast.success("Business setup completed!");
+
+      const role = String(
+        JSON.parse(localStorage.getItem("user") || "{}").role || "",
+      ).toLowerCase();
+
+      navigate(role === "staff" ? "/staff" : "/dashboard", {
+        replace: true,
+      });
     } catch (error) {
       console.error("TENANT CREATE FAILED:", {
         status: error?.response?.status,
@@ -99,7 +146,6 @@ const SetupPage = () => {
       const errorData = error?.response?.data;
       const errorMessage = JSON.stringify(errorData || {}).toLowerCase();
 
-      // Duplicate PAN
       if (
         errorMessage.includes("pan_no") &&
         (errorMessage.includes("unique") ||
@@ -112,7 +158,6 @@ const SetupPage = () => {
         return;
       }
 
-      // Password rules
       if (errorMessage.includes("password")) {
         toast.error(
           "The password cannot contain only numbers. Please use a combination of text and numbers.",
@@ -120,7 +165,6 @@ const SetupPage = () => {
         return;
       }
 
-      // Duplicate shop name / email
       if (
         errorMessage.includes("shop_name") ||
         errorMessage.includes("email")
@@ -139,7 +183,6 @@ const SetupPage = () => {
         }
       }
 
-      // Generic error
       toast.error(
         errorData?.message ||
           errorData?.detail ||
@@ -156,7 +199,6 @@ const SetupPage = () => {
 
     if (!file) return;
 
-    // Validate image type
     const allowedTypes = ["image/png", "image/jpeg"];
 
     if (!allowedTypes.includes(file.type)) {
@@ -167,7 +209,6 @@ const SetupPage = () => {
       return;
     }
 
-    // Maximum file size: 2 MB
     if (file.size > 2 * 1024 * 1024) {
       toast.error("Logo size must be less than 2MB.");
       event.target.value = "";
@@ -180,7 +221,6 @@ const SetupPage = () => {
       if (previousPreview) {
         URL.revokeObjectURL(previousPreview);
       }
-
       return URL.createObjectURL(file);
     });
   };
@@ -192,12 +232,10 @@ const SetupPage = () => {
     if (logoPreview) {
       URL.revokeObjectURL(logoPreview);
     }
-
     setLogoPreview(null);
     resetField("logo");
   };
 
-  // Release the preview URL when the component unmounts.
   useEffect(() => {
     return () => {
       if (logoPreview) {
@@ -206,7 +244,6 @@ const SetupPage = () => {
     };
   }, [logoPreview]);
 
-  // Avoid briefly showing the setup form while checking login.
   if (checkingAuth) {
     return null;
   }
@@ -233,7 +270,6 @@ const SetupPage = () => {
 
         {/* Card */}
         <div className="rounded-2xl border border-border bg-white p-6 shadow-xl shadow-slate-900/5 sm:p-8">
-          {/* Header */}
           <div className="mb-8">
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-orange-50">
               <img src={Logo} className="h-10 w-10" alt="PrintTech" />
@@ -464,7 +500,6 @@ const SetupPage = () => {
           </form>
         </div>
 
-        {/* Footer */}
         <p className="mt-5 text-center text-xs text-slate-400">
           Your business information can be updated later from settings.
         </p>

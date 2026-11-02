@@ -19,69 +19,6 @@ import {
 const STORAGE_KEY = "printing_press_notifications";
 
 // ========================================
-// INITIAL NOTIFICATIONS
-// ========================================
-
-const initialNotifications = [
-  {
-    id: 1,
-    type: "project",
-    title: "New Project Created",
-    message: "A new printing project has been created by Ram Sharma.",
-    createdAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
-    read: false,
-  },
-  {
-    id: 2,
-    type: "payment",
-    title: "Payment Received",
-    message: "Rs. 12,500 payment received from Hotel Himalayan.",
-    createdAt: new Date(Date.now() - 20 * 60 * 1000).toISOString(),
-    read: false,
-  },
-  {
-    id: 3,
-    type: "due",
-    title: "Payment Due",
-    message: "Rs. 8,500 payment is pending from ABC Traders.",
-    createdAt: new Date(Date.now() - 60 * 60 * 1000).toISOString(),
-    read: false,
-  },
-  {
-    id: 4,
-    type: "completed",
-    title: "Project Completed",
-    message: "Business Card Printing project has been completed.",
-    createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-    read: true,
-  },
-  {
-    id: 5,
-    type: "stock",
-    title: "Low Stock Alert",
-    message: "A4 100 GSM paper stock is running low.",
-    createdAt: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
-    read: true,
-  },
-  {
-    id: 6,
-    type: "project",
-    title: "New Project Created",
-    message: "Wedding card printing project added by Sunrise Events.",
-    createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-    read: true,
-  },
-  {
-    id: 7,
-    type: "payment",
-    title: "Payment Received",
-    message: "Rs. 25,000 payment received from Everest Traders.",
-    createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-    read: true,
-  },
-];
-
-// ========================================
 // DYNAMIC TIME
 // ========================================
 
@@ -144,11 +81,11 @@ const Notification = () => {
           error,
         );
 
-        return initialNotifications;
+        return [];
       }
     }
 
-    return initialNotifications;
+    return [];
   });
 
   const [search, setSearch] = useState("");
@@ -392,7 +329,6 @@ const Notification = () => {
 
         {/* =====================================================
             MOBILE SUMMARY
-            Notification Types appears FIRST on mobile
         ====================================================== */}
 
         <div className="mt-5 space-y-3 lg:hidden">

@@ -267,8 +267,17 @@ const CustomerPayments = () => {
           c.address.toLowerCase().includes(q) ||
           c.pan.toLowerCase().includes(q);
 
-        const matchesStatus =
-          statusFilter === "All" || c.status === statusFilter;
+        let matchesStatus = true;
+
+        if (statusFilter === "All") {
+          matchesStatus = true;
+        } else if (statusFilter === "Credit") {
+          // "In Credit" = anyone who still owes money
+          // (both Partial and Credit statuses)
+          matchesStatus = c.totalOutstanding > 0.01;
+        } else {
+          matchesStatus = c.status === statusFilter;
+        }
 
         return matchesSearch && matchesStatus;
       })
@@ -285,7 +294,8 @@ const CustomerPayments = () => {
         acc.billed += c.totalBilled;
         acc.paid += c.totalPaid;
         acc.outstanding += c.totalOutstanding;
-        if (c.status === "Credit") acc.creditCount += 1;
+        // Anyone with an outstanding balance is "in credit" from your side
+        if (c.totalOutstanding > 0.01) acc.creditCount += 1;
         if (c.status === "Paid") acc.paidCount += 1;
         return acc;
       },
@@ -415,8 +425,7 @@ const CustomerPayments = () => {
               <option value="All">All</option>
               <option value="Paid">Paid</option>
               <option value="Partial">Partial</option>
-              <option value="Credit">In Credit</option>
-              <option value="No Orders">No Orders</option>
+              <option value="Credit">In Credit (owes money)</option>
             </select>
           </div>
         </div>

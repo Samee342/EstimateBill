@@ -148,33 +148,6 @@ const AdminLayout = () => {
         ====================================================== */}
 
         <div className="flex min-w-0 flex-1 items-center gap-3 sm:gap-4">
-          {/* MOBILE MENU BUTTON */}
-
-          <button
-            type="button"
-            onClick={handleMobileMenu}
-            className="
-              flex
-              h-10
-              w-10
-              shrink-0
-              items-center
-              justify-center
-              border
-              border-slate-200
-              text-slate-600
-              transition
-              hover:bg-slate-50
-              dark:border-slate-700
-              dark:text-slate-300
-              dark:hover:bg-slate-800
-              lg:hidden
-            "
-            aria-label="Open sidebar"
-          >
-            <FiMenu size={21} />
-          </button>
-
           {/* SEARCH */}
 
           <div
@@ -313,6 +286,7 @@ const AdminLayout = () => {
               relative
               hidden
               md:block
+              border border-slate-200 px-2 py-2 rounded-xl
             "
           >
             {/* PROFILE BUTTON */}
@@ -323,10 +297,10 @@ const AdminLayout = () => {
               className={`
                 flex
                 items-center
-                gap-2.5
+                gap-2
                 rounded-lg
                 px-2
-                py-1.5
+                py-1
                 transition-all
                 duration-200
                 hover:bg-slate-50
@@ -361,23 +335,11 @@ const AdminLayout = () => {
               <div className="hidden text-left lg:block">
                 <p
                   className="
-    max-w-[150px]
-    truncate
-    text-sm
-    font-semibold
-    text-slate-700
-    dark:text-slate-200
-  "
-                >
-                  {user?.company_name?.split(" ")[0] || "PrintTech"}
-                </p>
-
-                <p
-                  className="
-                    text-[11px]
+                    text-sm
+                    font-bold
                     capitalize
-                    text-slate-400
-                    dark:text-slate-500
+                    text-slate-700
+                    dark:text-slate-900
                   "
                 >
                   {user?.name || "Admin"}

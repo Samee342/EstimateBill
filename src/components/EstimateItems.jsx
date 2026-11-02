@@ -28,10 +28,17 @@ const emptyItem = {
 };
 
 const inputClass =
-  "w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition placeholder:text-slate-500 focus:border-orange-400 focus:ring-2 focus:ring-orange-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:focus:ring-orange-900/30";
+  "w-full min-w-0 rounded-md border border-slate-300 bg-white px-2.5 py-2 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-orange-400 focus:ring-2 focus:ring-orange-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:focus:ring-orange-900/30";
 
 const labelClass =
-  "mb-1.5 block text-xs font-semibold text-slate-800 dark:text-slate-200";
+  "mb-1 block text-[11px] font-semibold text-slate-700 dark:text-slate-300";
+
+const paperOptions = [
+  { value: "art", label: "Art Paper" },
+  { value: "card", label: "Card Paper" },
+  { value: "newsprint", label: "Newsprint Paper" },
+  { value: "coated", label: "Coated Paper" },
+];
 
 const EstimateItems = ({ control, register }) => {
   const { fields, append, remove, update } = useFieldArray({
@@ -110,7 +117,7 @@ const EstimateItems = ({ control, register }) => {
   };
 
   const renderStaffSelect = (label, value, onChange) => (
-    <div>
+    <div className="min-w-0">
       <label className={labelClass}>{label}</label>
 
       <select
@@ -127,7 +134,7 @@ const EstimateItems = ({ control, register }) => {
             ? "Loading staff..."
             : staffList.length === 0
               ? "No staff available"
-              : "Select staff member"}
+              : "Select staff"}
         </option>
 
         {staffList.map((member) => (
@@ -214,12 +221,10 @@ const EstimateItems = ({ control, register }) => {
     setEditingIndex(index);
     setDetailsOpen(true);
 
-    if (typeof window !== "undefined") {
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth",
-      });
-    }
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
   };
 
   const toggleItemDetails = (index) => {
@@ -238,11 +243,8 @@ const EstimateItems = ({ control, register }) => {
       Object.keys(previous).forEach((key) => {
         const oldIndex = Number(key);
 
-        if (oldIndex < index) {
-          next[oldIndex] = previous[key];
-        } else if (oldIndex > index) {
-          next[oldIndex - 1] = previous[key];
-        }
+        if (oldIndex < index) next[oldIndex] = previous[key];
+        if (oldIndex > index) next[oldIndex - 1] = previous[key];
       });
 
       return next;
@@ -255,8 +257,14 @@ const EstimateItems = ({ control, register }) => {
     }
   };
 
-  const renderDraftField = (label, field, placeholder = "", type = "text") => (
-    <div>
+  const renderDraftField = (
+    label,
+    field,
+    placeholder = "",
+    type = "text",
+    extraProps = {},
+  ) => (
+    <div className="min-w-0">
       <label className={labelClass}>{label}</label>
       <input
         type={type}
@@ -270,12 +278,13 @@ const EstimateItems = ({ control, register }) => {
             ? "[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
             : ""
         }`}
+        {...extraProps}
       />
     </div>
   );
 
   const renderRegisteredField = (index, field, label, placeholder = "") => (
-    <div>
+    <div className="min-w-0">
       <label className={labelClass}>{label}</label>
       <input
         {...register(`items.${index}.${field}`)}
@@ -296,55 +305,69 @@ const EstimateItems = ({ control, register }) => {
     });
   };
 
+  const renderPaperSelect = (value, onChange) => (
+    <div className="min-w-0">
+      <label className={labelClass}>Paper Type</label>
+      <select
+        value={value || ""}
+        onChange={(event) => onChange(event.target.value)}
+        className={inputClass}
+      >
+        <option value="">Select paper</option>
+        {paperOptions.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+
   return (
-    <section className="mt-6 overflow-hidden rounded-xl border border-slate-300 bg-white dark:border-slate-700 dark:bg-slate-900">
-      {/* Header */}
-      <div className="flex flex-col gap-4 border-b border-slate-200 px-5 py-5 sm:flex-row sm:items-center sm:justify-between dark:border-slate-700">
-        <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-orange-700 dark:bg-orange-500/10 dark:text-orange-400">
-            <FaBoxOpen className="text-lg" />
+    <section className="mt-4 overflow-hidden rounded-lg border border-slate-300 bg-white dark:border-slate-700 dark:bg-slate-900">
+      {/* Compact Header */}
+      <div className="flex flex-col gap-2 border-b border-slate-200 px-3 py-3 sm:flex-row sm:items-center sm:justify-between dark:border-slate-700">
+        <div className="flex min-w-0 items-center gap-2.5">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-orange-50 text-orange-700 dark:bg-orange-500/10 dark:text-orange-400">
+            <FaBoxOpen className="text-sm" />
           </div>
 
-          <div>
+          <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <h2 className="text-base font-bold text-slate-900 dark:text-white">
+              <h2 className="text-sm font-bold text-slate-900 dark:text-white">
                 Estimate Items
               </h2>
-
-              <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-800 dark:bg-slate-800 dark:text-slate-200">
+              <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-300">
                 {fields.length} {fields.length === 1 ? "item" : "items"}
               </span>
             </div>
-
-            <p className="mt-1 text-xs text-slate-700 dark:text-slate-300">
-              Add products, specify printing requirements, and set pricing.
+            <p className="text-[11px] text-slate-600 dark:text-slate-400">
+              Add items, printing details and pricing.
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 self-start rounded-lg border border-orange-200 bg-orange-50 px-3 py-2 dark:border-orange-500/20 dark:bg-orange-500/10">
-          <FaCalculator className="text-orange-700 dark:text-orange-400" />
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-700 dark:text-slate-300">
-              Items total
-            </p>
-            <p className="text-sm font-bold text-orange-800 dark:text-orange-400">
-              Rs. {formatMoney(totalAmount)}
-            </p>
-          </div>
+        <div className="flex items-center gap-2 self-start rounded-md border border-orange-200 bg-orange-50 px-2.5 py-1.5 sm:self-auto dark:border-orange-500/20 dark:bg-orange-500/10">
+          <FaCalculator className="text-xs text-orange-700 dark:text-orange-400" />
+          <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+            Total:
+          </span>
+          <span className="text-sm font-bold text-orange-800 dark:text-orange-400">
+            Rs. {formatMoney(totalAmount)}
+          </span>
         </div>
       </div>
 
-      <div className="space-y-3 p-4 sm:p-5">
-        {/* Item Entry Form */}
-        <div className="rounded-xl border border-slate-300 bg-slate-50 p-4 sm:p-5 dark:border-slate-700 dark:bg-slate-800/40">
-          <div className="mb-5 flex items-center justify-between gap-3">
+      <div className="space-y-3 p-3">
+        {/* Compact Item Form */}
+        <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-800/40">
+          <div className="mb-3 flex items-center justify-between gap-2">
             <div>
-              <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+              <h3 className="text-xs font-bold text-slate-900 dark:text-white">
                 {editingIndex !== null ? "Edit Item" : "Add New Item"}
               </h3>
-              <p className="mt-1 text-xs text-slate-700 dark:text-slate-300">
-                Enter the item and pricing details below.
+              <p className="text-[10px] text-slate-600 dark:text-slate-400">
+                Enter item and pricing details.
               </p>
             </div>
 
@@ -352,16 +375,15 @@ const EstimateItems = ({ control, register }) => {
               <button
                 type="button"
                 onClick={resetDraft}
-                className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-200 hover:text-slate-900 dark:hover:bg-slate-700 dark:hover:text-white"
+                className="flex items-center gap-1 rounded-md px-2 py-1.5 text-[11px] font-semibold text-slate-600 hover:bg-slate-200 dark:text-slate-300 dark:hover:bg-slate-700"
               >
-                <FaTimes />
-                Cancel
+                <FaTimes /> Cancel
               </button>
             )}
           </div>
 
-          {/* Main Fields */}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-12">
+          {/* Main fields */}
+          <div className="grid grid-cols-1 gap-x-3 gap-y-2.5 sm:grid-cols-2 lg:grid-cols-12">
             <div className="sm:col-span-2 lg:col-span-5">
               {renderDraftField(
                 "Item Description *",
@@ -380,117 +402,86 @@ const EstimateItems = ({ control, register }) => {
 
             <div className="sm:col-span-2 lg:col-span-3">
               <label className={labelClass}>Amount</label>
-              <div className="flex min-h-[42px] items-center rounded-lg border border-orange-200 bg-orange-50 px-3 dark:border-orange-500/20 dark:bg-orange-500/10">
-                <span className="text-xs font-semibold text-orange-800 dark:text-orange-400">
+              <div className="flex min-h-[37px] items-center rounded-md border border-orange-200 bg-orange-50 px-2.5 dark:border-orange-500/20 dark:bg-orange-500/10">
+                <span className="text-[11px] font-semibold text-orange-800 dark:text-orange-400">
                   Rs.
                 </span>
-                <span className="ml-2 text-sm font-bold text-orange-900 dark:text-orange-300">
+                <span className="ml-1.5 text-sm font-bold text-orange-900 dark:text-orange-300">
                   {formatMoney(draftAmount)}
                 </span>
               </div>
-              <p className="mt-1 text-[10px] font-medium text-slate-600 dark:text-slate-400">
-                Quantity × Rate
-              </p>
             </div>
           </div>
 
-          {/* Printing Details Toggle */}
-          <div className="mt-5 border-t border-slate-300 pt-4 dark:border-slate-700">
+          {/* Specifications */}
+          <div className="mt-3 border-t border-slate-200 pt-2.5 dark:border-slate-700">
             <button
               type="button"
               onClick={() => setDetailsOpen((previous) => !previous)}
-              className="flex w-full items-center justify-between gap-3 text-left"
+              className="flex w-full items-center justify-between gap-2 text-left"
             >
-              <span className="flex items-center gap-2 text-sm font-semibold text-slate-800 dark:text-slate-200">
+              <span className="flex items-center gap-2 text-xs font-semibold text-slate-700 dark:text-slate-200">
                 <FaTools className="text-orange-600" />
-                Printing Specifications & Work Assignment:
+                Printing Specifications & Work Assignment
               </span>
 
               {detailsOpen ? (
-                <FaChevronUp className="shrink-0 text-xs text-slate-600 dark:text-slate-400" />
+                <FaChevronUp className="shrink-0 text-[10px] text-slate-500" />
               ) : (
-                <FaChevronDown className="shrink-0 text-xs text-slate-600 dark:text-slate-400" />
+                <FaChevronDown className="shrink-0 text-[10px] text-slate-500" />
               )}
             </button>
 
             {detailsOpen && (
-              <div className="mt-5 space-y-5">
+              <div className="mt-3 space-y-3">
                 <div>
-                  <p className="mb-3 text-xs font-bold uppercase tracking-wide text-slate-700 dark:text-slate-300">
+                  <p className="mb-2 text-[10px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                     Printing Specifications
                   </p>
 
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    {renderDraftField("Size", "size", "e.g. A4, A3, 12 × 18")}
+                  <div className="grid grid-cols-1 gap-x-3 gap-y-2.5 sm:grid-cols-2 lg:grid-cols-4">
+                    {renderDraftField("Size", "size", "e.g. A4, A3")}
                     {renderDraftField(
-                      "Ink / Masi",
+                      "Ink / Maso",
                       "maso",
                       "e.g. 1 color, 4 color",
+                      "text",
                       {
-                        validate: (value) => {
-                          // If the field is empty, let 'required' handle it instead
-                          if (!value) return true;
-
-                          // Check if the input is ONLY numbers (e.g., "1234")
-                          const isOnlyNumbers = /^\d+$/.test(value.trim());
-
-                          return (
-                            !isOnlyNumbers || "Only text values are allowed"
-                          );
-                        },
+                        pattern: ".*",
                       },
                     )}
-
-                    <div>
-                      <label className={labelClass}>Paper Type</label>
-
-                      <select
-                        value={draft.paper_type || ""}
-                        onChange={(e) =>
-                          handleDraftChange("paper_type", e.target.value)
-                        }
-                        className={inputClass}
-                      >
-                        <option value="">Select Paper Type</option>
-                        <option value="art">Art Paper</option>
-                        <option value="card">Card Paper</option>
-                        <option value="newsprint">Newsprint Paper</option>
-                        <option value="coated">Coated Paper</option>
-                      </select>
-                    </div>
-
+                    {renderPaperSelect(draft.paper_type, (value) =>
+                      handleDraftChange("paper_type", value),
+                    )}
                     {renderDraftField(
-                      "Bind Type",
+                      "Band Type",
                       "band_type",
                       "Enter bind type",
                     )}
                   </div>
                 </div>
 
-                <div className="border-t border-slate-300 pt-4 dark:border-slate-700">
-                  <p className="mb-3 text-xs font-bold uppercase tracking-wide text-slate-700 dark:text-slate-300">
+                <div className="border-t border-slate-200 pt-3 dark:border-slate-700">
+                  <p className="mb-2 text-[10px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                     Work Assignment
                   </p>
 
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                  <div className="grid grid-cols-1 gap-x-3 gap-y-2.5 sm:grid-cols-2 lg:grid-cols-4">
                     {renderDraftField(
                       "Work Type",
                       "work_type",
                       "e.g. Offset, digital",
                     )}
-
                     {renderStaffSelect(
                       "Designer",
                       draft.Designing_person,
                       (value) => handleDraftChange("Designing_person", value),
                     )}
-
                     {renderStaffSelect(
                       "Printing Person",
                       draft.printing_person,
                       (value) => handleDraftChange("printing_person", value),
                     )}
-
                     {renderStaffSelect(
                       "Binding Person",
                       draft.binding_person,
@@ -503,18 +494,18 @@ const EstimateItems = ({ control, register }) => {
           </div>
 
           {error && (
-            <p className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-400">
+            <p className="mt-3 rounded-md border border-red-200 bg-red-50 px-2.5 py-2 text-[11px] font-semibold text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-400">
               {error}
             </p>
           )}
 
-          {/* Add / Update Button */}
-          <div className="mt-5 flex flex-col-reverse gap-2 border-t border-slate-300 pt-4 sm:flex-row sm:justify-end dark:border-slate-700">
+          {/* Form actions */}
+          <div className="mt-3 flex flex-col-reverse gap-2 border-t border-slate-200 pt-3 sm:flex-row sm:justify-end dark:border-slate-700">
             {editingIndex !== null && (
               <button
                 type="button"
                 onClick={resetDraft}
-                className="flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                className="rounded-md border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
               >
                 Cancel
               </button>
@@ -523,27 +514,26 @@ const EstimateItems = ({ control, register }) => {
             <button
               type="button"
               onClick={handleAddItem}
-              className="flex items-center justify-center gap-2 rounded-lg bg-orange-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-orange-700 active:scale-[0.98]"
+              className="flex items-center justify-center gap-1.5 rounded-md bg-orange-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-orange-700 active:scale-[0.98]"
             >
               {editingIndex !== null ? <FaEdit /> : <FaPlus />}
               {editingIndex !== null ? "Update Item" : "Add Item"}
             </button>
           </div>
 
-          {/* Added Items: directly below the form fields in the same container */}
+          {/* Added Items */}
           {fields.length > 0 && (
-            <div className="mt-4 border-t border-dashed border-slate-300 pt-4 dark:border-slate-600">
-              <div className="mb-3 flex items-center justify-between gap-3">
-                <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+            <div className="mt-3 border-t border-dashed border-slate-300 pt-3 dark:border-slate-600">
+              <div className="mb-2 flex items-center justify-between">
+                <h3 className="text-xs font-bold text-slate-900 dark:text-white">
                   Added Items
                 </h3>
-
-                <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">
                   {fields.length} total
                 </span>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 {fields.map((field, index) => {
                   const item = items?.[index] || field;
                   const itemAmount = calculateAmount(item);
@@ -552,138 +542,93 @@ const EstimateItems = ({ control, register }) => {
                   return (
                     <div
                       key={field.id}
-                      className="overflow-hidden rounded-lg border border-slate-300 bg-white transition hover:border-orange-300 dark:border-slate-600 dark:bg-slate-900"
+                      className="overflow-hidden rounded-md border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900"
                     >
-                      <div className="flex flex-col gap-3 p-3 sm:flex-row sm:items-center">
-                        <div className="flex min-w-0 flex-1 items-start gap-3">
-                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-orange-100 text-xs font-bold text-orange-900 dark:bg-orange-500/20 dark:text-orange-300">
-                            {String(index + 1).padStart(2, "0")}
-                          </div>
+                      {/* Compact item row */}
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 px-2.5 py-2">
+                        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-orange-100 text-[10px] font-bold text-orange-800 dark:bg-orange-500/20 dark:text-orange-300">
+                          {index + 1}
+                        </span>
 
-                          <div className="min-w-0 flex-1">
-                            {item.item_description?.trim() && (
-                              <p className="break-words text-sm font-bold text-slate-900 dark:text-white">
-                                {item.item_description.trim()}
-                              </p>
-                            )}
-
-                            <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs font-medium text-slate-700 dark:text-slate-300">
-                              <span>
-                                Qty:{" "}
-                                <strong className="font-bold text-slate-900 dark:text-white">
-                                  {item.quantity ?? 0}
-                                </strong>
-                              </span>
-
-                              <span>
-                                Rate:{" "}
-                                <strong className="font-bold text-slate-900 dark:text-white">
-                                  Rs. {formatMoney(item.rate)}
-                                </strong>
-                              </span>
-
-                              {item.size && <span>Size: {item.size}</span>}
-                              {item.paper_type && (
-                                <span>Paper: {item.paper_type}</span>
-                              )}
-                            </div>
-                          </div>
+                        <div className="min-w-[120px] flex-1">
+                          <p className="truncate text-xs font-bold text-slate-900 dark:text-white">
+                            {item.item_description?.trim() || "Untitled item"}
+                          </p>
+                          <p className="mt-0.5 text-[10px] text-slate-500 dark:text-slate-400">
+                            Qty: {item.quantity ?? 0} × Rs.{" "}
+                            {formatMoney(item.rate)}
+                            {item.size ? ` · ${item.size}` : ""}
+                          </p>
                         </div>
 
-                        <div className="flex items-center justify-between gap-3 border-t border-slate-200 pt-2 sm:border-0 sm:pt-0 dark:border-slate-700">
-                          <div className="sm:text-right">
-                            <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
-                              Amount
-                            </p>
-                            <p className="mt-0.5 text-sm font-bold text-slate-900 dark:text-white">
-                              Rs. {formatMoney(itemAmount)}
-                            </p>
-                          </div>
+                        <div className="text-right">
+                          <p className="text-[9px] font-semibold uppercase text-slate-500 dark:text-slate-400">
+                            Amount
+                          </p>
+                          <p className="text-xs font-bold text-slate-900 dark:text-white">
+                            Rs. {formatMoney(itemAmount)}
+                          </p>
+                        </div>
 
-                          <div className="flex items-center gap-1">
-                            <button
-                              type="button"
-                              onClick={() => toggleItemDetails(index)}
-                              title={
-                                isExpanded ? "Hide details" : "View details"
-                              }
-                              className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-700 transition hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
-                            >
-                              {isExpanded ? (
-                                <FaChevronUp className="text-xs" />
-                              ) : (
-                                <FaChevronDown className="text-xs" />
-                              )}
-                            </button>
+                        <div className="flex items-center gap-0.5">
+                          <button
+                            type="button"
+                            onClick={() => toggleItemDetails(index)}
+                            title={isExpanded ? "Hide details" : "View details"}
+                            className="flex h-7 w-7 items-center justify-center rounded-md text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+                          >
+                            {isExpanded ? (
+                              <FaChevronUp className="text-[10px]" />
+                            ) : (
+                              <FaChevronDown className="text-[10px]" />
+                            )}
+                          </button>
 
-                            <button
-                              type="button"
-                              onClick={() => handleEditItem(index)}
-                              title="Edit item"
-                              className="flex h-9 w-9 items-center justify-center rounded-lg text-orange-700 transition hover:bg-orange-50 dark:text-orange-400 dark:hover:bg-orange-500/10"
-                            >
-                              <FaEdit />
-                            </button>
+                          <button
+                            type="button"
+                            onClick={() => handleEditItem(index)}
+                            title="Edit item"
+                            className="flex h-7 w-7 items-center justify-center rounded-md text-orange-700 hover:bg-orange-50 dark:text-orange-400 dark:hover:bg-orange-500/10"
+                          >
+                            <FaEdit className="text-xs" />
+                          </button>
 
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveItem(index)}
-                              title="Remove item"
-                              className="flex h-9 w-9 items-center justify-center rounded-lg text-red-700 transition hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10"
-                            >
-                              <FaTrash className="text-xs" />
-                            </button>
-                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveItem(index)}
+                            title="Remove item"
+                            className="flex h-7 w-7 items-center justify-center rounded-md text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10"
+                          >
+                            <FaTrash className="text-[10px]" />
+                          </button>
                         </div>
                       </div>
 
+                      {/* Expanded item details */}
                       {isExpanded && (
-                        <div className="border-t border-slate-300 bg-slate-100/70 px-4 py-4 dark:border-slate-700 dark:bg-slate-800/60">
-                          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                        <div className="border-t border-slate-200 bg-slate-50 px-3 py-3 dark:border-slate-700 dark:bg-slate-800/50">
+                          <div className="grid grid-cols-1 gap-x-3 gap-y-2.5 sm:grid-cols-2 lg:grid-cols-4">
                             {renderRegisteredField(
                               index,
                               "size",
                               "Size",
                               "Enter size",
                             )}
-
                             {renderRegisteredField(
                               index,
                               "maso",
                               "Ink / Maso",
                               "Enter ink details",
                             )}
-
-                            <div>
-                              <label className={labelClass}>Paper Type</label>
-
-                              <select
-                                value={item.paper_type || ""}
-                                onChange={(e) =>
-                                  update(index, {
-                                    ...item,
-                                    paper_type: e.target.value,
-                                  })
-                                }
-                                className={inputClass}
-                              >
-                                <option value="">Select Paper Type</option>
-                                <option value="art">Art Paper</option>
-                                <option value="card">Card Paper</option>
-                                <option value="newsprint">
-                                  Newsprint Paper
-                                </option>
-                                <option value="coated">Coated Paper</option>
-                              </select>
-                            </div>
-
+                            {renderPaperSelect(item.paper_type, (value) =>
+                              update(index, { ...item, paper_type: value }),
+                            )}
                             {renderRegisteredField(
                               index,
                               "band_type",
                               "Band Type",
                               "Enter band type",
                             )}
-
                             {renderRegisteredField(
                               index,
                               "work_type",
@@ -701,7 +646,6 @@ const EstimateItems = ({ control, register }) => {
                                   value,
                                 ),
                             )}
-
                             {renderStaffSelect(
                               "Printing Person",
                               item.printing_person,
@@ -712,7 +656,6 @@ const EstimateItems = ({ control, register }) => {
                                   value,
                                 ),
                             )}
-
                             {renderStaffSelect(
                               "Binding Person",
                               item.binding_person,
@@ -734,31 +677,18 @@ const EstimateItems = ({ control, register }) => {
           )}
         </div>
 
-        {/* Total Footer */}
-        <div className="flex flex-col gap-3 rounded-xl border border-orange-200 bg-orange-50 p-4 sm:flex-row sm:items-center sm:justify-between dark:border-orange-500/20 dark:bg-orange-500/5">
-          <div className="flex items-start gap-3">
-            <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-orange-700 dark:bg-slate-800 dark:text-orange-400">
-              <FaCalculator />
-            </div>
-
-            <div>
-              <p className="text-sm font-bold text-slate-900 dark:text-white">
-                Estimate items total
-              </p>
-              <p className="mt-1 text-xs font-medium text-slate-700 dark:text-slate-300">
-                Calculated automatically from quantity × rate for each item.
-              </p>
-            </div>
+        {/* Compact Total */}
+        <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-orange-200 bg-orange-50 px-3 py-2.5 dark:border-orange-500/20 dark:bg-orange-500/5">
+          <div className="flex items-center gap-2">
+            <FaCalculator className="text-sm text-orange-700 dark:text-orange-400" />
+            <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">
+              Estimate Items Total
+            </span>
           </div>
 
-          <div className="sm:text-right">
-            <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-              Total Amount
-            </p>
-            <p className="mt-1 text-xl font-bold tracking-tight text-orange-800 dark:text-orange-400">
-              Rs. {formatMoney(totalAmount)}
-            </p>
-          </div>
+          <p className="text-base font-bold text-orange-800 dark:text-orange-400">
+            Rs. {formatMoney(totalAmount)}
+          </p>
         </div>
       </div>
     </section>

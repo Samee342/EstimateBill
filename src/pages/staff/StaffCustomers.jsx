@@ -137,6 +137,10 @@ const StaffCustomers = () => {
     navigate(`/staff/customers/${uuid}/edit`);
   };
 
+  const handleView = (uuid) => {
+    navigate(`/staff/customers/${uuid}`);
+  };
+
   // ========================================
   // TOTAL CUSTOMERS
   // ========================================

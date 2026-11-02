@@ -325,7 +325,8 @@ const Sidebar = ({ sideBarOpen, setSideBarOpen }) => {
       )}
 
       {/* NAV — no overflow so submenus can escape */}
-      <nav className="flex-1 px-3 py-5">
+      <nav className="min-h-0 flex-1 overflow-y-auto px-3 py-5">
+        {" "}
         <div className="space-y-1">
           {/* DASHBOARD — single link with label */}
           <div className="group relative">

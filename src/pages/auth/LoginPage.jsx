@@ -45,6 +45,19 @@ const LoginPage = () => {
           companyName: response.user.company_name,
         }),
       );
+
+      // ── NEW: route users without a tenant to setup ──
+      const tenantId =
+        response.user?.tenant_id ??
+        response.user?.tenant?.id ??
+        response.user?.tenant ??
+        null;
+
+      if (!tenantId) {
+        navigate("/setup", { replace: true });
+        return;
+      }
+
       // Check role
       if (response.user.role === "admin") {
         navigate("/dashboard", { replace: true });
@@ -67,7 +80,6 @@ const LoginPage = () => {
       });
     }
   };
-
   return (
     <div className="flex min-h-screen w-full items-center justify-center bg-gray-100 p-4 font-sans sm:p-6 lg:p-8">
       <div className="flex w-full max-w-6xl overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-xl">

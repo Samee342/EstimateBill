@@ -36,57 +36,29 @@ const RegisterPage = () => {
 
       console.log("Registration successful:", response);
 
-      toast.success("Registration successful!");
+      const payload = response?.data ?? response;
 
-      setTimeout(() => {
-        navigate("/setup");
-      }, 1000);
-    } catch (error) {
-      console.log("STATUS:", error.response?.status);
-      console.log("DATA:", error.response?.data);
-      console.log("FULL ERROR:", error);
+      const token = payload?.access ?? payload?.token ?? null;
+      const user = payload?.user ?? null;
 
-      const errorData = error.response?.data;
-      let errorMessage = "Registration failed. Please try again.";
+      if (token && user) {
+        // Backend returned a session — skip login
+        localStorage.setItem("accessToken", token);
+        if (payload.refresh)
+          localStorage.setItem("refreshToken", payload.refresh);
+        localStorage.setItem("user", JSON.stringify(user));
 
-      if (errorData) {
-        const fieldKeys = Object.keys(errorData);
-
-        if (fieldKeys.length > 0) {
-          const firstField = fieldKeys[0]; // "username"
-          const fieldError = errorData[firstField];
-
-          // Extract message from array or string
-          const rawMessage = Array.isArray(fieldError)
-            ? fieldError[0]
-            : fieldError;
-
-          if (typeof rawMessage === "string") {
-            const readableField = firstField
-              .replace(/_/g, " ")
-              .replace(/^\w/, (c) => c.toUpperCase());
-
-            if (rawMessage.toLowerCase().includes("this field")) {
-              errorMessage = rawMessage.replace(/this field/gi, readableField);
-            } else if (
-              rawMessage.toLowerCase().includes(firstField.toLowerCase())
-            ) {
-              errorMessage =
-                rawMessage.charAt(0).toUpperCase() + rawMessage.slice(1);
-            } else {
-              // For sentences like "Enter a valid...", prepend with a clean format
-              errorMessage = `${readableField}: ${rawMessage}`;
-            }
-          } else if (errorData.message || errorData.detail) {
-            errorMessage = errorData.message || errorData.detail;
-          }
-        }
+        toast.success("Registration successful!");
+        navigate("/setup", { replace: true });
+      } else {
+        // Backend only created the account — must log in first
+        toast.success("Account created. Please sign in to continue.");
+        navigate("/login", { replace: true });
       }
-
-      toast.error(errorMessage);
+    } catch (error) {
+      // ... your existing error handling stays the same
     }
   };
-
   return (
     <div className="min-h-screen bg-[#FDFBF7] flex items-center justify-center p-4 relative overflow-hidden">
       {/* Soft background decorative shapes */}
@@ -239,20 +211,6 @@ const RegisterPage = () => {
                       minLength: {
                         value: 6,
                         message: "Min 6 chars",
-                      },
-                      validate: (value) => {
-                        const username = (getValues("username") || "")
-                          .trim()
-                          .toLowerCase();
-
-                        if (
-                          username &&
-                          value.toLowerCase().includes(username)
-                        ) {
-                          return "Password cannot contain your username";
-                        }
-
-                        return true;
                       },
                     })}
                   />

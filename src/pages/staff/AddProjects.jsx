@@ -588,25 +588,29 @@ const AddProjects = () => {
 
   return (
     <>
-      <div className="no-print min-h-screen bg-slate-50 px-4 py-6 dark:bg-slate-700 sm:px-6 lg:px-8">
+      <div className="no-print min-h-screen bg-slate-50 px-3 py-4 dark:bg-slate-700 sm:px-5 lg:px-6">
+        {" "}
         <div className="mx-auto mb-6 max-w-7xl">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-200">
-                {isEditMode ? "Edit Project" : "Create Project"}
-              </h1>
-              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                {isEditMode
-                  ? "Update customer order, printing items and project details."
-                  : "Create customer order, estimate and payment details."}
-              </p>
+          <div className="mx-auto mb-4 max-w-7xl">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-200">
+                  {isEditMode ? "Edit Project" : "Create Project"}
+                </h1>
+
+                <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+                  {isEditMode
+                    ? "Update customer order, printing items and project details."
+                    : "Enter customer, order and payment details."}
+                </p>
+              </div>
             </div>
           </div>
         </div>
-
         <form onSubmit={handleSubmit(onSubmit)} className="mx-auto max-w-7xl">
           {/* 01. CUSTOMER INFORMATION */}
-          <div className="mb-6 overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800">
+          <div className="mb-4 overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800">
+            {" "}
             <div className="border-b border-slate-100 px-6 py-5 dark:border-slate-700">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50">
@@ -622,7 +626,6 @@ const AddProjects = () => {
                 </div>
               </div>
             </div>
-
             <EstimateHeader
               register={register}
               errors={errors}
@@ -631,36 +634,42 @@ const AddProjects = () => {
           </div>
 
           {/* 02. PROJECT / ORDER INFORMATION */}
-          <div className="mb-6 rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800">
-            <div className="border-b border-slate-100 px-6 py-5 dark:border-slate-700">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50">
-                  <FiBriefcase className="text-orange-600" size={18} />
+          <div className="mb-4 rounded-xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800">
+            {/* Header */}
+            <div className="border-b border-slate-100 px-4 py-3 dark:border-slate-700">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-orange-50">
+                  <FiBriefcase className="text-orange-600" size={16} />
                 </div>
+
                 <div>
-                  <h2 className="font-semibold text-slate-900 dark:text-slate-200">
+                  <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-200">
                     02. Project / Order Information
                   </h2>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
                     Enter the main details of this customer order.
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-5 p-6 md:grid-cols-2">
+            {/* Fields */}
+            <div className="grid grid-cols-1 gap-3 p-4 md:grid-cols-2">
+              {/* Project Name */}
               <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                <label className="mb-1.5 block text-xs font-medium text-slate-700 dark:text-slate-300">
                   Project Name
                 </label>
+
                 <input
                   type="text"
                   placeholder="Example: Wedding Cards"
                   {...register("project_name", {
                     required: "Project name is required.",
                   })}
-                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
                 />
+
                 {errors.project_name && (
                   <p className="mt-1 text-xs text-red-500">
                     {errors.project_name.message}
@@ -668,9 +677,10 @@ const AddProjects = () => {
                 )}
               </div>
 
+              {/* Due Date */}
               <div>
-                <label className="mb-2 flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
-                  <FiCalendar size={15} />
+                <label className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-slate-700 dark:text-slate-300">
+                  <FiCalendar size={13} />
                   Due Date
                 </label>
 
@@ -701,13 +711,15 @@ const AddProjects = () => {
                 )}
               </div>
 
+              {/* Priority */}
               <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                <label className="mb-1.5 block text-xs font-medium text-slate-700 dark:text-slate-300">
                   Priority
                 </label>
+
                 <select
                   {...register("priority")}
-                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-orange-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-orange-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
                 >
                   <option value="low">Low</option>
                   <option value="normal">Normal</option>
@@ -716,13 +728,15 @@ const AddProjects = () => {
                 </select>
               </div>
 
+              {/* Work Stage */}
               <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                <label className="mb-1.5 block text-xs font-medium text-slate-700 dark:text-slate-300">
                   Work Stage
                 </label>
+
                 <select
                   {...register("work_status", { required: true })}
-                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-orange-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-orange-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
                 >
                   <option value="pending">Pending</option>
                   <option value="printed">Printed</option>
@@ -747,41 +761,40 @@ const AddProjects = () => {
             </div>
           </div>
 
-          {/* 04. ESTIMATE SUMMARY */}
-          <div className="mb-6">
-            <EstimateSummary control={control} register={register} />
-          </div>
-
           {/* 05. PAYMENT INFORMATION */}
-          <div className="mb-6 overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800">
-            <div className="border-b border-slate-100 px-6 py-5 dark:border-slate-700">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50">
-                  <FiCreditCard className="text-orange-600" size={18} />
-                </div>
-                <div>
-                  <h2 className="font-semibold text-slate-900 dark:text-slate-200">
-                    05. Payment Information
-                  </h2>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
-                    Record advance payment and payment status.
-                  </p>
-                </div>
+
+          <div className="mb-4 overflow-hidden rounded-lg border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800">
+            {/* Compact Header */}
+            <div className="flex items-center gap-2.5 border-b border-slate-100 px-3 py-3 dark:border-slate-700">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-orange-50 dark:bg-orange-500/10">
+                <FiCreditCard className="text-orange-600" size={15} />
+              </div>
+
+              <div>
+                <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-200">
+                  05. Payment Information
+                </h2>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                  Record advance payment and payment status.
+                </p>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-5 p-6 md:grid-cols-3">
-              <div className="rounded-xl bg-slate-50 p-4 dark:bg-slate-700">
-                <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
+            {/* Payment Fields */}
+            <div className="grid grid-cols-1 gap-3 p-3 sm:grid-cols-2 lg:grid-cols-3">
+              {/* Total Amount */}
+              <div className="flex flex-col justify-center rounded-md border border-slate-200 bg-slate-50 px-3 py-2.5 dark:border-slate-700 dark:bg-slate-700/50">
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                   Total Amount
                 </p>
-                <p className="mt-2 text-xl font-bold text-slate-800 dark:text-white">
+                <p className="mt-1 text-lg font-bold text-slate-800 dark:text-white">
                   Rs. {formatMoney(totalAmount)}
                 </p>
               </div>
 
+              {/* Advance Payment */}
               <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">
                   Advance Payment
                 </label>
                 <input
@@ -800,31 +813,33 @@ const AddProjects = () => {
                       message: "Advance cannot exceed total amount.",
                     },
                   })}
-                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-orange-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                  className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:focus:ring-orange-900/30"
                 />
                 {errors.advance && (
-                  <p className="mt-1 text-xs text-red-500">
+                  <p className="mt-1 text-[11px] text-red-500">
                     {errors.advance.message}
                   </p>
                 )}
               </div>
 
-              <div className="rounded-xl bg-orange-50 p-4 dark:bg-orange-900/20">
-                <p className="text-xs font-medium uppercase tracking-wide text-orange-500">
+              {/* Remaining */}
+              <div className="flex flex-col justify-center rounded-md border border-orange-200 bg-orange-50 px-3 py-2.5 dark:border-orange-500/20 dark:bg-orange-900/20">
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-orange-600 dark:text-orange-400">
                   Remaining
                 </p>
-                <p className="mt-2 text-xl font-bold text-orange-600">
+                <p className="mt-1 text-lg font-bold text-orange-700 dark:text-orange-400">
                   Rs. {formatMoney(remainingAmount)}
                 </p>
               </div>
 
+              {/* Payment Method */}
               <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">
                   Payment Method
                 </label>
                 <select
                   {...register("paymentMethod")}
-                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                  className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-orange-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
                 >
                   <option value="Cash">Cash</option>
                   <option value="Bank Transfer">Bank Transfer</option>
@@ -834,30 +849,19 @@ const AddProjects = () => {
                 </select>
               </div>
 
+              {/* Payment Status */}
               <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">
                   Payment Status
                 </label>
                 <select
                   {...register("paymentStatus")}
-                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+                  className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-orange-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
                 >
                   <option value="Unpaid">Unpaid</option>
                   <option value="Partial">Partial</option>
                   <option value="Paid">Paid</option>
                 </select>
-              </div>
-
-              <div>
-                <label className="mb-2 flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
-                  <FiCalendar size={15} />
-                  Payment Date
-                </label>
-                <input
-                  type="date"
-                  {...register("paymentDate")}
-                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-600 dark:bg-slate-700 dark:text-white"
-                />
               </div>
             </div>
           </div>
@@ -868,39 +872,40 @@ const AddProjects = () => {
           </div>
 
           {/* 07. FINAL TOTAL */}
-          <div className="mb-6 flex justify-end">
-            <div className="w-full overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800 sm:w-96">
-              <div className="border-b border-slate-100 px-5 py-4 dark:border-slate-700">
-                <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+          <div className="mb-4 flex justify-end">
+            <div className="w-full overflow-hidden rounded-lg border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800 sm:w-80">
+              <div className="flex items-center justify-between border-b border-slate-100 px-3 py-2 dark:border-slate-700">
+                <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                   Estimate Summary
                 </p>
               </div>
-              <div className="space-y-3 px-5 py-5">
-                <div className="flex justify-between">
-                  <span className="text-sm text-slate-500 dark:text-slate-400">
+
+              <div className="space-y-2 px-3 py-3">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-xs text-slate-500 dark:text-slate-400">
                     Total
                   </span>
-                  <span className="font-semibold text-slate-800 dark:text-white">
+                  <span className="text-sm font-semibold text-slate-800 dark:text-white">
                     Rs. {formatMoney(totalAmount)}
                   </span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-slate-500 dark:text-slate-400">
+
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-xs text-slate-500 dark:text-slate-400">
                     Advance
                   </span>
-                  <span className="font-semibold text-slate-800 dark:text-white">
+                  <span className="text-sm font-semibold text-slate-800 dark:text-white">
                     Rs. {formatMoney(advance)}
                   </span>
                 </div>
-                <div className="border-t border-slate-100 pt-3 dark:border-slate-700">
-                  <div className="flex justify-between">
-                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-                      Remaining
-                    </span>
-                    <span className="text-xl font-bold text-orange-600">
-                      Rs. {formatMoney(remainingAmount)}
-                    </span>
-                  </div>
+
+                <div className="flex items-center justify-between gap-3 border-t border-slate-100 pt-2 dark:border-slate-700">
+                  <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                    Remaining
+                  </span>
+                  <span className="text-lg font-bold text-orange-600 dark:text-orange-400">
+                    Rs. {formatMoney(remainingAmount)}
+                  </span>
                 </div>
               </div>
             </div>

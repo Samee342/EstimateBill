@@ -14,6 +14,7 @@ import {
   createCustomer,
   getCustomer,
   updateCustomer,
+  getCustomerById,
 } from "../../../api/customer";
 import toast from "react-hot-toast";
 
@@ -42,39 +43,44 @@ const AddCustomer = () => {
   // =========================================================
   // EDIT MODE
   // =========================================================
-
   useEffect(() => {
     if (!isEditMode) return;
 
     const fetchCustomer = async () => {
       try {
-        const response = await getCustomer(id);
+        const response = await getCustomerById(id);
 
-        console.log("Customer details:", response);
+        console.log("Individual customer response:", response);
+
+        // Handle different response structures
+        const customer = response?.data?.data || response?.data || response;
+
+        if (!customer || Array.isArray(customer) || !customer.name) {
+          throw new Error("Invalid customer data received from API.");
+        }
 
         reset({
-          name: response.name || "",
-          contact_no: response.contact_no || "",
-          email: response.email || "",
-          company: response.company_name || "",
-          customer_type: response.customer_type || "individual",
-          address: response.address || "",
+          name: customer.name || "",
+          contact_no: customer.contact_no || "",
+          email: customer.email || "",
+          company_name: customer.company_name || customer.company || "",
+          pan_no: customer.pan_no || "",
+          customer_type: customer.customer_type || "individual",
+          address: customer.address || "",
         });
       } catch (error) {
         console.error("Get customer error:", error);
 
-        alert(
-          error.response?.data?.message ||
-            error.response?.data?.detail ||
+        toast.error(
+          error.response?.data?.detail ||
+            error.message ||
             "Failed to load customer.",
         );
-
-        navigate("/customers");
       }
     };
 
     fetchCustomer();
-  }, [id, isEditMode, reset, navigate]);
+  }, [id, isEditMode, reset]);
   // =========================================================
   // SUBMIT
   // =========================================================

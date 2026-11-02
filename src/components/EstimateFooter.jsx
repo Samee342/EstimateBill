@@ -13,16 +13,16 @@ const EstimateFooter = ({ register }) => {
       {/* Input */}
       <div>
         <label
-          htmlFor="printingDetails"
+          htmlFor="print_details_full"
           className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300"
         >
           विवरण
         </label>
 
         <textarea
-          id="printingDetails"
-          rows={4}
-          {...(register ? register("printingDetails") : {})}
+          id="print_details_full"
+          rows={2}
+          {...(register ? register("print_details_full") : {})}
           className="w-full resize-none rounded-xl border border-slate-300 bg-slate-50 dark:text-slate-300 dark:bg-slate-800 px-4 py-3 text-sm text-slate-700 outline-none transition-all placeholder:text-slate-400 focus:border-orange-500  focus:ring-4 focus:ring-orange-100"
         />
       </div>

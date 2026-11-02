@@ -535,23 +535,9 @@ const StaffLayout = () => {
         {/* TOP HEADER */}
         <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-slate-200 bg-white/95 px-4 backdrop-blur sm:h-20 sm:px-5 md:px-8 dark:border-slate-800 dark:bg-slate-900/95">
           <div className="flex min-w-0 items-center gap-3">
-            <button
-              type="button"
-              onClick={() => setMobileSidebarOpen(true)}
-              className="flex h-9 w-9 shrink-0   items-center justify-center rounded-lg text-slate-500 transition hover:bg-orange-50 hover:text-orange-500 dark:text-slate-300 dark:hover:bg-slate-800 lg:hidden"
-              title="Open menu"
-              aria-label="Open menu"
-            >
-              <FiMenu size={20} />
-            </button>
-
             <div className="min-w-0">
               <p className="truncate text-[10px] font-medium uppercase tracking-wider text-orange-500 sm:text-xs">
                 Staff Workspace
-              </p>
-
-              <p className="mt-0.5 hidden text-xs text-slate-400 sm:block">
-                Welcome back, {staffName}
               </p>
             </div>
           </div>
