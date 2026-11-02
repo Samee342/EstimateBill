@@ -266,16 +266,6 @@ const StaffLayout = () => {
               <FiChevronLeft size={18} />
             </button>
           )}
-
-          <button
-            type="button"
-            onClick={() => setMobileSidebarOpen(false)}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200 lg:hidden"
-            title="Close sidebar"
-            aria-label="Close sidebar"
-          >
-            <FiX size={20} />
-          </button>
         </div>
 
         {/* EXPAND SIDEBAR BUTTON */}
@@ -548,7 +538,7 @@ const StaffLayout = () => {
             <button
               type="button"
               onClick={() => setMobileSidebarOpen(true)}
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-slate-500 transition hover:bg-orange-50 hover:text-orange-500 dark:text-slate-300 dark:hover:bg-slate-800 lg:hidden"
+              className="flex h-9 w-9 shrink-0   items-center justify-center rounded-lg text-slate-500 transition hover:bg-orange-50 hover:text-orange-500 dark:text-slate-300 dark:hover:bg-slate-800 lg:hidden"
               title="Open menu"
               aria-label="Open menu"
             >

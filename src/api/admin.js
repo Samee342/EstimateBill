@@ -52,7 +52,7 @@ const updateProfile = async (data) => {
 };
 
 const resetDataByAdmin = async () => {
-  const response = await api.post("/customerapi/customers/clear");
+  const response = await api.delete("/customerapi/clear/");
   return response.data;
 };
 
